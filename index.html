@@ -624,8 +624,9 @@
   .bloom-layer {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     animation: blossomIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+    will-change: transform, opacity; /* GPU-composite the bloom-in so it stays smooth */
   }
-  .bloom-layer svg { display: block; overflow: visible; filter: drop-shadow(0 8px 22px rgba(216,105,138,0.22)); }
+  .bloom-layer svg { display: block; overflow: visible; }
   @keyframes blossomIn {
     0%   { transform: scale(0.2) rotate(var(--r0, -20deg)); opacity: 0; }
     100% { transform: scale(1) rotate(0deg); opacity: 1; }
@@ -633,8 +634,9 @@
   .bloom-petal {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     animation: petalIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    will-change: transform, opacity; /* GPU-composite each petal so 9+ animate without stutter */
   }
-  .bloom-petal svg { display: block; overflow: visible; filter: drop-shadow(0 6px 16px rgba(216,105,138,0.20)); }
+  .bloom-petal svg { display: block; overflow: visible; }
   @keyframes petalIn {
     0%   { transform: scale(0.04); opacity: 0; }
     55%  { opacity: 1; }
@@ -724,6 +726,15 @@
       </div>
     </div>
 
+    <div class="success" id="success">
+      <div class="confetti" id="confetti"></div>
+      <div class="card">
+        <div class="big">💝</div>
+        <div class="mono">
+          <span class="letter">M</span><span class="h">♡</span><span class="letter">V</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ✨ The real site lives here — starter content, we'll shape it together. -->
@@ -741,9 +752,12 @@
   <!-- ✎ Drawing screen -->
   <div class="draw" id="draw"></div>
 
+  <!-- 🏠 Merged site + board (scrolls from letter into the wall) -->
+  <div class="home" id="home"></div>
+
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"IlSYBmRDnkDUGnkmSZN2/A==","iv":"aGdWfyT08M9f3H9V","ct":"P00nb4DZcHE+WUYPxYHhC7QgKvd2Ah825M/r9XqXOd2N4cSaAaFFFnbxsMwQJhMaoTJbE3VOAZltxl7FkEV8sMwLVaIb4JFZQnTMykIaSKMfdwRGeb7albda7709DEb5sAZfith9iw9B0N4+zuYggRzsPuOOfWKFvpFs3AKKfVpR8FU=","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"lebt9/1PQxHZdDfpEHwO6Q==","iv":"f9wbvwu7i1NRpKho","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -893,6 +907,22 @@
     heartsEl.appendChild(s);
   }
 
+  // celebration rain (built once, on success)
+  function celebrate() {
+    var box = document.getElementById("confetti");
+    if (box.childElementCount) return;
+    var cc = ["🌸", "✨", "💕", "🩷", "💗", "🎉"];
+    for (var i = 0; i < 22; i++) {
+      var s = document.createElement("span");
+      s.textContent = cc[i % cc.length];
+      s.style.left = Math.round(Math.random() * 96) + "%";
+      s.style.fontSize = (18 + Math.round(Math.random() * 22)) + "px";
+      s.style.animation = "rain " + (2.6 + Math.random() * 2.4).toFixed(1) + "s ease-in " +
+                          (Math.random() * 1.4).toFixed(1) + "s infinite";
+      box.appendChild(s);
+    }
+  }
+
   renderDots();
 
   // a soft, blurred heart used as the reveal mask (grows from the centre)
@@ -932,6 +962,20 @@
     document.body.style.overflow = "hidden";
     markDebug("lock");
   }
+  function showCelebration() {
+    resetSite();
+    backdropEl.style.display = "";
+    siteEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    lockEl.style.display = "";
+    lockEl.classList.remove("dismiss");
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    entered = CORRECT_CODE; status = "success"; renderDots();
+    celebrate();
+    successEl.classList.add("show");
+    document.body.style.overflow = "hidden";
+    markDebug("celebrate");
+  }
   function showBloom() {
     resetSite();
     backdropEl.style.display = "";
@@ -956,18 +1000,46 @@
     }, 2900);
     bTimer(heartRevealToWall, 3650);
   }
-  // bloom → soft-heart reveal straight onto the note board (lock → bloom → wall)
+  // bloom → soft-heart reveal straight onto the note board (lock → bloom → wall).
+  // mask-size is grown in a JS rAF loop — CSS mask-size transitions hard-cut in some browsers.
   function heartRevealToWall() {
     wallEl.classList.add("show");
     void wallEl.offsetWidth;   // give the board real dimensions...
-    renderWall();               // ...so notes are sized/placed correctly before the reveal
+    renderWall();               // ...so notes size/place correctly before the reveal
     wallEl.classList.add("heart-reveal");
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
-    void wallEl.offsetWidth;   // commit the 0% start before transitioning
-    wallEl.style.transition = "-webkit-mask-size 1.3s ease-out, mask-size 1.3s ease-out";
-    wallEl.style.webkitMaskSize = wallEl.style.maskSize = "650% 650%";
-    bTimer(showWall, 1450);     // once the heart has filled the screen, settle into the board
+    var t0 = null, dur = 1300, to = 650;
+    function grow(ts) {
+      if (t0 == null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 3);          // ease-out
+      var sz = (to * e).toFixed(1) + "%";
+      wallEl.style.webkitMaskSize = wallEl.style.maskSize = sz + " " + sz;
+      if (p < 1) requestAnimationFrame(grow);
+      else showWall();                          // heart filled the screen → settle
+    }
+    requestAnimationFrame(grow);
   }
+  function showSite() {
+    clearBloomTimers();
+    successEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    siteEl.classList.remove("heart-reveal");
+    siteEl.style.transition = "";
+    siteEl.style.webkitMaskImage = siteEl.style.maskImage = "";
+    siteEl.style.webkitMaskSize = siteEl.style.maskSize = "";
+    siteEl.classList.add("show");
+    lockEl.classList.add("dismiss");
+    lockEl.style.display = "none";
+    backdropEl.style.display = "none";
+    document.body.style.overflow = "auto";
+    markDebug("site");
+    initNotes();
+    loadNotes();
+  }
+
+  // 📝 note-wall preview (debug tab for now)
   function showWall() {
     clearBloomTimers();
     editingNote = null;
@@ -1516,6 +1588,106 @@
   // ---------- home (site) that transitions onto the board on a small scroll/swipe ----------
   var homeActive = false, navState = "home", navBusy = false;
 
+  function showHome() {
+    clearBloomTimers();
+    successEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = "";
+    siteEl.classList.remove("show");
+    lockEl.style.display = "none";
+    backdropEl.style.display = "none";
+    renderHome();
+    homeEl.style.transition = ""; homeEl.style.transform = "";
+    homeEl.classList.add("show");
+    document.body.style.overflow = "hidden";
+    navState = "home"; navBusy = false; homeActive = true;
+    markDebug("home");
+  }
+
+  function renderHome() {
+    // the site (hero + letter) is the resting state; a tiny scroll transitions to the board
+    var heroEl = siteEl.querySelector(".hero"), letterEl = siteEl.querySelector(".letter");
+    var topHTML = (heroEl ? heroEl.outerHTML : "<section class='hero'><h1>Welcome, my love</h1></section>") + (letterEl ? letterEl.outerHTML : "");
+    homeEl.innerHTML = '<div class="site home-site">' + topHTML + "</div>";
+  }
+
+  // a small scroll/swipe just TRIGGERS a full self-playing slide between site and board
+  // A single "reveal amount" v (0 = home fully shown, 1 = fully dissolved/board shown) drives both:
+  //   • the mask position — the soft transparent band sweeps from the bottom up the screen;
+  //   • the content translate — the page swipes up like a real scroll.
+  // vFrom/vTo let us play it forward (0→1, to board) or backward (1→0, back home).
+  var navRaf = 0; // id of the in-flight transition frame, so we never stack two loops
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function animMask(vFrom, vTo, done) {
+    var t0 = null, dur = 760;
+    var inner = homeEl.querySelector(".home-site") || homeEl;
+    function apply(v) {
+      // slide the 250vh mask up: at v=0 the opaque plateau (0-45% = 0-112vh) fully covers the
+      // 100vh viewport (solid, no peek); as v→1 the smoothstep fade sweeps in from the bottom and
+      // up until fully dissolved (y=-250vh puts the viewport past the transparent end).
+      var y = (-250 * v).toFixed(1) + "vh";
+      homeEl.style.webkitMaskPosition = "0 " + y;
+      homeEl.style.maskPosition = "0 " + y;
+      inner.style.transform = "translate3d(0," + (-110 * v).toFixed(2) + "vh,0)"; // swipe up
+    }
+    function finish() {
+      inner.style.transform = "";
+      homeEl.style.webkitMaskImage = ""; homeEl.style.maskImage = "";
+      homeEl.style.webkitMaskPosition = ""; homeEl.style.maskPosition = "";
+      if (done) done();
+    }
+    if (navRaf) { cancelAnimationFrame(navRaf); navRaf = 0; } // never run two at once
+    if (reduceMotion) { apply(vTo); finish(); return; }        // no motion → snap to end state
+    apply(vFrom);
+    function step(ts) {
+      if (t0 == null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; // ease-in-out
+      apply(vFrom + (vTo - vFrom) * e);
+      if (p < 1) { navRaf = requestAnimationFrame(step); }
+      else { navRaf = 0; finish(); }
+    }
+    navRaf = requestAnimationFrame(step);
+  }
+  function navToBoard() {
+    if (navBusy || navState !== "home") return;
+    navBusy = true; navState = "animating";
+    backdropEl.style.display = "";                 // board's living backdrop
+    wallEl.classList.add("show");                  // show FIRST so the board has real dimensions...
+    void wallEl.offsetWidth;                        // ...force layout...
+    renderWall();                                   // ...then render, so notes size/place exactly like the Wall tab
+    homeEl.classList.add("revealing");
+    animMask(0, 1, function () {  // transparent band sweeps bottom→up + content swipes up, revealing board
+      homeEl.classList.remove("show", "revealing");
+      navState = "board"; navBusy = false;
+    });
+  }
+  function navToHome() {
+    if (navBusy || navState !== "board") return;
+    navBusy = true; navState = "animating";
+    homeEl.classList.add("show", "revealing");
+    animMask(1, 0, function () {  // band recedes back down + content swipes down as the site fills in
+      wallEl.classList.remove("show"); wallEl.innerHTML = "";
+      backdropEl.style.display = "none"; // home is flat cream, no living backdrop
+      homeEl.classList.remove("revealing");
+      navState = "home"; navBusy = false;
+    });
+  }
+
+  window.addEventListener("wheel", function (e) {
+    if (!homeActive) return;
+    if (navState === "home" && e.deltaY > 6) { e.preventDefault(); navToBoard(); }
+    else if (navState === "board" && e.deltaY < -6) { e.preventDefault(); navToHome(); }
+  }, { passive: false });
+  var navTouchY = null;
+  window.addEventListener("touchstart", function (e) { if (homeActive) navTouchY = e.touches[0].clientY; }, { passive: true });
+  window.addEventListener("touchmove", function (e) {
+    if (!homeActive || navTouchY == null) return;
+    var dy = navTouchY - e.touches[0].clientY; // >0 = swipe up
+    if (navState === "home" && dy > 34) { navTouchY = null; navToBoard(); }
+    else if (navState === "board" && dy < -34 && !e.target.closest(".wnote")) { navTouchY = null; navToHome(); }
+  }, { passive: true });
+
   // ---------- notes board (Supabase) ----------
   // In the published build these two are blanked and get filled by
   // decryptPayload() on a correct unlock (build.js handles that).
@@ -1524,6 +1696,83 @@
   var NOTE_COLORS = ["#fff59d", "#ffd1dc", "#bfe0ff", "#c8f0c8", "#ffe0b3", "#e6d4ff"]; // sticky-note pastels
   var PIN_COLORS = ["#d63b3b", "#3b74d6", "#e0a021", "#3bb06a", "#c33bd6"];             // pushpins
   var notesInited = false;
+
+  function notesEndpoint() { return SUPABASE_URL + "/rest/v1/notes"; }
+  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+  function fmtDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+    catch (e) { return ""; }
+  }
+
+  function renderNotes(list) {
+    var grid = document.getElementById("notesGrid");
+    var statusEl = document.getElementById("notesStatus");
+    if (!grid) return;
+    grid.innerHTML = "";
+    if (!list || !list.length) {
+      if (statusEl) { statusEl.style.display = ""; statusEl.textContent = "no notes yet — be the first to leave one 💕"; }
+      return;
+    }
+    if (statusEl) statusEl.style.display = "none";
+    list.forEach(function (n, i) {
+      var el = document.createElement("div");
+      el.className = "note";
+      el.style.background = n.color || NOTE_COLORS[i % NOTE_COLORS.length];
+      el.style.setProperty("--tilt", (((i * 53) % 9) - 4) + "deg");   // stable per-note lean, -4..4°
+      el.style.setProperty("--pin", PIN_COLORS[i % PIN_COLORS.length]);
+      var who = n.author ? '<span class="who">' + esc(n.author) + "</span>" : '<span class="who">&nbsp;</span>';
+      el.innerHTML = '<div class="body">' + esc(n.body) + "</div>" +
+                     '<div class="meta">' + who + "<span>" + fmtDate(n.created_at) + "</span></div>";
+      grid.appendChild(el);
+    });
+  }
+
+  function loadNotes() {
+    var grid = document.getElementById("notesGrid");
+    var statusEl = document.getElementById("notesStatus");
+    if (!grid) return;
+    if (statusEl) { statusEl.style.display = ""; statusEl.textContent = "loading our notes…"; }
+    fetch(notesEndpoint() + "?select=*&order=created_at.desc", {
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(renderNotes)
+      .catch(function (e) {
+        if (statusEl) { statusEl.style.display = ""; statusEl.textContent = "couldn't load our notes right now 😢"; }
+        console.error("[notes] load failed", e);
+      });
+  }
+
+  // attach the "pin a note" handler once the board is in the DOM (dev: at load; prod: after unlock)
+  function initNotes() {
+    if (notesInited) return;
+    var form = document.getElementById("noteForm");
+    if (!form) return;
+    notesInited = true;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var bodyEl = document.getElementById("noteBody");
+      var authorEl = document.getElementById("noteAuthor");
+      var body = bodyEl.value.trim();
+      if (!body) return;
+      var author = authorEl.value.trim();
+      var color = NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)];
+      var btn = form.querySelector("button");
+      btn.disabled = true;
+      fetch(notesEndpoint(), {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY,
+          "Content-Type": "application/json", Prefer: "return=representation"
+        },
+        body: JSON.stringify({ body: body, author: author || null, color: color })
+      })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(function () { bodyEl.value = ""; loadNotes(); })
+        .catch(function (e) { console.error("[notes] post failed", e); alert("Couldn't pin that note — try again in a sec 💗"); })
+        .then(function () { btn.disabled = false; });
+    });
+  }
 
   // a pretty layered cherry-blossom, drawn in SVG.
   // Each layer is its own stacked SVG so it can bloom in on its own delay.
@@ -1649,10 +1898,13 @@
       if (!b) return;
       var s = b.getAttribute("data-screen");
       if (s === "lock") showLock();
+      else if (s === "celebrate") showCelebration();
       else if (s === "bloom") showBloom();
+      else if (s === "site") showSite();
       else if (s === "wall") showWall();
       else if (s === "add") showAdd();
       else if (s === "draw") showDraw();
+      else if (s === "home") showHome();
     });
   }
 
