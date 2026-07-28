@@ -1,0 +1,12 @@
+# never commit secrets
+secret.txt
+*.secret
+.env
+.env.*
+
+# plaintext source of the site (letter + passcode + Supabase key in the clear)
+# — only the ENCRYPTED index.html gets published
+index.src.html
+
+# macOS
+.DS_Store

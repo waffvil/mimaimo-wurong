@@ -1,0 +1,27 @@
+name: Keep Supabase awake
+
+# Supabase free projects pause after ~7 days of no activity.
+# This pings the database on a schedule so our notes board never sleeps.
+# Runs every 3 days (comfortable buffer under the 7-day limit), and can be
+# triggered by hand from the Actions tab too.
+
+on:
+  schedule:
+    - cron: "0 9 */3 * *"   # 09:00 UTC, every 3rd day
+  workflow_dispatch:          # lets you run it manually anytime
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the notes table
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          curl --fail --silent --show-error \
+            "$SUPABASE_URL/rest/v1/notes?select=id&limit=1" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -o /dev/null
+          echo "Pinged Supabase — project kept awake. 🌸"

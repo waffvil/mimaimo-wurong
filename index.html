@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>M ♡ V</title>
+<!-- PWA: installable, fullscreen, instant-launch on iPhone (Safari → Share → Add to Home Screen) -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffe3ec">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="M + V">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    color: #6f4a54;
+    overflow: hidden;
+    /* persistent pink base so no screen swap ever flashes a different colour */
+    background: linear-gradient(160deg, #ffe6ee 0%, #fff2e6 46%, #ffe0ea 78%, #ffd9e6 100%);
+  }
+
+  /* ---------- animations ---------- */
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    12%  { opacity: var(--peak, 0.5); }
+    88%  { opacity: var(--peak, 0.5); }
+    100% { transform: translateY(-112vh) rotate(220deg); opacity: 0; }
+  }
+  @keyframes shimmer {
+    0%   { transform: translate(-6%, -4%) scale(1); }
+    50%  { transform: translate(6%, 4%) scale(1.12); }
+    100% { transform: translate(-6%, -4%) scale(1); }
+  }
+  @keyframes shakeX {
+    0%,100% { transform: translateX(0); }
+    15% { transform: translateX(-9px); }
+    30% { transform: translateX(8px); }
+    45% { transform: translateX(-6px); }
+    60% { transform: translateX(5px); }
+    75% { transform: translateX(-3px); }
+    90% { transform: translateX(2px); }
+  }
+  @keyframes checkPulse {
+    0%,100% { transform: scale(1.18); opacity: 1; }
+    50% { transform: scale(0.9); opacity: 0.5; }
+  }
+  @keyframes rain {
+    0%   { transform: translateY(-12vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 1; }
+    100% { transform: translateY(112vh) rotate(300deg); opacity: 0; }
+  }
+  @keyframes cardIn {
+    0%   { transform: scale(0.6) translateY(20px); opacity: 0; }
+    60%  { transform: scale(1.06) translateY(0); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  @keyframes heartBeat {
+    0%,100% { transform: scale(1); }
+    30% { transform: scale(1.18); }
+    45% { transform: scale(0.96); }
+    60% { transform: scale(1.09); }
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ---------- bloom screen ---------- */
+  @keyframes petalOpen {
+    0%   { transform: rotate(var(--a)) translateY(0) scale(0); opacity: 0; }
+    30%  { opacity: 1; }
+    100% { transform: rotate(var(--a)) translateY(calc(-1 * var(--len))) scale(1); opacity: 1; }
+  }
+  @keyframes growSpin {
+    0%   { transform: translate(-50%,-50%) scale(0.25) rotate(-25deg); }
+    100% { transform: translate(-50%,-50%) scale(1.25) rotate(28deg); }
+  }
+  @keyframes coreIn {
+    0%   { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+    60%  { transform: translate(-50%,-50%) scale(1.25); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  }
+  @keyframes flash {
+    0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.95; }
+    100% { transform: translate(-50%,-50%) scale(6); opacity: 0; }
+  }
+  @keyframes blackIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes hintIn {
+    0%   { opacity: 0; letter-spacing: 2px; }
+    100% { opacity: 0.85; letter-spacing: 6px; }
+  }
+
+  /* ---------- stage ---------- */
+  .backdrop { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .stage {
+    position: relative;
+    min-height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    background: transparent; /* the persistent .backdrop shows through */
+  }
+  .shimmer {
+    position: absolute; inset: -20%;
+    pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(38% 42% at 24% 28%, rgba(255,182,205,0.55), transparent 70%),
+      radial-gradient(40% 44% at 78% 72%, rgba(255,214,168,0.50), transparent 72%),
+      radial-gradient(34% 38% at 62% 18%, rgba(255,196,222,0.42), transparent 70%);
+    animation: shimmer 16s ease-in-out infinite;
+  }
+  .hearts { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+  .hearts span { position: absolute; bottom: -6vh; will-change: transform, opacity; }
+
+  .panel {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; align-items: center;
+    width: 100%; max-width: 340px;
+  }
+
+  .mono {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; margin-bottom: 34px;
+    font-size: 44px; /* reference size for the optical nudge below */
+    transform: translateX(-0.22em); /* counter the cursive V's rightward ink overflow */
+  }
+  .mono .letter {
+    font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
+    font-size: 44px; font-weight: 600; color: #d8698a; line-height: 1;
+  }
+  /* em-based margins scale with the monogram size (big lock vs small celebration) */
+  .mono .h { font-size: 20px; color: #e58aa4; margin: 0 0.5em 0 0.8em; transform: translateY(-2px); }
+  /* on unlock, the M and V draw together and the heart swells —
+     0.75s ease-in-out to match the passcode "checking" pulse timing */
+  .mono .letter, .mono .h { transition: transform 0.75s ease-in-out; }
+  .mono.together > .letter:first-child { transform: translateX(1.28em); }
+  .mono.together > .letter:last-child  { transform: translateX(-1.28em); }
+  .mono.together .h { transform: translateY(-2px) scale(1.5); position: relative; z-index: 3; }
+
+
+  .prompt {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic; font-size: 17px; letter-spacing: 0.2px;
+    text-align: center; margin: 4px 0 26px; color: #935767;
+    text-wrap: pretty;
+  }
+
+  .dots { display: flex; gap: 16px; margin-bottom: 40px; height: 22px; align-items: center; }
+  .dots .dot {
+    width: clamp(13px,3.6vw,16px); height: clamp(13px,3.6vw,16px);
+    border-radius: 50%;
+    border: 2px solid rgba(215,106,134,0.45);
+    background: transparent;
+    transform: scale(0.72);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    display: inline-block;
+  }
+  .dots .dot.filled {
+    border-color: #d76a86;
+    background: radial-gradient(circle at 35% 30%, #ff9fb6, #d76a86);
+    transform: scale(1.18);
+    box-shadow: 0 3px 10px rgba(215,106,134,0.5);
+  }
+  .dots.checking .dot.filled { animation: checkPulse 0.75s ease-in-out infinite; }
+
+  .pad {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: clamp(14px, 4.5vw, 20px); justify-items: center;
+  }
+  .key {
+    width: clamp(62px,19vw,76px); height: clamp(62px,19vw,76px);
+    border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.6);
+    color: #8a5462;
+    font-size: clamp(26px,7vw,31px); font-weight: 300;
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(216,105,138,0.18), inset 0 1px 0 rgba(255,255,255,0.8);
+    transition: transform 0.12s ease, background 0.15s ease;
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    user-select: none;
+  }
+  .key:active { transform: scale(0.9); background: rgba(255,196,214,0.85); }
+  .key.del {
+    background: transparent; box-shadow: none; color: #c07d8e;
+    font-size: clamp(22px,6vw,26px);
+  }
+  .key.del:active { background: rgba(255,196,214,0.55); }
+  .spacer { width: clamp(62px,19vw,76px); height: clamp(62px,19vw,76px); }
+
+  /* ---------- success ---------- */
+  .success {
+    position: fixed; inset: 0; z-index: 5;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px;
+    background: linear-gradient(160deg, rgba(255,231,239,0.94), rgba(255,239,228,0.94));
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+  }
+  .success.show { display: flex; animation: fadeIn 0.4s ease both; }
+  .confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .confetti span { position: absolute; top: -8vh; }
+  .success .card { position: relative; text-align: center; animation: cardIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .success .big { font-size: 64px; animation: heartBeat 1.4s ease-in-out infinite; margin-bottom: 10px; }
+  .success .mono { font-size: 30px; } /* scales the translateX nudge to this size */
+  .success .mono .letter { font-size: 30px; }
+  .success .mono .h { font-size: 15px; }
+  .success .msg { font-family: Georgia, serif; font-style: italic; font-size: 24px; color: #935767; margin: 0; }
+
+  /* ---------- lock fade-out + revealed site ---------- */
+  .stage { transition: opacity 0.9s ease; }
+  .stage.dismiss { opacity: 0; pointer-events: none; }
+  .panel { transition: opacity 0.6s ease; }
+  .panel.fade { opacity: 0; }
+
+  .site {
+    display: none;
+    min-height: 100dvh;
+    width: 100%;
+    background: linear-gradient(160deg, #fff6f2 0%, #fff8f0 100%);
+  }
+  .site.show { display: block; animation: fadeIn 0.9s ease both; }
+
+  /* starter content inside the revealed site */
+  .site .hero {
+    min-height: 100dvh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 40px 24px; gap: 8px;
+  }
+  .site .hero-mono {
+    display: flex; align-items: center; margin-bottom: 12px;
+    font-size: 56px; transform: translateX(-0.22em); /* same optical nudge, scaled */
+  }
+  .site .hero-mono .letter {
+    font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
+    font-size: 56px; font-weight: 600; color: #d8698a; line-height: 1;
+  }
+  .site .hero-mono .h { font-size: 26px; color: #e58aa4; margin: 0 0.5em 0 0.8em; transform: translateY(-2px); }
+  .site .hero h1 {
+    font-family: Georgia, "Times New Roman", serif; font-style: italic;
+    font-weight: 500; font-size: clamp(28px, 8vw, 40px); color: #935767; margin: 0;
+  }
+  .site .hero p {
+    font-family: Georgia, serif; font-size: clamp(15px, 4.5vw, 18px);
+    color: #a06d7a; margin: 4px 0 0;
+  }
+  .site .scroll-hint {
+    margin-top: 34px; font: 12px -apple-system, system-ui, sans-serif;
+    letter-spacing: 2px; text-transform: uppercase; color: #c99; opacity: 0.8;
+    animation: floatHint 2s ease-in-out infinite;
+  }
+  @keyframes floatHint { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  /* --- cute decorative symbol lines (her aesthetic ♡) --- */
+  .site .deco {
+    text-align: center; color: #d78bac; opacity: 0.9;
+    font-size: 15px; letter-spacing: 1px; line-height: 1.6;
+    margin: 14px 0; font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+  .site .kao {
+    text-align: center; color: #cf7ba0; font-size: 17px;
+    margin: 6px 0; font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+  .site .deco--soft { color: #e0a6c1; font-size: 14px; }
+
+  /* --- the letter --- */
+  .letter { max-width: 640px; margin: 0 auto; padding: 20px 22px; }
+  .letter-card {
+    background: linear-gradient(#fffdfb, #fff6f1);
+    border: 1px solid rgba(216,105,138,0.10);
+    border-radius: 22px; padding: 38px 32px 26px;
+    box-shadow: 0 22px 60px rgba(216,105,138,0.14);
+  }
+  .letter-card h2 {
+    font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
+    font-weight: 600; color: #d8698a; font-size: clamp(30px, 9vw, 42px);
+    margin: 0 0 20px; text-align: center;
+  }
+  .letter-card p {
+    font-family: Georgia, "Times New Roman", serif; font-size: clamp(15px, 4.3vw, 17px);
+    line-height: 1.85; color: #7a5560; margin: 0 0 15px; text-wrap: pretty;
+  }
+  .letter-card .sign {
+    font-family: "Snell Roundhand", "Segoe Script", cursive;
+    font-size: 28px; color: #d8698a; text-align: right; margin-top: 10px;
+  }
+
+  /* --- notes board --- */
+  .board { max-width: 940px; margin: 0 auto; padding: 46px 18px 96px; }
+  .board h2 {
+    font-family: "Snell Roundhand", "Segoe Script", cursive;
+    color: #d8698a; font-weight: 600; font-size: clamp(28px, 8vw, 40px);
+    text-align: center; margin: 0 0 4px;
+  }
+  .board .sub {
+    text-align: center; font-family: Georgia, serif; font-style: italic;
+    color: #a06d7a; margin: 0 0 26px; font-size: 15px;
+  }
+  .note-form {
+    display: flex; flex-direction: column; gap: 10px;
+    max-width: 460px; margin: 0 auto 42px;
+    background: rgba(255,255,255,0.72); border-radius: 18px; padding: 16px;
+    box-shadow: 0 12px 34px rgba(216,105,138,0.12);
+  }
+  .note-form textarea, .note-form input {
+    border: 1px solid rgba(216,105,138,0.25); border-radius: 12px;
+    padding: 12px 14px; color: #7a5560; background: #fffdfc; outline: none;
+    font-family: Georgia, serif;
+  }
+  .note-form textarea { font-size: 16px; line-height: 1.5; resize: vertical; min-height: 74px; }
+  .note-form textarea:focus, .note-form input:focus { border-color: #ff9dc2; }
+  .note-form .row { display: flex; gap: 10px; }
+  .note-form input { flex: 1; font-size: 15px; }
+  .note-form button {
+    border: none; cursor: pointer; border-radius: 12px; padding: 11px 20px;
+    font: 600 15px -apple-system, system-ui, sans-serif; color: #fff; white-space: nowrap;
+    background: linear-gradient(135deg, #ff9dc2, #d8698a);
+    box-shadow: 0 6px 16px rgba(216,105,138,0.35);
+    transition: transform 0.12s ease, filter 0.15s ease;
+  }
+  .note-form button:active { transform: scale(0.96); }
+  .note-form button:disabled { filter: grayscale(0.4) opacity(0.6); cursor: default; }
+  .board .status {
+    text-align: center; color: #a06d7a; font-family: Georgia, serif;
+    font-style: italic; padding: 18px;
+  }
+  /* the cork pin-board the notes live on */
+  .notes-grid {
+    columns: 4 156px; column-gap: 18px;
+    padding: 28px 22px 32px;
+    border-radius: 12px;
+    background-color: #d3a969;
+    background-image:
+      radial-gradient(circle at 15% 25%, rgba(90,60,25,0.16) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 60% 65%, rgba(90,60,25,0.13) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 82% 32%, rgba(255,240,210,0.20) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 38% 82%, rgba(90,60,25,0.12) 0 1.5px, transparent 2px);
+    background-size: 26px 26px, 34px 34px, 22px 22px, 30px 30px;
+    box-shadow: inset 0 0 44px rgba(80,50,20,0.35), 0 16px 36px rgba(120,80,40,0.28);
+    border: 11px solid #9c6a34;
+    border-image: linear-gradient(145deg, #b8834a, #7c4e22) 1;
+    min-height: 200px;
+  }
+  .note {
+    break-inside: avoid; margin: 0 0 18px; padding: 18px 15px 14px;
+    position: relative;
+    box-shadow: 0 7px 14px rgba(40,25,10,0.28);
+    transform: rotate(var(--tilt, -2deg));
+    animation: notePop 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .note::before { /* pushpin */
+    content: ""; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+    width: 15px; height: 15px; border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #fff, var(--pin, #d63b3b) 60%, rgba(0,0,0,0.4));
+    box-shadow: 0 3px 4px rgba(0,0,0,0.35);
+  }
+  .note .body {
+    font-family: "Bradley Hand", "Marker Felt", "Segoe Print", "Comic Sans MS", cursive;
+    font-size: 16px; line-height: 1.45;
+    color: #4a3a2e; white-space: pre-wrap; word-break: break-word;
+  }
+  .note .meta {
+    margin-top: 10px; font: 12px "Bradley Hand", "Marker Felt", cursive;
+    color: rgba(60,45,30,0.6); display: flex; justify-content: space-between; gap: 8px;
+  }
+  .note .meta .who { font-weight: 700; color: rgba(60,45,30,0.85); }
+  @keyframes notePop {
+    0%   { opacity: 0; transform: rotate(var(--tilt, -2deg)) scale(0.7); }
+    100% { opacity: 1; transform: rotate(var(--tilt, -2deg)) scale(1); }
+  }
+
+  /* ---------- note wall screen ---------- */
+  @keyframes swayNote { 0%,100% { transform: rotate(var(--tilt)); } 50% { transform: rotate(calc(var(--tilt) + 0.7deg)); } }
+  @keyframes twinkle { 0%,100% { opacity: 0.18; transform: scale(0.85); } 50% { opacity: 0.8; transform: scale(1.12); } }
+  @keyframes driftUp {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    14%  { opacity: 0.45; }
+    86%  { opacity: 0.45; }
+    100% { transform: translateY(-108vh) rotate(200deg); opacity: 0; }
+  }
+  .wall {
+    position: fixed; inset: 0; z-index: 6; display: none;
+    overflow: hidden;
+    padding: 30px 22px 22px; color: #74505c;
+    background-color: #fffaf1;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(255,240,190,0.34), transparent 48%),
+      radial-gradient(circle at 84% 34%, rgba(255,214,228,0.30), transparent 48%),
+      repeating-linear-gradient(90deg, rgba(244,150,178,0.055) 0 30px, transparent 30px 60px),
+      repeating-linear-gradient(0deg, rgba(244,150,178,0.055) 0 30px, transparent 30px 60px),
+      repeating-linear-gradient(90deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px),
+      repeating-linear-gradient(0deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px);
+    background-position: 0 0, 0 0, 8px 8px, 8px 8px, 0 0, 0 0;
+  }
+  .wall.show { display: flex; flex-direction: column; }
+  .wall-frame { position: absolute; inset: 18px; z-index: 0; pointer-events: none; border-radius: 20px; border: 2px solid rgba(214,150,178,0.6); box-shadow: inset 0 0 0 5px rgba(255,255,255,0.4), 0 6px 20px rgba(204,100,136,0.06); }
+  .wall-floaters { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+  .wall-floaters span { position: absolute; }
+  .wall-corner { position: absolute; z-index: 3; pointer-events: none; font-size: 14px; color: rgba(226,150,180,0.75); }
+  .wall-inner { position: relative; z-index: 1; width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 6px 6px 0; }
+  .wall-head { text-align: center; margin-bottom: 12px; flex: 0 0 auto; }
+  .wall-deco { font-size: 12px; letter-spacing: 3px; color: #d3a3b6; }
+  .wall-title { font-family: "Snell Roundhand","Segoe Script","Brush Script MT",cursive; font-size: 34px; color: #cc6488; line-height: 1.25; }
+  .wall-count { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #ab7c8f; }
+  .wall-notes { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; }
+  .wnote { position: absolute; cursor: pointer; touch-action: none; }
+  .wnote.movable { cursor: grab; }
+  .wnote-card { transition: box-shadow 0.25s ease; }
+  .wnote-card:hover { box-shadow: 0 12px 22px rgba(170,135,145,0.3), inset 0 -10px 16px rgba(0,0,0,0.028) !important; }
+  /* tap-to-expand modal */
+  .wall-modal {
+    position: fixed; inset: 0; z-index: 20; display: none;
+    align-items: center; justify-content: center; padding: 24px; cursor: pointer;
+    background: rgba(120,80,95,0.28); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  }
+  .wall-modal.open { display: flex; }
+  .wm-stage { display: flex; align-items: flex-start; gap: 16px; }
+  .wm-note-box { position: relative; }
+  .wm-note { position: absolute; left: 50%; top: 50%; transform-origin: center; animation: fadeIn 0.3s ease both; }
+  .wm-stage { animation: notePopBig 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .wm-tools { display: flex; flex-direction: column; gap: 10px; }
+  .wm-tool {
+    width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
+    background: rgba(255,255,255,0.94); box-shadow: 0 6px 16px rgba(150,90,110,0.28);
+    font-size: 18px; color: #a05a72; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.12s ease, background 0.12s ease;
+  }
+  .wm-tool:hover { background: #ffe1ec; transform: scale(1.08); }
+  .wall-modal-card {
+    width: min(90vw, 430px); min-height: 230px; padding: 42px 32px 30px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 30px 70px rgba(80,50,60,0.4);
+    animation: notePopBig 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes notePopBig { 0% { opacity: 0; transform: scale(0.6) rotate(-4deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+
+  /* + button (top-right of the wall) */
+  .wall-add {
+    position: absolute; top: 30px; right: 34px; z-index: 8;
+    width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-family: -apple-system, system-ui, sans-serif; font-weight: 300; font-size: 32px;
+    line-height: 1; padding: 0; color: #fff;
+    background: linear-gradient(135deg, #ffa6c9, #d8698a);
+    box-shadow: 0 8px 18px rgba(216,105,138,0.4);
+    transition: transform 0.14s ease, box-shadow 0.14s ease;
+  }
+  .wall-add span { display: block; margin-top: -2px; }
+  .wall-add:hover { transform: scale(1.08) rotate(90deg); box-shadow: 0 10px 22px rgba(216,105,138,0.5); }
+  .wall-add:active { transform: scale(0.94); }
+  /* confirm-placement pill, shown while a note is movable */
+  .wall-place {
+    position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%);
+    z-index: 15; display: none; border: none; cursor: pointer;
+    padding: 12px 26px; border-radius: 999px; color: #fff;
+    font: 600 15px "Bradley Hand", "Segoe Print", cursive;
+    background: linear-gradient(135deg, #ffa6c9, #d8698a);
+    box-shadow: 0 8px 22px rgba(216,105,138,0.45);
+  }
+  .wall-place.show { display: block; animation: placePop 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes placePop { 0% { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.9); } 100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+
+  /* ---------- add-a-note creator screen ---------- */
+  .add, .draw {
+    position: fixed; inset: 0; z-index: 7; display: none; overflow-y: auto;
+    padding: 26px 18px 70px; color: #74505c;
+    background-color: #fffaf1;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(255,240,190,0.34), transparent 48%),
+      radial-gradient(circle at 84% 34%, rgba(255,214,228,0.30), transparent 48%),
+      repeating-linear-gradient(90deg, rgba(244,150,178,0.05) 0 30px, transparent 30px 60px),
+      repeating-linear-gradient(0deg, rgba(244,150,178,0.05) 0 30px, transparent 30px 60px);
+  }
+  .add.show, .draw.show { display: block; }
+  .draw-stage { display: flex; justify-content: center; margin: 4px 0 18px; }
+  .draw-card { position: relative; overflow: hidden; box-shadow: 0 12px 28px rgba(170,135,145,0.3); }
+  .draw-tools { max-width: 360px; margin: 0 auto; }
+  .draw-open {
+    display: block; width: 100%; margin: 0 0 6px; cursor: pointer;
+    border: 1.5px dashed rgba(216,105,138,0.4); background: rgba(255,255,255,0.7); color: #b8446a;
+    border-radius: 12px; padding: 10px; font: 600 14px "Bradley Hand","Segoe Print",cursive;
+  }
+  .draw-open:hover { background: #fff3f7; }
+  .draw-hex { width: 32px; height: 32px; border: none; border-radius: 9px; padding: 0; cursor: pointer; background: none; box-shadow: 0 0 0 1.5px rgba(216,105,138,0.3); }
+  .draw-hex::-webkit-color-swatch-wrapper { padding: 0; }
+  .draw-hex::-webkit-color-swatch { border: none; border-radius: 8px; }
+  .draw-hex::-moz-color-swatch { border: none; border-radius: 8px; }
+  .draw-size-row { display: flex; align-items: center; gap: 14px; padding: 6px 4px; }
+  .draw-size-row input[type=range] { flex: 1; accent-color: #d8698a; height: 6px; }
+  .draw-size-dot { flex: 0 0 auto; border-radius: 50%; box-shadow: 0 1px 3px rgba(120,80,95,0.3); transition: width 0.1s, height 0.1s; }
+
+  /* ---------- merged site + board ---------- */
+  .home {
+    position: fixed; inset: 0; z-index: 6; display: none; overflow: hidden; color: #935767;
+    background: transparent;  /* board (#wall) sits behind — the CONTENT carries the background */
+  }
+  .home.show { display: block; }
+  /* transition: a soft transparent band that SWEEPS from the bottom upward, revealing the board.
+     The mask image is 200vh tall (opaque top half, feathering to transparent lower half); we slide
+     its position up over time so the transparent front rises bottom→top. The content also swipes
+     up. mask-position-y and translate are both driven from one eased progress. */
+  .home.revealing {
+    /* Solid plateau (0–45%) covers the whole viewport at rest → home fully opaque, no peek.
+       Then a SMOOTHSTEP ease to transparent (45→100%): the opacity slope starts at ~0 and grows
+       gradually, so there is NO knee/corner anywhere — nothing for the eye to read as a line as
+       the mask slides up. The fade front still enters from the bottom and sweeps upward. */
+    -webkit-mask-image: linear-gradient(to bottom,
+      #000 0%, #000 45%,
+      rgba(0,0,0,0.99) 50%, rgba(0,0,0,0.95) 56%, rgba(0,0,0,0.86) 62%,
+      rgba(0,0,0,0.72) 68%, rgba(0,0,0,0.55) 74%, rgba(0,0,0,0.38) 80%,
+      rgba(0,0,0,0.22) 86%, rgba(0,0,0,0.10) 92%, rgba(0,0,0,0.03) 96%, transparent 100%);
+    mask-image: linear-gradient(to bottom,
+      #000 0%, #000 45%,
+      rgba(0,0,0,0.99) 50%, rgba(0,0,0,0.95) 56%, rgba(0,0,0,0.86) 62%,
+      rgba(0,0,0,0.72) 68%, rgba(0,0,0,0.55) 74%, rgba(0,0,0,0.38) 80%,
+      rgba(0,0,0,0.22) 86%, rgba(0,0,0,0.10) 92%, rgba(0,0,0,0.03) 96%, transparent 100%);
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 250vh; mask-size: 100% 250vh;
+    will-change: -webkit-mask-position, mask-position;
+  }
+  .home .site { background: transparent; width: 100%; }
+  .home .site .hero { min-height: auto; }
+  .home .home-site { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 24px;
+    background: linear-gradient(160deg, #fff6f2 0%, #fff8f0 100%); }
+  .home.revealing .home-site { will-change: transform; backface-visibility: hidden; }
+  .add-inner {
+    position: relative;
+    max-width: 720px; margin: 18px auto;
+    background: rgba(255,253,250,0.94);
+    border: 1.5px dashed rgba(228,168,190,0.55);
+    border-radius: 24px;
+    padding: 22px 26px 26px;
+    box-shadow: 0 22px 55px rgba(200,120,150,0.22);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+  }
+  .add-back {
+    position: absolute; top: 16px; left: 18px; z-index: 2;
+    width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+    border: 1.5px solid rgba(204,100,136,0.3); background: rgba(255,255,255,0.6);
+    color: #c07d95; font: 18px/1 -apple-system, system-ui, sans-serif;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .add-back:hover { background: #ffe1ec; color: #b8446a; }
+  .add-title { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 32px; color: #cc6488; text-align: center; margin: 2px 0 16px; }
+  .add-cols { display: flex; flex-wrap: wrap; gap: 26px; align-items: flex-start; }
+  .add-col { flex: 1 1 280px; min-width: 260px; }
+  .add-col-left { position: sticky; top: 20px; }
+  @media (max-width: 620px) { .add-col-left { position: static; } }
+  .add-col-right .add-label { text-align: center; }
+  .add-col-right .add-opts { justify-content: center; }
+  .add-preview { display: flex; align-items: center; justify-content: center; min-height: 340px; margin-bottom: 4px; }
+  .add-preview .pv { position: relative; display: inline-block; transition: transform 0.2s ease; }
+  .add-hint { text-align: center; font: 13px "Bradley Hand","Segoe Print",cursive; color: #b98aa0; margin-bottom: 6px; }
+  .note-edit { outline: none; }
+  .note-edit:empty:before { content: attr(data-ph); opacity: 0.45; }
+  .add-row { margin: 13px 0; }
+  .add-label { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 15px; color: #b07890; margin-bottom: 7px; letter-spacing: 0.4px; }
+  .add-opts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .opt {
+    border: 1.5px solid rgba(216,105,138,0.28); background: #fff; border-radius: 12px;
+    padding: 8px 13px; font: 600 13px "Bradley Hand","Segoe Print",cursive; color: #8a5462; cursor: pointer;
+    transition: background 0.14s ease, border-color 0.14s ease;
+  }
+  .opt:hover { background: #fff3f7; }
+  .opt.sel { border-color: #d8698a; background: #ffe1ec; color: #b8446a; }
+  .opt-swatch {
+    width: 32px; height: 32px; border-radius: 9px; cursor: pointer;
+    box-shadow: 0 0 0 1.5px rgba(216,105,138,0.3); transition: box-shadow 0.14s ease, transform 0.14s ease;
+  }
+  .opt-swatch:hover { transform: scale(1.06); }
+  .opt-swatch.sel { box-shadow: 0 0 0 3px #d8698a; }
+  .add-msg {
+    width: 100%; box-sizing: border-box; border: 1.5px solid rgba(216,105,138,0.28); border-radius: 14px;
+    padding: 13px 15px; font: 17px "Bradley Hand","Segoe Print",cursive; color: #6a4a54;
+    min-height: 150px; resize: vertical; background: #fffdfc; outline: none;
+  }
+  .add-msg:focus { border-color: #ff9dc2; }
+  .add-actions { display: flex; gap: 10px; margin-top: 24px; }
+  .add-btn { flex: 1; border: none; border-radius: 14px; padding: 14px; font: 600 15px -apple-system, system-ui, sans-serif; cursor: pointer; transition: transform 0.12s ease; }
+  .add-btn:active { transform: scale(0.97); }
+  .add-btn.primary { background: linear-gradient(135deg, #ff9dc2, #d8698a); color: #fff; box-shadow: 0 8px 18px rgba(216,105,138,0.35); }
+  .add-btn.ghost { background: rgba(255,255,255,0.8); color: #a06d7a; }
+  .wall-modal .wm-body { font-family: "Bradley Hand","Segoe Print","Comic Sans MS",cursive; font-size: 24px; line-height: 1.5; margin: 0; }
+  .wall-modal .wm-from { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 26px; text-align: right; opacity: 0.85; margin-top: 22px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* kill the always-running loops: floating hearts, shimmer, confetti, note sway, hint bob.
+       These are the only continuous animations, so this is what protects weak devices/battery. */
+    .shimmer, .hearts span, .confetti span, .success .big,
+    .wnote, .scroll-hint { animation: none !important; }
+    .stage { transition: none; }
+  }
+
+  .bloom {
+    position: fixed; inset: 0; z-index: 6; display: none; overflow: hidden;
+    background: transparent; /* the persistent .backdrop (gradient + shimmer + hearts) shows through */
+  }
+  .bloom.show { display: block; }
+  .blossom { z-index: 1; }
+  .blossom {
+    position: absolute; left: 50%; top: 50%;
+    width: 180px; height: 180px;
+    transform: translate(-50%, -50%) scale(1.9); /* overall blossom size — bump this to grow it */
+    transition: transform 0.7s cubic-bezier(0.6, 0, 0.85, 0.2), opacity 0.7s ease;
+  }
+  .blossom.shrink { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  /* site revealed through a growing soft heart */
+  .site.heart-reveal {
+    position: fixed; inset: 0; z-index: 7;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: center; mask-position: center;
+    -webkit-mask-size: 0% 0%; mask-size: 0% 0%;
+  }
+  .bloom-layer {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    animation: blossomIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .bloom-layer svg { display: block; overflow: visible; filter: drop-shadow(0 8px 22px rgba(216,105,138,0.22)); }
+  @keyframes blossomIn {
+    0%   { transform: scale(0.2) rotate(var(--r0, -20deg)); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .bloom-petal {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    animation: petalIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .bloom-petal svg { display: block; overflow: visible; filter: drop-shadow(0 6px 16px rgba(216,105,138,0.20)); }
+  @keyframes petalIn {
+    0%   { transform: scale(0.04); opacity: 0; }
+    55%  { opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .spk { opacity: 0; animation: spk 0.8s ease-out both; }
+  @keyframes spk {
+    0%   { opacity: 0; }
+    45%  { opacity: 0.95; }
+    100% { opacity: 0; }
+  }
+  /* side-by-side compare (dev, for choosing the bloom style) */
+  .compare { display: flex; gap: 64px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .compare-col { position: relative; }
+  .compare .blossom { width: 220px; height: 220px; }
+  .compare-label {
+    position: absolute; top: -36px; left: 0; right: 0; text-align: center;
+    font: 600 11px/1 -apple-system, system-ui, sans-serif;
+    letter-spacing: 2px; text-transform: uppercase; color: #c07d95;
+  }
+
+  /* 🔧 DEBUG BAR — dev only */
+  .debugbar {
+    position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%);
+    z-index: 9999; display: flex; align-items: center; gap: 6px;
+    padding: 6px 8px; border-radius: 999px;
+    background: rgba(40,20,30,0.72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    font-family: -apple-system, system-ui, sans-serif;
+  }
+  .debugbar .debug-label {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); padding: 0 4px;
+  }
+  .debugbar button {
+    border: none; cursor: pointer; border-radius: 999px;
+    padding: 6px 11px; font-size: 12px; font-weight: 500;
+    background: rgba(255,255,255,0.14); color: #fff;
+    transition: background 0.15s ease;
+  }
+  .debugbar button:hover { background: rgba(255,255,255,0.28); }
+  .debugbar button.active { background: #d8698a; color: #fff; }
+  .centerguide {
+    position: fixed; top: 0; bottom: 0; left: 50%; width: 1px;
+    transform: translateX(-50%); background: rgba(220,0,60,0.55);
+    z-index: 9998; pointer-events: none; display: none;
+  }
+  .centerguide::before {
+    content: ""; position: fixed; left: 0; right: 0; top: 50%; height: 1px;
+    background: rgba(220,0,60,0.35);
+  }
+  .centerguide.on { display: block; }
+</style>
+</head>
+<body>
+  <!-- persistent living backdrop (gradient base on <body>) — shows behind every screen -->
+  <div class="backdrop" id="backdrop">
+    <div class="shimmer"></div>
+    <div class="hearts" id="hearts"></div>
+  </div>
+
+  <div class="stage" id="lock">
+    <div class="panel">
+      <div class="mono">
+        <span class="letter">M</span>
+        <span class="h">♡</span>
+        <span class="letter">V</span>
+      </div>
+      <div class="dots" id="dots">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+
+      <div class="pad" id="pad">
+        <button class="key" data-key="1">1</button>
+        <button class="key" data-key="2">2</button>
+        <button class="key" data-key="3">3</button>
+        <button class="key" data-key="4">4</button>
+        <button class="key" data-key="5">5</button>
+        <button class="key" data-key="6">6</button>
+        <button class="key" data-key="7">7</button>
+        <button class="key" data-key="8">8</button>
+        <button class="key" data-key="9">9</button>
+        <span class="spacer"></span>
+        <button class="key" data-key="0">0</button>
+        <button class="key del" data-key="del" aria-label="Delete">⌫</button>
+      </div>
+    </div>
+
+    <div class="success" id="success">
+      <div class="confetti" id="confetti"></div>
+      <div class="card">
+        <div class="big">💝</div>
+        <div class="mono">
+          <span class="letter">M</span><span class="h">♡</span><span class="letter">V</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✨ The real site lives here — starter content, we'll shape it together. -->
+  <main class="site" id="site"></main>
+
+  <!-- 🌸 Bloom transition screen — petals recreated in pure CSS (no image assets). -->
+  <div class="bloom" id="bloom"></div>
+
+  <!-- 📝 Note wall preview screen (debug tab for now) -->
+  <div class="wall" id="wall"></div>
+
+  <!-- ✎ Add-a-note creator screen -->
+  <div class="add" id="add"></div>
+
+  <!-- ✎ Drawing screen -->
+  <div class="draw" id="draw"></div>
+
+  <!-- 🏠 Merged site + board (scrolls from letter into the wall) -->
+  <div class="home" id="home"></div>
+
+  
+
+  <script>window.ENC_PAYLOAD = {"salt":"3DoNL3xHbvUGI2pw2xcOAg==","iv":"K7UKKleAKXLi715y","ct":"p7V8SUMjrUq2Yy4usHLB/JdMbmsmeCi913ug0dpWUmdeGSmHQcM8YHmoloyJQUNHu3kFAoHhjwIIixr6LR5VJa6GUDs9YIh194H2HvlvuL7eimjBfO0rjyGeBDRxVRs+AHO5mwM9Zca/4egGrWHSxMUissl82+b51k6fYd7lFkQqfg1HeNCU81tJxYMlj1dIDoLeCjfVfrfFaLG/20fKilcoYyH18A8v7q3tyxdY6VPOtbfeKlwkwoc0HTwD1dYVxCAUG9c6nqRB4a/tcPa/K+TYXF2kOgd0QXjWPk+KGpVWiT7PD7NNyB8iSpAFMcdzETZg+v8gmc2oJlNY55sic3O3dTR+72ykH3x2rl8+P5yOvEvjrGzSl+RB5q20L5oIYKk/9zNuWAHbjIUuYBT1YNbiLHgvdAcFFmPhku7qXa8IW5mJ7LU1NLz0RP0e3hNw8jdHG6OkxXDmirrAJHhO15O0FMaWez+QZE6TSiyj/0Gb0TyaKXal7bzlvKZ3eMxHxTF3j4I7PbMbmArZBhqwSDGiJn7QPodJ9ZGyJXoQzA8SiQJNXnz0rv/2Ic20pprcTp57sPFRzfGU8YwlH65axB0tLP3FuIw/Co/sOhf01EwRefuy5fcSpyHf8Q7ngrtcSn3kOGS8jQpgzt+IXPrmlC1LxgfRZT3gIj5jvsntoWzMGSqcG7pry57jY4wD/AQoRe4F8A0+G1MY7jWjhP2qjKSixsh8/gVeTbgN1dmwF1l/MXiYpdncb4ei5S//KK0/zlp4EnLyQL9Cf4D/mHQPUv86KZjg1ZkWP0dQH6v0XJHxc10J+wGZMKjaPXyZ4UOvRX1JXfk2o7LXta4xYLUpAhanNmFWOOPNyJ3JOcN9wWF762BxiIZ13UitlMuH+gOTHnsKwF+wOmqkpF6a1NhQuZHjjj5I9y9KQoylXpA8s9gsNr66lVR/MhRtDAblFoOz/f6N83+pHJtY0MRzohJjX26bLttJnfrO57lV4B0i6F3VKVfQ9yr8xe2fRgbrHOw4k1Sr4OcyijrD6ishDsK7yamhn7Q60oq2iLGUjJf5TcXqIW+x3tffKrU8TqIuFzct7GQ2FsQtDRJ8UAqEGTBzx0wU7ovnQrLJ48io0XpOREbkbCCToyyFgOP9irXaH7l7gPoPKfmKNE08MpOgYq4k7pBJzH1R4JQhEr1R7GLG4lNuIs5mLEayt5FRdgjx3c0scK2ysUPiUaK3rGESbSuvnZ8XjUMVu7AuUewQjDcnMKRtsHAqKvjfiD/Ybhzav63XmlBa2WG+MJpiP+7qkKf6+ZOyuQ7dOE70psFi4SPQem91QCWqbQxpKVHb3fFodH7irywxMIJaTI0JyfgmX6aUjADD2Iw2S6SFYBoO4N34vXT1c+SzBN/xlxHhv53UWl5OqLFIY6qxoPtzpTUiWgS5Bj4ILz1g9/Rbp2qI3hZibi+ou+cqR5JgiHZ5NKovbh3zO6n6vkbFY/nKUgGYMbO1WDD0i+xw2Ar9iy9RQweXLzMaI5dkLzAf6qz9ya1hFCmzZ2Rnd4QEhY3t+qBJGqLMpIO9qrI7csaL/c5pH97wwII3enDOjmpYcnyMQFdIg+KQPAp+hRan5wY7JyjluwlYfnES20/ypvhqra2mF4PKXqXkgCEruO9o4CcZpVNL+PNNDag4dlG+lVu1wgsEKhvM+F4SAmlx/CCf88Dd1DC3npriIhlb7kJ/LWTAk06w8+x9AliJUtcNuWbiSk8wj41ubKf0sduqKkWnEXjegEFqC+x0w12Ta7cOEucv5HRXvRwFKCEPRl7nIb+eA0QTBC9PlS4iI0RyNtWlpxqVT3Qaje7LO6NTZ2rhNA95BLVJ6lQHznw1YZwnFJuzw1E8brW36t3+q07SNnYxKWlTfjKcbEnbCUsJdGi3JdtqZTPVJNwElQUfT01v3rxNb+f9wxIH4DCZ1iApsZ89dcRC4S2ujbNaqWA1vsk5KVXeS8rZdAFgBBvATMEJeeEaqD7yM1E5dREGjkOdBdNvKP3v3N01Kamh+En75+2GFvHkzPK4nE967jz60bK094Ei9/9MzFaQzEw+IHmMWHNg6MaM52gUL4nNMubPGxx+dElRV0i+Tqbbk19O63J0Zw9CfEG5NuaMGi7oGYcQvYsdVjJHn3lNZo09J4GLCxd+thFAR2l1fLi11+uDi86mLh8wpW8qJFiQenK0VnTI7tZTcm3s+eBkRtMyJeHZwi32S0Rtj4MLRmmwrN0Y5BZDV4yt8Sbqp8yj/nz96hhh3m+MrJPLkUzaUcJyu3Y9gw0uLjlwwTPsruOzIBzqiKHbCfGYTLnay3qDCHxkmMQknZWZPOjhHbSQSmnZdxm+rmivizhO9bTE8T22yr1xdONbgc7p3/NsSFVEILPkPykEIJI3l3uxSLWHWu43V7z4fnelO1yEKJC+OJ750njq3Kz9qwmD9feozBHOa1FQzLy06KQf6LibcOKz1gFOr15PBAzNR32CAhl8MW84qqzPiXM3X2Mm+IVt0sZKW+qIqcdAdlrVIBpk25Jp+ab2TKQLbhafLXTvZgMvWEWV4uxhbQ7hNJu5TcpSMp3QJwS8XcosC2eh6aWekO/BQhm4wVqnC1FNdFplPDUlSFdnjM+Ojn1ZiUHqBRUNZky6mvWYw4hmAAl0z3R11+s8rA9epI0IJsetKNUdMTS8WadWnc10fWAfIFPTgGL96Nj9x/P2Q2pFf6178lalWe8kY8SYDNVOBadjzenwZvI2mfqHEE8JWW53xUikrRYrSJK3p3NgXjqTAlDXxIcZfb6R90TlzA5zP7PujmBBweZF7YieLlj30P+DP+NBxTApzIkFi4tNYz3Yxj9XoGJ7y9ADYIRaM1ToG3hK7ddPJaVvXrybrYgH06D9G1bP/8XgrqpFXXoZOIU/bgxJqfxezXfOF0K7rl3TsGPIOAmOt6pZpfE1u7QSeNfHhL7Tjgu6C9lKXLAb9KOko7sdKckcBG4vZXmBX/qSD2mOlpI4Yd035HchRXqtO/6Fdk50GlGhoT/yftY7rP3Or81fT8cmBu/wekR4PgWqZIOf9SS3YDxRWrmhPKz3LNz4wsHhV5pJx5CvPMQtrFxRyforyYZO+Zxk0962bS7CGh1Uyysy6VdccBP2ugackq/0Llgxmuod4hL+jE812qpJjZ1xjCQ1UaqPYqt7nF5S7D12ZRC5EJCbxXn/CfiuFohT9uEDhdoyQDhQD7yM9Fr0Mh0uWBfkbEzW2r5XMG743ScW3G1DVFL9kNybNX/HVHVWt2XFB7O6Kehp8iTBcgLgLQY1RJD3n+VhShW8B3lGtmaYKxZ6CBv9HitUSwhLGFAERaO9FOqAxGswaDiLqyc6f0CRyats","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+<script>
+(function () {
+  // DEV passcode for the un-encrypted source. build.js sets this to null in the
+  // published file, where the code is validated by decryption instead.
+  var CORRECT_CODE = null;
+
+  var entered = "";
+  var status = "idle"; // idle | checking | success | error
+  var dotsEl = document.getElementById("dots");
+  var dots = dotsEl.querySelectorAll(".dot");
+  var padEl = document.getElementById("pad");
+  var successEl = document.getElementById("success");
+  var lockEl = document.getElementById("lock");
+  var siteEl = document.getElementById("site");
+  var bloomEl = document.getElementById("bloom");
+  var wallEl = document.getElementById("wall");
+  var addEl = document.getElementById("add");
+  var drawEl = document.getElementById("draw");
+  var homeEl = document.getElementById("home");
+  var panelEl = document.querySelector(".panel");
+  var monoEl = panelEl ? panelEl.querySelector(".mono") : null;
+  var backdropEl = document.getElementById("backdrop");
+
+  function renderDots() {
+    for (var i = 0; i < dots.length; i++) {
+      dots[i].classList.toggle("filled", i < entered.length);
+    }
+    dotsEl.classList.toggle("checking", status === "checking");
+  }
+
+  function locked() { return status === "checking" || status === "success"; }
+
+  function press(d) {
+    if (locked() || status === "error") return;
+    entered = (entered + d).slice(0, 6);
+    renderDots();
+    if (entered.length === 6) {
+      status = "checking";
+      renderDots();
+      setTimeout(check, 750);
+    }
+  }
+
+  function del() {
+    if (locked() || status === "error") return;
+    entered = entered.slice(0, -1);
+    renderDots();
+  }
+
+  function onUnlockSuccess() {
+    status = "success";
+    renderDots();
+    // 1) M and V draw together (heart swells); 2) keypad fades; 3) the blossom begins
+    if (monoEl) monoEl.classList.add("together");
+    setTimeout(function () {
+      if (panelEl) panelEl.classList.add("fade");
+      setTimeout(showBloom, 650);
+    }, 750);
+  }
+
+  function onWrongCode() {
+    status = "error";
+    dotsEl.style.animation = "none";
+    void dotsEl.offsetWidth;
+    dotsEl.style.animation = "shakeX 0.55s ease";
+    setTimeout(function () {
+      entered = "";
+      status = "idle";
+      renderDots();
+    }, 650);
+  }
+
+  function check() {
+    // PROD: the code is the AES key — it's correct only if it decrypts the payload.
+    if (window.ENC_PAYLOAD) {
+      decryptPayload(entered).then(function (ok) { ok ? onUnlockSuccess() : onWrongCode(); });
+      return;
+    }
+    // DEV: plaintext compare (only when the page hasn't been encrypted yet)
+    if (entered === CORRECT_CODE) onUnlockSuccess(); else onWrongCode();
+  }
+
+  // ---------- decryption (browser side; mirrors build.js) ----------
+  function b64ToBytes(b64) {
+    var bin = atob(b64), out = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function decryptPayload(code) {
+    var enc = window.ENC_PAYLOAD;
+    var baseKey;
+    return crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"])
+      .then(function (bk) {
+        baseKey = bk;
+        return crypto.subtle.deriveKey(
+          { name: "PBKDF2", salt: b64ToBytes(enc.salt), iterations: enc.iter, hash: "SHA-256" },
+          baseKey, { name: "AES-GCM", length: 256 }, false, ["decrypt"]
+        );
+      })
+      .then(function (key) {
+        return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64ToBytes(enc.iv) }, key, b64ToBytes(enc.ct));
+      })
+      .then(function (buf) {
+        var data = JSON.parse(new TextDecoder().decode(buf));
+        SUPABASE_URL = data.url;           // creds only exist after a correct unlock
+        SUPABASE_KEY = data.key;
+        siteEl.innerHTML = data.site;       // inject the (previously encrypted) letter + board
+        return true;
+      })
+      .catch(function () { return false; }); // wrong code → auth tag fails → decrypt throws
+  }
+
+  // keypad clicks
+  padEl.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-key]");
+    if (!btn) return;
+    var k = btn.getAttribute("data-key");
+    if (k === "del") del(); else press(k);
+  });
+
+  // physical keyboard — only while the lock screen is the active view (never while typing a note)
+  window.addEventListener("keydown", function (e) {
+    var t = e.target;
+    if (t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+    if (lockEl.style.display === "none") return; // some other screen is showing
+    if (e.key >= "0" && e.key <= "9") { e.preventDefault(); press(e.key); }
+    else if (e.key === "Backspace") { e.preventDefault(); del(); }
+  });
+
+  // floating background hearts
+  // her aesthetic symbols mixed with a few soft emojis, drifting up the background
+  var chars = ["♡", "❥", "ᰔ", "ʚ♡ɞ", "🎀", "୨♡୧", "✧", "🩷", "˚₊‧", "❦", "💗", "꒰♡꒱", "🌸", "‧₊˚", "𓆩♡𓆪", "✨", "🤍"];
+  var heartsEl = document.getElementById("hearts");
+  for (var i = 0; i < 22; i++) {
+    var s = document.createElement("span");
+    var ch = chars[i % chars.length];
+    var size = 13 + Math.round(Math.random() * 22);
+    var peak = (0.28 + Math.random() * 0.35).toFixed(2);
+    var dur = 13 + Math.random() * 12;
+    s.textContent = ch;
+    s.style.left = Math.round(Math.random() * 96) + "%";
+    s.style.fontSize = size + "px";
+    s.style.color = "rgba(216,120,162," + (0.3 + Math.random() * 0.35).toFixed(2) + ")";
+    s.style.setProperty("--peak", peak);
+    // negative delay = start mid-flight, so the screen is already full on load
+    s.style.animation = "floatUp " + dur.toFixed(1) + "s linear " + (-Math.random() * dur).toFixed(1) + "s infinite";
+    heartsEl.appendChild(s);
+  }
+
+  // celebration rain (built once, on success)
+  function celebrate() {
+    var box = document.getElementById("confetti");
+    if (box.childElementCount) return;
+    var cc = ["🌸", "✨", "💕", "🩷", "💗", "🎉"];
+    for (var i = 0; i < 22; i++) {
+      var s = document.createElement("span");
+      s.textContent = cc[i % cc.length];
+      s.style.left = Math.round(Math.random() * 96) + "%";
+      s.style.fontSize = (18 + Math.round(Math.random() * 22)) + "px";
+      s.style.animation = "rain " + (2.6 + Math.random() * 2.4).toFixed(1) + "s ease-in " +
+                          (Math.random() * 1.4).toFixed(1) + "s infinite";
+      box.appendChild(s);
+    }
+  }
+
+  renderDots();
+
+  // a soft, blurred heart used as the reveal mask (grows from the centre)
+  var HEART_MASK = 'url("data:image/svg+xml,' + encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>" +
+      "<defs><filter id='s' x='-40%' y='-40%' width='180%' height='180%'>" +
+      "<feGaussianBlur stdDeviation='5'/></filter></defs>" +
+      "<path filter='url(#s)' fill='#fff' d='M50 84 C18 60 10 36 28 24 C40 16 50 26 50 34 " +
+      "C50 26 60 16 72 24 C90 36 82 60 50 84 Z'/></svg>"
+  ) + '")';
+
+  // ---------- sequence timers (so switching screens cancels a running bloom) ----------
+  var bloomTimers = [];
+  function bTimer(fn, ms) { bloomTimers.push(setTimeout(fn, ms)); }
+  function clearBloomTimers() { bloomTimers.forEach(clearTimeout); bloomTimers = []; }
+  function resetSite() {
+    clearBloomTimers();
+    siteEl.classList.remove("heart-reveal");
+    siteEl.style.transition = "";
+    siteEl.style.webkitMaskImage = siteEl.style.maskImage = "";
+    siteEl.style.webkitMaskSize = siteEl.style.maskSize = "";
+  }
+
+  // ---------- screen switching (used by the reveal + the debug bar) ----------
+  function showLock() {
+    resetSite();
+    backdropEl.style.display = "";
+    successEl.classList.remove("show");
+    siteEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    lockEl.style.display = "";
+    lockEl.classList.remove("dismiss");
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    if (panelEl) panelEl.classList.remove("fade");
+    if (monoEl) monoEl.classList.remove("together");
+    entered = ""; status = "idle"; renderDots();
+    document.body.style.overflow = "hidden";
+    markDebug("lock");
+  }
+  function showCelebration() {
+    resetSite();
+    backdropEl.style.display = "";
+    siteEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    lockEl.style.display = "";
+    lockEl.classList.remove("dismiss");
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    entered = CORRECT_CODE; status = "success"; renderDots();
+    celebrate();
+    successEl.classList.add("show");
+    document.body.style.overflow = "hidden";
+    markDebug("celebrate");
+  }
+  function showBloom() {
+    resetSite();
+    backdropEl.style.display = "";
+    successEl.classList.remove("show");
+    siteEl.classList.remove("show");
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    lockEl.style.display = "none";
+    renderBloom();                 // rebuild markup so the animation restarts
+    bloomEl.classList.add("show");
+    // gentle cross-fade in (over the identical pink base) instead of a hard cut
+    bloomEl.style.opacity = "0";
+    void bloomEl.offsetWidth;
+    bloomEl.style.transition = "opacity 0.8s ease";
+    bloomEl.style.opacity = "1";
+    document.body.style.overflow = "hidden";
+    markDebug("bloom");
+
+    // choreography: bloom → hold → shrink to nothing → soft-heart reveal of the site
+    bTimer(function () {
+      var b = bloomEl.querySelector(".blossom");
+      if (b) b.classList.add("shrink");
+    }, 2900);
+    bTimer(heartRevealToSite, 3650);
+  }
+  function heartRevealToSite() {
+    siteEl.classList.add("show", "heart-reveal");
+    siteEl.style.webkitMaskImage = siteEl.style.maskImage = HEART_MASK;
+    void siteEl.offsetWidth; // commit the 0% start before transitioning
+    siteEl.style.transition = "-webkit-mask-size 1.3s ease-out, mask-size 1.3s ease-out";
+    siteEl.style.webkitMaskSize = siteEl.style.maskSize = "650% 650%";
+    bTimer(showSite, 1450); // once the heart has filled the screen, settle into the real site
+  }
+  function showSite() {
+    clearBloomTimers();
+    successEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    siteEl.classList.remove("heart-reveal");
+    siteEl.style.transition = "";
+    siteEl.style.webkitMaskImage = siteEl.style.maskImage = "";
+    siteEl.style.webkitMaskSize = siteEl.style.maskSize = "";
+    siteEl.classList.add("show");
+    lockEl.classList.add("dismiss");
+    lockEl.style.display = "none";
+    backdropEl.style.display = "none";
+    document.body.style.overflow = "auto";
+    markDebug("site");
+    initNotes();
+    loadNotes();
+  }
+
+  // 📝 note-wall preview (debug tab for now)
+  function showWall() {
+    clearBloomTimers();
+    editingNote = null;
+    successEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    siteEl.classList.remove("show");
+    lockEl.style.display = "none";
+    backdropEl.style.display = "none";
+    wallEl.classList.add("show"); // show first so the board can be measured
+    void wallEl.offsetWidth;
+    renderWall();
+    document.body.style.overflow = "hidden";
+    markDebug("wall");
+  }
+
+  // ---------- shared note styling (used by BOTH the wall and the add-a-note creator) ----------
+  var WFONT = "'Bradley Hand','Segoe Print','Comic Sans MS',cursive";
+  var WSCRIPT = "'Snell Roundhand','Segoe Script',cursive";
+  var WPADS = [
+    { bg: "linear-gradient(170deg,#fffbe4,#fff5cd)", ink: "#8e7442", fold: "#f6ecc4", chk: "#ffe79a" }, // yellow
+    { bg: "linear-gradient(170deg,#fff0f5,#ffe4ee)", ink: "#9c6480", fold: "#f7dbe6", chk: "#ffc8dc" }, // pink
+    { bg: "linear-gradient(170deg,#eef7ff,#e0f0fd)", ink: "#5e7a95", fold: "#d5e8f7", chk: "#c3e2f7" }, // blue
+    { bg: "linear-gradient(170deg,#f0fbee,#e2f5df)", ink: "#5f8461", fold: "#d8efd5", chk: "#c4ecc1" }, // green
+    { bg: "linear-gradient(170deg,#f5f0ff,#ebe3fc)", ink: "#7a6a9e", fold: "#e2d9f6", chk: "#d9caf3" }  // purple
+  ];
+  var WPIN_HUES = ["#e8577b", "#5b8de8", "#e8a83a", "#5bb56a", "#b06ae0"];
+  var WTAPE_HUES = ["rgba(255,190,205,0.78)", "rgba(198,224,255,0.76)", "rgba(255,236,180,0.74)", "rgba(200,240,205,0.74)", "rgba(224,208,248,0.74)"];
+  var WDOODLES = ["♡", "❀", "✧", "ᰔ", "⋆"];
+  var WINK = ["#7c5566", "#3a3a44", "#3b6fa0", "#c0567e", "#6f57a0", "#4f8f6a"]; // pen colours
+  var WDOODLE_CHOICES = ["♥", "♡", "❀", "✿", "✧"];               // corner doodle picker (solid heart + symbols)
+  function heartTile(hex) {
+    var hp = "M0 4 C-4.5 0 -4 -4.5 -1.4 -4.5 C-0.2 -4.5 0 -3 0 -2.3 C0 -3 0.2 -4.5 1.4 -4.5 C4 -4.5 4.5 0 0 4 Z";
+    function h(x, y, r, sc) { return '<path d="' + hp + '" transform="translate(' + x + ' ' + y + ') rotate(' + r + ') scale(' + sc + ')"/>'; }
+    var hearts = h(13, 15, -14, 1.15) + h(46, 20, 16, 0.85) + h(28, 46, -6, 1.05) + h(56, 53, 12, 0.9) + h(7, 52, 8, 0.8) + h(52, 7, -10, 0.75);
+    return "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="66" height="66"><g fill="' + hex + '" opacity="0.11">' + hearts + '</g></svg>');
+  }
+
+  // the two of us
+  var EM = "em yêu";   // M
+  var ANH = "anh yêu"; // V
+
+  var SAMPLE_NOTES = [
+    { body: "you made me tea this morning without asking ♡", author: EM },
+    { body: "you're the prettiest girl in every room", author: ANH },
+    { body: "let's do the picnic again — same bad sandwiches", author: EM },
+    { body: "i love your sleepy morning voice", author: ANH },
+    { body: "9 months. still butterflies", author: EM },
+    { body: "dance with me in the kitchen tonight?", author: ANH },
+    { body: "thank you for being my calm", author: EM },
+    { body: "come home safe, i'll be waiting", author: ANH },
+    { body: "you make ordinary days feel soft", author: EM },
+    { body: "saved you the last bit of cake ❀", author: ANH },
+    { body: "your laugh is my favourite sound", author: EM },
+    { body: "i'd pick you again, every time", author: ANH }
+  ];
+  var USER_NOTES = []; // notes added this session (later: from Supabase)
+
+  function stW(o) { var s = ""; for (var k in o) { if (o[k] == null) continue; var kk = k.charAt(0) === "-" ? k : k.replace(/[A-Z]/g, function (m) { return "-" + m.toLowerCase(); }); s += kk + ":" + o[k] + ";"; } return s; }
+  function escW(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+  function hshW(s) { var x = 0; s = s || ""; for (var i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) | 0; return Math.abs(x); }
+  function hexRgbW(h) { h = h.replace("#", ""); if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2]; return parseInt(h.substr(0,2),16)+","+parseInt(h.substr(2,2),16)+","+parseInt(h.substr(4,2),16); }
+
+  // resolve a note's full style — explicit fields win, anything missing is derived from a hash (samples)
+  function resolveNoteStyle(n) {
+    var seed = hshW((n.body || "") + "|" + (n.author || "") + "|" + (n.seed || ""));
+    return {
+      color: n.color != null ? n.color : (seed >> 17) % WPADS.length,
+      paper: n.paper || ["plain", "lined", "check", "hearts"][(seed >> 11) % 4],
+      curved: n.edge ? n.edge === "curved" : ((seed >> 15) % 2 === 0),
+      folded: n.folded != null ? n.folded : ((seed >> 13) % 4 === 0),
+      fasten: n.fasten || ((seed >> 5) % 2 === 0 ? "pin" : "tape"),
+      pin: n.pin || ["heart", "star", "circle", "flower"][(seed >> 6) % 4],
+      pinColor: n.pinColor != null ? n.pinColor : (seed >> 8) % WPIN_HUES.length,
+      tape: n.tape != null ? n.tape : (seed >> 6) % WTAPE_HUES.length,
+      tapePat: n.tapePat || ["stripe", "plain", "check"][(seed >> 9) % 3],
+      inkColor: n.inkColor != null ? n.inkColor : -1,   // -1 = auto (matches the paper tone)
+      tilt: n.tilt != null ? n.tilt : ((seed >> 3) % 120) / 10 - 6,
+      doodle: n.doodle != null ? n.doodle : WDOODLE_CHOICES[(seed >> 13) % WDOODLE_CHOICES.length],
+      strokes: n.strokes || []
+    };
+  }
+
+  function noteCardBg(s) {
+    var pad = WPADS[s.color], ink = hexRgbW(pad.ink), ct = hexRgbW(pad.chk);
+    if (s.paper === "lined") return "repeating-linear-gradient(180deg, transparent 0 17px, rgba(" + ink + ",0.12) 17px 18px), " + pad.bg;
+    if (s.paper === "check") return "repeating-linear-gradient(0deg, rgba(" + ct + ",0.55) 0 11px, transparent 11px 22px), repeating-linear-gradient(90deg, rgba(" + ct + ",0.55) 0 11px, transparent 11px 22px), " + pad.bg;
+    if (s.paper === "hearts") return "url('" + heartTile(pad.ink) + "'), " + pad.bg;
+    return pad.bg;
+  }
+  function noteDecoHTML(s, k) {
+    k = k || 1;
+    if (s.fasten === "pin") {
+      var pc = WPIN_HUES[s.pinColor];
+      if (s.pin === "circle") return '<span style="' + stW({ position: "absolute", top: (7 * k) + "px", left: "50%", marginLeft: (-7 * k) + "px", width: (14 * k) + "px", height: (14 * k) + "px", borderRadius: "50%", zIndex: 5, background: "radial-gradient(circle at 34% 30%, #fff, " + pc + " 68%, rgba(0,0,0,0.32))", boxShadow: "0 " + (2 * k) + "px " + (4 * k) + "px rgba(120,80,95,0.4)" }) + '"></span>';
+      var glyph = s.pin === "heart" ? "♥" : s.pin === "star" ? "★" : "❀"; // flower
+      return '<span style="' + stW({ position: "absolute", top: (3 * k) + "px", left: "50%", transform: "translateX(-50%)", zIndex: 5, fontSize: (17 * k) + "px", lineHeight: (17 * k) + "px", color: pc, textShadow: "0 2px 3px rgba(120,80,95,0.35)" }) + '">' + glyph + "</span>";
+    }
+    var tc = WTAPE_HUES[s.tape];
+    var tbg = s.tapePat === "plain" ? tc
+      : s.tapePat === "check" ? "repeating-linear-gradient(0deg, rgba(255,255,255,0.5) 0 4px, transparent 4px 8px), repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0 4px, transparent 4px 8px), " + tc
+      : "repeating-linear-gradient(45deg, rgba(255,255,255,0.82) 0 5px, " + tc + " 5px 10px)";
+    return '<span style="' + stW({ position: "absolute", top: (-9 * k) + "px", left: "50%", marginLeft: (-27 * k) + "px", width: (54 * k) + "px", height: (18 * k) + "px", zIndex: 5, transform: "rotate(-3deg)", background: tbg, boxShadow: "0 1px 3px rgba(120,80,95,0.22)", borderRadius: "1px" }) + '"></span>';
+  }
+  // freehand drawing rendered as an SVG overlay (vector strokes, x/y are 0–1 of the note)
+  function strokesSVG(strokes) {
+    if (!strokes || !strokes.length) return "";
+    var polys = strokes.map(function (st) {
+      var pts = st.pts.map(function (p) { return (p[0] * 100).toFixed(1) + "," + (p[1] * 100).toFixed(1); }).join(" ");
+      return '<polyline points="' + pts + '" fill="none" stroke="' + st.color + '" stroke-width="' + st.w + '" stroke-linecap="round" stroke-linejoin="round"/>';
+    }).join("");
+    return '<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4">' + polys + "</svg>";
+  }
+
+  // the deco + card markup (positioning is provided by the parent wrapper)
+  // sizePx = the square side; everything scales off a 210px reference so the note
+  // looks identical (just bigger/smaller) on the wall, preview, expanded view and draw page.
+  function noteInner(s, body, author, sizePx) {
+    var pad = WPADS[s.color];
+    var ink = s.inkColor >= 0 ? WINK[s.inkColor] : pad.ink;
+    var dood = s.doodle === "none" ? "" : s.doodle;
+    var k = sizePx / 210;
+    var card = { position: "relative", width: sizePx + "px", height: sizePx + "px", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: (22 * k) + "px " + (12 * k) + "px " + (9 * k) + "px", backgroundImage: noteCardBg(s), borderRadius: (s.curved ? 12 * k : 2) + "px", boxShadow: "0 " + (7 * k) + "px " + (15 * k) + "px rgba(170,135,145,0.2), inset 0 " + (-10 * k) + "px " + (16 * k) + "px rgba(0,0,0,0.028)" };
+    var foldStyle = s.folded ? { position: "absolute", right: 0, bottom: 0, width: (15 * k) + "px", height: (15 * k) + "px", background: "linear-gradient(135deg, transparent 50%, " + pad.fold + " 50%)" } : { display: "none" };
+    return noteDecoHTML(s, k) +
+      '<div class="wnote-card" style="' + stW(card) + '">' +
+        '<p style="' + stW({ margin: 0, flex: 1, overflow: "hidden", fontFamily: WFONT, fontSize: (14 * k) + "px", lineHeight: (18 * k) + "px", color: ink, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }) + '">' + escW(body) + "</p>" +
+        '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+          '<span style="' + stW({ fontFamily: WSCRIPT, fontSize: (16 * k) + "px", lineHeight: (16 * k) + "px", color: ink, opacity: 0.85 }) + '">— ' + escW(author) + "</span>" +
+          '<span style="' + stW({ fontSize: (12 * k) + "px", color: ink, opacity: 0.55 }) + '">' + dood + "</span>" +
+        "</div>" +
+        '<span style="' + stW(foldStyle) + '"></span>' +
+        strokesSVG(s.strokes) +
+      "</div>";
+  }
+
+  function renderWall() {
+    var NOTES = SAMPLE_NOTES.concat(USER_NOTES);
+    var floaters = "";
+    for (var fi = 0; fi < 14; fi++) {
+      var sparkle = fi % 3 === 1;
+      var fc = ["♡", "✧", "ᰔ", "❀", "˚"][fi % 5];
+      floaters += '<span style="' + stW({
+        left: Math.round(Math.random() * 94) + "%",
+        bottom: sparkle ? (Math.round(Math.random() * 90) + "%") : "-6vh",
+        fontSize: (10 + Math.round(Math.random() * 14)) + "px",
+        color: "rgba(232,150,180," + (0.32 + Math.random() * 0.3).toFixed(2) + ")",
+        animation: sparkle
+          ? "twinkle " + (2.6 + Math.random() * 2.6).toFixed(1) + "s ease-in-out " + (Math.random() * 3).toFixed(1) + "s infinite"
+          : "driftUp " + (17 + Math.random() * 13).toFixed(1) + "s linear " + (Math.random() * 14).toFixed(1) + "s infinite"
+      }) + '">' + fc + "</span>";
+    }
+    var corners =
+      '<span class="wall-corner" style="top:22px;left:24px;">❀</span>' +
+      '<span class="wall-corner" style="top:22px;right:24px;">❀</span>' +
+      '<span class="wall-corner" style="bottom:22px;left:24px;">♡</span>' +
+      '<span class="wall-corner" style="bottom:22px;right:24px;">♡</span>';
+
+    wallEl.innerHTML =
+      '<div class="wall-floaters">' + floaters + "</div>" +
+      '<div class="wall-frame"></div>' + corners +
+      '<button class="wall-add" id="wallAdd" title="add a note"><span>+</span></button>' +
+      '<button class="wall-place" id="wallPlace">place it here ♡</button>' +
+      '<div class="wall-inner">' +
+        '<div class="wall-head">' +
+          '<div class="wall-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
+          '<div class="wall-title">our note wall</div>' +
+          '<div class="wall-count">✧ ' + NOTES.length + ' little notes so far ✧</div>' +
+        "</div>" +
+        '<div class="wall-notes" id="wallNotes"></div>' +
+      "</div>" +
+      '<div class="wall-modal" id="wallModal"></div>';
+
+    var wallNotes = document.getElementById("wallNotes");
+    var bw = wallNotes.clientWidth || 340;
+    var bh = wallNotes.clientHeight || 500;
+    var noteW = Math.min(190, Math.max(148, bw * 0.44));
+
+    if (!renderWall._ctx) renderWall._ctx = document.createElement("canvas").getContext("2d");
+    var ctx = renderWall._ctx;
+    ctx.font = "14px " + WFONT;
+    function lineCount(str, w) {
+      var total = 0, paras = (str || "").split("\n");
+      for (var pi = 0; pi < paras.length; pi++) {
+        var words = paras[pi].split(" "), cur = "", lc = 1;
+        for (var wi = 0; wi < words.length; wi++) {
+          var word = words[wi];
+          while (ctx.measureText(word).width > w) {          // break a very long unbroken word
+            var k = 1; while (k < word.length && ctx.measureText(word.slice(0, k + 1)).width <= w) k++;
+            if (cur) { lc++; } lc++; cur = ""; word = word.slice(k);
+          }
+          var next = cur ? cur + " " + word : word;
+          if (ctx.measureText(next).width > w && cur) { lc++; cur = word; } else cur = next;
+        }
+        total += lc;
+      }
+      return total;
+    }
+
+    // any note without a saved spot gets a tidy starting position (x, y are both % of the board)
+    (function ensurePos() {
+      var cols = bw < 520 ? 2 : (bw < 820 ? 3 : 4), placed = 0;
+      for (var k = 0; k < NOTES.length; k++) {
+        var nn = NOTES[k];
+        if (nn.x == null || nn.y == null) {
+          var c = placed % cols, r = Math.floor(placed / cols);
+          nn.x = cols === 1 ? 50 : 14 + c * (72 / (cols - 1));
+          nn.y = 8 + r * 26;
+          placed++;
+        }
+      }
+    })();
+
+    renderWall._meta = [];
+    var html = "";
+    for (var i = 0; i < NOTES.length; i++) {
+      var n = NOTES[i], s = resolveNoteStyle(n);
+      var noteH = Math.round(noteW); // square post-it (keeps drawings undistorted)
+      var left = Math.round(Math.max(0, Math.min(bw - noteW, n.x / 100 * bw - noteW / 2)));
+      var top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh)));
+      var wrap = { position: "absolute", left: left + "px", top: top + "px", width: Math.round(noteW) + "px", zIndex: 10 + i, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
+
+      renderWall._meta.push({ body: n.body, author: n.author, bg: noteCardBg(s), ink: WPADS[s.color].ink, curved: s.curved });
+      html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH) + "</div>";
+    }
+    wallNotes.innerHTML = html;
+
+    document.getElementById("wallAdd").addEventListener("click", showAdd);
+
+    // ----- drag to place · tap to open -----
+    var modal = document.getElementById("wallModal");
+    function closeModal() { modal.classList.remove("open"); modal.innerHTML = ""; }
+    function openNoteModal(idx) {
+      var n = NOTES[idx], s = resolveNoteStyle(n);
+      var size = Math.round(Math.min(window.innerWidth * 0.82, 380));
+      modal.innerHTML =
+        '<div class="wm-stage">' +
+          '<div class="wm-note-box" style="position:relative;width:' + size + 'px;height:' + size + 'px">' +
+            noteInner(s, n.body, n.author, size) +
+          "</div>" +
+          '<div class="wm-tools">' +
+            '<button class="wm-tool" data-act="close" title="close">✕</button>' +
+            '<button class="wm-tool" data-act="move" title="move it">✥</button>' +
+            '<button class="wm-tool" data-act="edit" title="edit">✎</button>' +
+            '<button class="wm-tool" data-act="delete" title="remove">🗑</button>' +
+          '</div>' +
+        '</div>';
+      modal.classList.add("open");
+      modal.onclick = function (e) {
+        var t = e.target.closest(".wm-tool");
+        if (t) {
+          var a = t.getAttribute("data-act");
+          if (a === "close") closeModal();
+          else if (a === "move") { closeModal(); unlockNote(idx); }
+          else if (a === "edit") { closeModal(); editNote(idx); }
+          else if (a === "delete") { closeModal(); deleteNote(idx); }
+          return;
+        }
+        if (e.target === modal) closeModal(); // tap backdrop to close
+      };
+    }
+    function deleteNote(idx) {
+      var n = NOTES[idx], a = SAMPLE_NOTES.indexOf(n), b = USER_NOTES.indexOf(n);
+      if (a >= 0) SAMPLE_NOTES.splice(a, 1);
+      if (b >= 0) USER_NOTES.splice(b, 1);
+      renderWall();
+    }
+    function editNote(idx) {
+      var n = NOTES[idx], s = resolveNoteStyle(n);
+      editingNote = n;
+      addDraft = { body: n.body, author: n.author, color: s.color, inkColor: s.inkColor >= 0 ? s.inkColor : 0, paper: s.paper, edge: s.curved ? "curved" : "sharp", folded: s.folded, doodle: s.doodle, fasten: s.fasten, pin: s.pin, pinColor: s.pinColor, tape: s.tape, tapePat: s.tapePat, tilt: s.tilt, strokes: (n.strokes || []).map(function (st) { return { color: st.color, w: st.w, pts: st.pts.slice() }; }) };
+      showAdd();
+    }
+
+    // make note `idx` the single movable one (locks all the others)
+    var placeBtn = document.getElementById("wallPlace");
+    placeBtn.addEventListener("click", relockAll);
+    function unlockNote(idx) {
+      for (var k = 0; k < NOTES.length; k++) NOTES[k].locked = k !== idx;
+      var els = wallNotes.querySelectorAll(".wnote");
+      for (var j = 0; j < els.length; j++) els[j].classList.toggle("movable", +els[j].getAttribute("data-i") === idx);
+      placeBtn.classList.add("show");
+    }
+    // lock everything again (confirm placement, or clicking off the movable note)
+    function relockAll() {
+      for (var k = 0; k < NOTES.length; k++) NOTES[k].locked = true;
+      var els = wallNotes.querySelectorAll(".wnote.movable");
+      for (var j = 0; j < els.length; j++) els[j].classList.remove("movable");
+      placeBtn.classList.remove("show");
+    }
+    if (NOTES.some(function (n) { return n.locked === false; })) placeBtn.classList.add("show"); // a just-added note is already movable
+
+    var drag = null;
+    wallNotes.addEventListener("pointerdown", function (e) {
+      var el = e.target.closest(".wnote");
+      if (!el) { relockAll(); return; }              // clicked empty board → lock the movable note
+      var idx = +el.getAttribute("data-i");
+      if (NOTES[idx].locked !== false) relockAll();  // clicked a different (locked) note → lock the movable one
+      drag = { el: el, idx: idx, sx: e.clientX, sy: e.clientY, ol: parseFloat(el.style.left), ot: parseFloat(el.style.top), w: el.offsetWidth, moved: false, movable: NOTES[idx].locked === false };
+      el.setPointerCapture(e.pointerId);
+      if (drag.movable) { el.style.zIndex = 999; el.style.animation = "none"; el.style.cursor = "grabbing"; }
+    });
+    wallNotes.addEventListener("pointermove", function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+      if (Math.abs(dx) + Math.abs(dy) > 5) drag.moved = true;
+      if (!drag.movable || !drag.moved) return;
+      var maxTop = wallNotes.clientHeight - drag.el.offsetHeight;
+      drag.el.style.left = Math.max(0, Math.min(bw - drag.w, drag.ol + dx)) + "px";
+      drag.el.style.top = Math.max(0, Math.min(maxTop, drag.ot + dy)) + "px";
+    });
+    function endDrag() {
+      if (!drag) return;
+      var d = drag; drag = null;
+      if (d.movable) {
+        d.el.style.cursor = ""; d.el.style.zIndex = 10 + d.idx;
+        if (d.moved) {
+          var left = parseFloat(d.el.style.left), top = parseFloat(d.el.style.top);
+          NOTES[d.idx].x = (left + d.w / 2) / bw * 100;   // % of board width
+          NOTES[d.idx].y = top / bh * 100;                 // % of board height
+          // TODO: persist to Supabase
+        } else {
+          openNoteModal(d.idx);                            // tapped the movable note → just read it
+        }
+      } else if (!d.moved) {
+        openNoteModal(d.idx);                              // tap a locked note → open it (use the move ✥ tool to unlock)
+      }
+    }
+    wallNotes.addEventListener("pointerup", endDrag);
+    wallNotes.addEventListener("pointercancel", endDrag);
+  }
+
+  // ---------- the "add a note" creator (its own screen) ----------
+  var addDraft = { body: "", author: EM, color: 1, inkColor: 0, paper: "plain", edge: "curved", folded: false, doodle: "♡", fasten: "tape", pin: "heart", pinColor: 0, tape: 0, tapePat: "stripe", tilt: -2, strokes: [] };
+  var drawStrokes = [], drawColor = "#c0567e", drawW = 2;
+  var DRAW_COLORS = ["#c0567e", "#e8577b", "#5b8de8", "#5bb56a", "#e8a83a", "#7c5566", "#3a3a44", "#ffffff"];
+  var DRAW_SIZES = [{ label: "fine", w: 1.1 }, { label: "medium", w: 2 }, { label: "bold", w: 3.4 }];
+  var editingNote = null; // set when the creator is editing an existing note
+
+  function showAdd() {
+    clearBloomTimers();
+    successEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    siteEl.classList.remove("show");
+    lockEl.style.display = "none";
+    backdropEl.style.display = "none";
+    renderAdd();
+    addEl.classList.add("show");
+    document.body.style.overflow = "auto";
+    markDebug("add");
+  }
+
+  function renderAdd() {
+    function curVal(g) { if (g === "folded") return addDraft.folded ? "folded" : "flat"; return addDraft[g]; }
+    function group(g, items) {
+      return items.map(function (it) {
+        var sel = String(curVal(g)) === String(it.v) ? " sel" : "";
+        if (it.swatch) return '<span class="opt-swatch' + sel + '" data-g="' + g + '" data-v="' + it.v + '" style="background:' + it.swatch + '"></span>';
+        return '<button class="opt' + sel + '" data-g="' + g + '" data-v="' + it.v + '">' + it.label + "</button>";
+      }).join("");
+    }
+    var row = function (label, opts, id) { return '<div class="add-row"' + (id ? ' id="' + id + '"' : "") + '><div class="add-label">' + label + '</div><div class="add-opts">' + opts + "</div></div>"; };
+
+    addEl.innerHTML =
+      '<div class="add-inner">' +
+        '<button class="add-back" id="addCancel" title="back">←</button>' +
+        '<div class="add-title">✎ leave a note</div>' +
+        '<div class="add-cols">' +
+          '<div class="add-col add-col-left">' +
+            '<div class="add-hint">✎ tap the note to write</div>' +
+            '<div class="add-preview"><div class="pv" id="addPvInner"></div></div>' +
+            '<button class="draw-open" id="drawOpen">✎ ' + (addDraft.strokes && addDraft.strokes.length ? "edit drawing" : "add a drawing") + "</button>" +
+            row("from", group("author", [{ v: EM, label: "em yêu (M)" }, { v: ANH, label: "anh yêu (V)" }])) +
+          "</div>" +
+          '<div class="add-col add-col-right">' +
+            row("colour", group("color", WPADS.map(function (p, ix) { return { v: ix, swatch: p.bg }; }))) +
+            row("ink", group("inkColor", WINK.map(function (c, ix) { return { v: ix, swatch: c }; }))) +
+            row("paper", group("paper", [{ v: "plain", label: "plain" }, { v: "lined", label: "lined" }, { v: "check", label: "check" }, { v: "hearts", label: "hearts" }])) +
+            row("edge", group("edge", [{ v: "curved", label: "curved" }, { v: "sharp", label: "sharp" }])) +
+            row("corner doodle", group("doodle", WDOODLE_CHOICES.map(function (d) { return { v: d, label: d }; }))) +
+            row("held up by", group("fasten", [{ v: "pin", label: "pin" }, { v: "tape", label: "tape" }])) +
+            row("pin", group("pin", [{ v: "heart", label: "♥" }, { v: "star", label: "★" }, { v: "circle", label: "●" }, { v: "flower", label: "❀" }]) + '</div><div class="add-opts" style="margin-top:8px">' + group("pinColor", WPIN_HUES.map(function (c, ix) { return { v: ix, swatch: c }; })), "addPinSub") +
+            row("tape", group("tape", WTAPE_HUES.map(function (c, ix) { return { v: ix, swatch: c }; })) + '</div><div class="add-opts" style="margin-top:8px">' + group("tapePat", [{ v: "stripe", label: "striped" }, { v: "plain", label: "plain" }, { v: "check", label: "checkered" }]), "addTapeSub") +
+          "</div>" +
+        "</div>" +
+        '<div class="add-actions"><button class="add-btn primary" id="addSave">pin it to the wall 💗</button></div>' +
+      "</div>";
+
+    if (!renderAdd._bound) {
+      renderAdd._bound = true;
+      addEl.addEventListener("click", function (e) {
+        var o = e.target.closest("[data-g]");
+        if (!o) return;
+        var g = o.getAttribute("data-g"), v = o.getAttribute("data-v");
+        if (g === "color" || g === "pinColor" || g === "tape" || g === "inkColor") addDraft[g] = +v;
+        else if (g === "folded") addDraft.folded = v === "folded";
+        else addDraft[g] = v;
+        var sibs = addEl.querySelectorAll('[data-g="' + g + '"]');
+        for (var k = 0; k < sibs.length; k++) sibs[k].classList.remove("sel");
+        o.classList.add("sel");
+        if (g === "fasten") toggleSub();
+        updatePreview();
+      });
+    }
+    document.getElementById("addCancel").addEventListener("click", showWall);
+    document.getElementById("addSave").addEventListener("click", submitNote);
+    document.getElementById("drawOpen").addEventListener("click", showDraw);
+    toggleSub();
+    updatePreview();
+  }
+
+  function toggleSub() {
+    var p = document.getElementById("addPinSub"), t = document.getElementById("addTapeSub");
+    if (p) p.style.display = addDraft.fasten === "pin" ? "" : "none";
+    if (t) t.style.display = addDraft.fasten === "tape" ? "" : "none";
+  }
+  function updatePreview() {
+    var pv = document.getElementById("addPvInner");
+    if (!pv) return;
+    pv.style.transform = "rotate(" + addDraft.tilt + "deg)";
+    var size = Math.min(340, window.innerWidth - 56); // stable, consistently big
+    pv.innerHTML = noteInner(resolveNoteStyle(addDraft), addDraft.body, addDraft.author, size); // square post-it
+    var p = pv.querySelector(".wnote-card > p");
+    if (p) {
+      p.className = "note-edit";
+      p.setAttribute("contenteditable", "true");
+      p.setAttribute("spellcheck", "false");
+      p.setAttribute("data-ph", "write something sweet…");
+      p.addEventListener("input", function () { addDraft.body = p.innerText; });
+    }
+  }
+  function submitNote() {
+    var body = (addDraft.body || "").trim();
+    if (!body) { var p = document.querySelector("#addPvInner .wnote-card p"); if (p) p.focus(); return; }
+    if (editingNote) {
+      // update the existing note in place (keeps its position on the board)
+      var n = editingNote;
+      n.body = body; n.author = addDraft.author; n.color = addDraft.color; n.inkColor = addDraft.inkColor;
+      n.paper = addDraft.paper; n.edge = addDraft.edge; n.folded = addDraft.folded; n.doodle = addDraft.doodle;
+      n.fasten = addDraft.fasten; n.pin = addDraft.pin; n.pinColor = addDraft.pinColor;
+      n.tape = addDraft.tape; n.tapePat = addDraft.tapePat; n.tilt = addDraft.tilt; n.strokes = addDraft.strokes;
+    } else {
+      SAMPLE_NOTES.forEach(function (n) { n.locked = true; });   // lock everything…
+      USER_NOTES.forEach(function (n) { n.locked = true; });
+      USER_NOTES.push({
+        body: body, author: addDraft.author, color: addDraft.color, inkColor: addDraft.inkColor,
+        paper: addDraft.paper, edge: addDraft.edge, folded: addDraft.folded, doodle: addDraft.doodle,
+        fasten: addDraft.fasten, pin: addDraft.pin, pinColor: addDraft.pinColor, tape: addDraft.tape,
+        tapePat: addDraft.tapePat, tilt: addDraft.tilt, strokes: addDraft.strokes, seed: (USER_NOTES.length + 1) * 7, locked: false,
+        x: 50, y: 10 + (USER_NOTES.length % 6) * 7    // % of board — lands centre-top; drag it anywhere
+      });
+    }
+    addDraft.body = "";
+    showWall();
+  }
+
+  // ---------- the drawing screen ----------
+  function showDraw() {
+    clearBloomTimers();
+    successEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    wallEl.classList.remove("show"); wallEl.innerHTML = "";
+    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    siteEl.classList.remove("show");
+    lockEl.style.display = "none";
+    backdropEl.style.display = "none";
+    renderDraw();
+    drawEl.classList.add("show");
+    document.body.style.overflow = "auto";
+    markDebug("draw");
+  }
+
+  function renderDraw() {
+    var s = resolveNoteStyle(addDraft);
+    var sBg = {}; for (var kk in s) sBg[kk] = s[kk]; sBg.strokes = []; // note look, minus the drawing (canvas handles that)
+    var size = Math.round(Math.min(window.innerWidth * 0.84, 340));
+    drawStrokes = (addDraft.strokes || []).map(function (st) { return { color: st.color, w: st.w, pts: st.pts.slice() }; });
+
+    function sw(list, key, val) { return list.map(function (o) { var v = key === "color" ? o : o.w; var sel = v === val ? " sel" : ""; if (key === "color") return '<span class="opt-swatch' + sel + '" data-dc="' + o + '" style="background:' + o + '"></span>'; return '<button class="opt' + sel + '" data-dw="' + o.w + '">' + o.label + "</button>"; }).join(""); }
+
+    drawEl.innerHTML =
+      '<div class="add-inner">' +
+        '<button class="add-back" id="drawBack" title="back">←</button>' +
+        '<div class="add-title">✎ doodle on it</div>' +
+        '<div class="draw-stage">' +
+          '<div class="draw-card" style="position:relative;width:' + size + 'px;height:' + size + 'px">' +
+            noteInner(sBg, addDraft.body, addDraft.author, size) +
+            '<canvas id="drawCanvas" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;z-index:6;border-radius:' + (s.curved ? "16px" : "3px") + '"></canvas>' +
+          "</div>" +
+        "</div>" +
+        '<div class="draw-tools">' +
+          '<div class="add-label">pen colour</div>' +
+          '<div class="add-opts" id="drawCols">' + sw(DRAW_COLORS, "color", drawColor) + '<input type="color" id="drawHex" class="draw-hex" value="' + drawColor + '" title="custom colour"></div>' +
+          '<div class="add-label">brush size</div>' +
+          '<div class="draw-size-row"><input type="range" id="drawRange" min="0.6" max="6.5" step="0.1" value="' + drawW + '"><span class="draw-size-dot" id="drawDot"></span></div>' +
+          '<div class="add-opts" style="margin-top:14px">' +
+            '<button class="add-btn ghost" id="drawUndo">↶ undo</button>' +
+            '<button class="add-btn ghost" id="drawClear">clear</button>' +
+            '<button class="add-btn primary" id="drawDone">done ✓</button>' +
+          "</div>" +
+        "</div>" +
+      "</div>";
+
+    var canvas = document.getElementById("drawCanvas");
+    var ctx = canvas.getContext("2d");
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = size * dpr; canvas.height = size * dpr; ctx.scale(dpr, dpr);
+    function paintStroke(st) {
+      if (!st.pts.length) return;
+      ctx.strokeStyle = st.color; ctx.lineWidth = st.w / 100 * size; ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.beginPath(); ctx.moveTo(st.pts[0][0] * size, st.pts[0][1] * size);
+      for (var i = 1; i < st.pts.length; i++) ctx.lineTo(st.pts[i][0] * size, st.pts[i][1] * size);
+      if (st.pts.length === 1) ctx.lineTo(st.pts[0][0] * size + 0.1, st.pts[0][1] * size + 0.1);
+      ctx.stroke();
+    }
+    function redraw() { ctx.clearRect(0, 0, size, size); drawStrokes.forEach(paintStroke); }
+    redraw();
+
+    var cur = null;
+    function at(e) { var r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }
+    canvas.addEventListener("pointerdown", function (e) { canvas.setPointerCapture(e.pointerId); cur = { color: drawColor, w: drawW, pts: [at(e)] }; });
+    canvas.addEventListener("pointermove", function (e) { if (!cur) return; cur.pts.push(at(e)); redraw(); paintStroke(cur); });
+    function endStroke() { if (cur) { if (cur.pts.length) drawStrokes.push(cur); cur = null; } }
+    canvas.addEventListener("pointerup", endStroke);
+    canvas.addEventListener("pointercancel", endStroke);
+
+    function setSel(container, el) { var xs = container.children; for (var i = 0; i < xs.length; i++) xs[i].classList.remove("sel"); if (el) el.classList.add("sel"); }
+    var hex = document.getElementById("drawHex"), dot = document.getElementById("drawDot");
+    function updateDot() { var px = Math.max(4, Math.round(drawW * 2.8)); dot.style.width = px + "px"; dot.style.height = px + "px"; dot.style.background = drawColor; }
+    updateDot();
+    document.getElementById("drawCols").addEventListener("click", function (e) { var c = e.target.closest("[data-dc]"); if (c) { drawColor = c.getAttribute("data-dc"); setSel(this, c); hex.value = drawColor; updateDot(); } });
+    hex.addEventListener("input", function () { drawColor = this.value; setSel(document.getElementById("drawCols"), null); updateDot(); });
+    document.getElementById("drawRange").addEventListener("input", function () { drawW = +this.value; updateDot(); });
+    document.getElementById("drawUndo").onclick = function () { drawStrokes.pop(); redraw(); };
+    document.getElementById("drawClear").onclick = function () { drawStrokes = []; redraw(); };
+    document.getElementById("drawDone").onclick = function () { addDraft.strokes = drawStrokes.map(function (st) { return { color: st.color, w: st.w, pts: st.pts }; }); showAdd(); };
+    document.getElementById("drawBack").onclick = function () { showAdd(); };
+  }
+
+  // ---------- home (site) that transitions onto the board on a small scroll/swipe ----------
+  var homeActive = false, navState = "home", navBusy = false;
+
+  function showHome() {
+    clearBloomTimers();
+    successEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = "";
+    siteEl.classList.remove("show");
+    lockEl.style.display = "none";
+    backdropEl.style.display = "none";
+    renderHome();
+    homeEl.style.transition = ""; homeEl.style.transform = "";
+    homeEl.classList.add("show");
+    document.body.style.overflow = "hidden";
+    navState = "home"; navBusy = false; homeActive = true;
+    markDebug("home");
+  }
+
+  function renderHome() {
+    // the site (hero + letter) is the resting state; a tiny scroll transitions to the board
+    var heroEl = siteEl.querySelector(".hero"), letterEl = siteEl.querySelector(".letter");
+    var topHTML = (heroEl ? heroEl.outerHTML : "<section class='hero'><h1>Welcome, my love</h1></section>") + (letterEl ? letterEl.outerHTML : "");
+    homeEl.innerHTML = '<div class="site home-site">' + topHTML + "</div>";
+  }
+
+  // a small scroll/swipe just TRIGGERS a full self-playing slide between site and board
+  // A single "reveal amount" v (0 = home fully shown, 1 = fully dissolved/board shown) drives both:
+  //   • the mask position — the soft transparent band sweeps from the bottom up the screen;
+  //   • the content translate — the page swipes up like a real scroll.
+  // vFrom/vTo let us play it forward (0→1, to board) or backward (1→0, back home).
+  var navRaf = 0; // id of the in-flight transition frame, so we never stack two loops
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function animMask(vFrom, vTo, done) {
+    var t0 = null, dur = 760;
+    var inner = homeEl.querySelector(".home-site") || homeEl;
+    function apply(v) {
+      // slide the 250vh mask up: at v=0 the opaque plateau (0-45% = 0-112vh) fully covers the
+      // 100vh viewport (solid, no peek); as v→1 the smoothstep fade sweeps in from the bottom and
+      // up until fully dissolved (y=-250vh puts the viewport past the transparent end).
+      var y = (-250 * v).toFixed(1) + "vh";
+      homeEl.style.webkitMaskPosition = "0 " + y;
+      homeEl.style.maskPosition = "0 " + y;
+      inner.style.transform = "translate3d(0," + (-110 * v).toFixed(2) + "vh,0)"; // swipe up
+    }
+    function finish() {
+      inner.style.transform = "";
+      homeEl.style.webkitMaskImage = ""; homeEl.style.maskImage = "";
+      homeEl.style.webkitMaskPosition = ""; homeEl.style.maskPosition = "";
+      if (done) done();
+    }
+    if (navRaf) { cancelAnimationFrame(navRaf); navRaf = 0; } // never run two at once
+    if (reduceMotion) { apply(vTo); finish(); return; }        // no motion → snap to end state
+    apply(vFrom);
+    function step(ts) {
+      if (t0 == null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; // ease-in-out
+      apply(vFrom + (vTo - vFrom) * e);
+      if (p < 1) { navRaf = requestAnimationFrame(step); }
+      else { navRaf = 0; finish(); }
+    }
+    navRaf = requestAnimationFrame(step);
+  }
+  function navToBoard() {
+    if (navBusy || navState !== "home") return;
+    navBusy = true; navState = "animating";
+    backdropEl.style.display = "";                 // board's living backdrop
+    wallEl.classList.add("show");                  // show FIRST so the board has real dimensions...
+    void wallEl.offsetWidth;                        // ...force layout...
+    renderWall();                                   // ...then render, so notes size/place exactly like the Wall tab
+    homeEl.classList.add("revealing");
+    animMask(0, 1, function () {  // transparent band sweeps bottom→up + content swipes up, revealing board
+      homeEl.classList.remove("show", "revealing");
+      navState = "board"; navBusy = false;
+    });
+  }
+  function navToHome() {
+    if (navBusy || navState !== "board") return;
+    navBusy = true; navState = "animating";
+    homeEl.classList.add("show", "revealing");
+    animMask(1, 0, function () {  // band recedes back down + content swipes down as the site fills in
+      wallEl.classList.remove("show"); wallEl.innerHTML = "";
+      backdropEl.style.display = "none"; // home is flat cream, no living backdrop
+      homeEl.classList.remove("revealing");
+      navState = "home"; navBusy = false;
+    });
+  }
+
+  window.addEventListener("wheel", function (e) {
+    if (!homeActive) return;
+    if (navState === "home" && e.deltaY > 6) { e.preventDefault(); navToBoard(); }
+    else if (navState === "board" && e.deltaY < -6) { e.preventDefault(); navToHome(); }
+  }, { passive: false });
+  var navTouchY = null;
+  window.addEventListener("touchstart", function (e) { if (homeActive) navTouchY = e.touches[0].clientY; }, { passive: true });
+  window.addEventListener("touchmove", function (e) {
+    if (!homeActive || navTouchY == null) return;
+    var dy = navTouchY - e.touches[0].clientY; // >0 = swipe up
+    if (navState === "home" && dy > 34) { navTouchY = null; navToBoard(); }
+    else if (navState === "board" && dy < -34 && !e.target.closest(".wnote")) { navTouchY = null; navToHome(); }
+  }, { passive: true });
+
+  // ---------- notes board (Supabase) ----------
+  // In the published build these two are blanked and get filled by
+  // decryptPayload() on a correct unlock (build.js handles that).
+  var SUPABASE_URL = "";
+  var SUPABASE_KEY = "";
+  var NOTE_COLORS = ["#fff59d", "#ffd1dc", "#bfe0ff", "#c8f0c8", "#ffe0b3", "#e6d4ff"]; // sticky-note pastels
+  var PIN_COLORS = ["#d63b3b", "#3b74d6", "#e0a021", "#3bb06a", "#c33bd6"];             // pushpins
+  var notesInited = false;
+
+  function notesEndpoint() { return SUPABASE_URL + "/rest/v1/notes"; }
+  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+  function fmtDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+    catch (e) { return ""; }
+  }
+
+  function renderNotes(list) {
+    var grid = document.getElementById("notesGrid");
+    var statusEl = document.getElementById("notesStatus");
+    if (!grid) return;
+    grid.innerHTML = "";
+    if (!list || !list.length) {
+      if (statusEl) { statusEl.style.display = ""; statusEl.textContent = "no notes yet — be the first to leave one 💕"; }
+      return;
+    }
+    if (statusEl) statusEl.style.display = "none";
+    list.forEach(function (n, i) {
+      var el = document.createElement("div");
+      el.className = "note";
+      el.style.background = n.color || NOTE_COLORS[i % NOTE_COLORS.length];
+      el.style.setProperty("--tilt", (((i * 53) % 9) - 4) + "deg");   // stable per-note lean, -4..4°
+      el.style.setProperty("--pin", PIN_COLORS[i % PIN_COLORS.length]);
+      var who = n.author ? '<span class="who">' + esc(n.author) + "</span>" : '<span class="who">&nbsp;</span>';
+      el.innerHTML = '<div class="body">' + esc(n.body) + "</div>" +
+                     '<div class="meta">' + who + "<span>" + fmtDate(n.created_at) + "</span></div>";
+      grid.appendChild(el);
+    });
+  }
+
+  function loadNotes() {
+    var grid = document.getElementById("notesGrid");
+    var statusEl = document.getElementById("notesStatus");
+    if (!grid) return;
+    if (statusEl) { statusEl.style.display = ""; statusEl.textContent = "loading our notes…"; }
+    fetch(notesEndpoint() + "?select=*&order=created_at.desc", {
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(renderNotes)
+      .catch(function (e) {
+        if (statusEl) { statusEl.style.display = ""; statusEl.textContent = "couldn't load our notes right now 😢"; }
+        console.error("[notes] load failed", e);
+      });
+  }
+
+  // attach the "pin a note" handler once the board is in the DOM (dev: at load; prod: after unlock)
+  function initNotes() {
+    if (notesInited) return;
+    var form = document.getElementById("noteForm");
+    if (!form) return;
+    notesInited = true;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var bodyEl = document.getElementById("noteBody");
+      var authorEl = document.getElementById("noteAuthor");
+      var body = bodyEl.value.trim();
+      if (!body) return;
+      var author = authorEl.value.trim();
+      var color = NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)];
+      var btn = form.querySelector("button");
+      btn.disabled = true;
+      fetch(notesEndpoint(), {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY,
+          "Content-Type": "application/json", Prefer: "return=representation"
+        },
+        body: JSON.stringify({ body: body, author: author || null, color: color })
+      })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(function () { bodyEl.value = ""; loadNotes(); })
+        .catch(function (e) { console.error("[notes] post failed", e); alert("Couldn't pin that note — try again in a sec 💗"); })
+        .then(function () { btn.disabled = false; });
+    });
+  }
+
+  // a pretty layered cherry-blossom, drawn in SVG.
+  // Each layer is its own stacked SVG so it can bloom in on its own delay.
+  function renderBloom() {
+    // one petal, pointing up, base at the center (100,100), notched tip at the top
+    var petal = "M100 100 C70 92 58 56 78 30 C83 22 91 22 100 35 C109 22 117 22 122 30 C142 56 130 92 100 100 Z";
+
+    var N = 9; // 💐 nine layers — one for each month together
+
+    // blend two hex colors, t = 0 (a) → 1 (b)
+    function hx(c) { return [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]; }
+    function mix(a, b, t) {
+      var A = hx(a), B = hx(b);
+      return "#" + [0, 1, 2].map(function (k) {
+        var v = Math.round(A[k] + (B[k] - A[k]) * t);
+        return ("0" + v.toString(16)).slice(-2);
+      }).join("");
+    }
+
+    // each layer's petal gradient is interpolated between a light (front)
+    // and a deep (back) palette, so layer N is always a step darker than N-1.
+    var stopDefs = [
+      [0,   "#fffdfe", "#ffe6f0"],  // near-center: stays bright
+      [0.5, "#ffe8f1", "#ff9dc0"],  // middle
+      [1,   "#ffccde", "#df5d89"]   // tip: deepens the most
+    ];
+    function petalGrad(i, t, radius) {
+      var stops = stopDefs.map(function (s) {
+        return '<stop offset="' + s[0] + '" stop-color="' + mix(s[1], s[2], t) + '"/>';
+      }).join("");
+      return '<radialGradient id="petalFill' + i + '" cx="100" cy="100" r="' + radius +
+             '" gradientUnits="userSpaceOnUse">' + stops + '</radialGradient>';
+    }
+    var CORE_GRAD =
+      '<radialGradient id="coreFill" cx="100" cy="97" r="15" gradientUnits="userSpaceOnUse">' +
+        '<stop offset="0" stop-color="#fff7d6"/>' +
+        '<stop offset="0.6" stop-color="#ffe08c"/>' +
+        '<stop offset="1" stop-color="#f4b64f"/>' +
+      '</radialGradient>';
+
+    function svgWrap(defsInner, inner) {
+      return '<svg viewBox="0 0 200 200" width="180" height="180" xmlns="http://www.w3.org/2000/svg">' +
+             '<defs>' + defsInner + '</defs>' + inner + '</svg>';
+    }
+    function petalsMarkup(count, fillId, stroke, scale, rot) {
+      var p = "", step = 360 / count;
+      for (var i = 0; i < count; i++) {
+        p += '<path d="' + petal + '" fill="url(#' + fillId + ')" stroke="' + stroke + '" ' +
+             'stroke-opacity="0.22" stroke-width="1" ' +
+             'transform="rotate(' + (i * step + step / 2 + rot) + ' 100 100)"/>';
+      }
+      return '<g transform="translate(100 100) scale(' + scale + ') translate(-100 -100)">' + p + '</g>';
+    }
+
+    // stamens + golden centre
+    var core = "";
+    for (var s = 0; s < 10; s++) {
+      var ang = (Math.PI * 2 / 10) * s, r = 17;
+      var x = (100 + Math.cos(ang) * r).toFixed(1), y = (100 + Math.sin(ang) * r).toFixed(1);
+      core += '<line x1="100" y1="100" x2="' + x + '" y2="' + y + '" stroke="#f6c14b" stroke-width="1.4"/>' +
+              '<circle cx="' + x + '" cy="' + y + '" r="2.2" fill="#f4a63a"/>';
+    }
+    core += '<circle cx="100" cy="100" r="11" fill="url(#coreFill)"/>';
+
+    var lightGrad = petalGrad(0, 0.32, 96);   // id petalFill0 — soft front petals
+    var deepGrad  = petalGrad(1, 0.62, 122);  // id petalFill1 — deeper back petals
+
+    // a little white twinkle at the petal tip, flashing as the petal pops
+    function spark(begin) {
+      return '<g class="spk" style="animation-delay:' + begin.toFixed(2) + 's">' +
+             '<path d="M100 13 L100 31 M91 22 L109 22" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>' +
+             '<circle cx="100" cy="22" r="2" fill="#fff"/></g>';
+    }
+    // one petal at `angle`, optionally scaled, with its tip sparkle
+    function petalUnit(angle, scale, fillId, stroke, begin) {
+      var body = '<path d="' + petal + '" fill="url(#' + fillId + ')" stroke="' + stroke + '" ' +
+                 'stroke-opacity="0.25" stroke-width="1"/>' + spark(begin);
+      if (scale && scale !== 1) body = '<g transform="translate(100 100) scale(' + scale + ') translate(-100 -100)">' + body + '</g>';
+      return '<g transform="rotate(' + angle + ' 100 100)">' + body + '</g>';
+    }
+    function petalDiv(gradDef, angle, scale, fillId, stroke, delay) {
+      return '<div class="bloom-petal" style="animation-delay:' + delay.toFixed(2) + 's">' +
+             svgWrap(gradDef, petalUnit(angle, scale, fillId, stroke, delay + 0.05)) + '</div>';
+    }
+
+    var STEP = 0.15;
+    var OFF = 0.4; // petals wait for the centre to appear first
+
+    // the golden centre appears first (the heart of the flower), then a 5-petal
+    // blossom opens around it, then 4 more grow in behind (5 → 9) — one per month.
+    var h = '<div class="blossom">';
+    var backAngles = [36, 108, 180, 252];          // 4 back petals filling the gaps of the 5
+    for (var b = 0; b < 4; b++)                     // DOM-first so they paint behind…
+      h += petalDiv(deepGrad, backAngles[b], 1.28, "petalFill1", "#f97ba4", OFF + (5 + b) * STEP + 0.1); // …but appear after the 5
+    for (var i = 0; i < 5; i++)
+      h += petalDiv(lightGrad, i * 72, 1, "petalFill0", "#ff97bd", OFF + i * STEP);
+    // centre first (delay 0), and last in the DOM so it stays on top
+    h += '<div class="bloom-petal" style="animation-delay:0s">' + svgWrap(CORE_GRAD, core) + '</div>';
+    h += '</div>';
+
+    bloomEl.innerHTML = h;
+  }
+
+  // 🔧 DEBUG BAR — dev only, remove before sharing.
+  var debugbar = document.getElementById("debugbar");
+  function markDebug(name) {
+    if (!debugbar) return;
+    var btns = debugbar.querySelectorAll("button");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle("active", btns[i].getAttribute("data-screen") === name);
+    }
+  }
+  var centerguide = document.getElementById("centerguide");
+  if (debugbar) {
+    debugbar.addEventListener("click", function (e) {
+      var t = e.target.closest("[data-toggle]");
+      if (t && t.getAttribute("data-toggle") === "center") {
+        var on = centerguide.classList.toggle("on");
+        t.classList.toggle("active", on);
+        return;
+      }
+      var b = e.target.closest("[data-screen]");
+      if (!b) return;
+      var s = b.getAttribute("data-screen");
+      if (s === "lock") showLock();
+      else if (s === "celebrate") showCelebration();
+      else if (s === "bloom") showBloom();
+      else if (s === "site") showSite();
+      else if (s === "wall") showWall();
+      else if (s === "add") showAdd();
+      else if (s === "draw") showDraw();
+      else if (s === "home") showHome();
+    });
+  }
+
+  
+})();
+
+// ---------- PWA: register the service worker (only over http/https — no-ops on file://) ----------
+if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () { /* offline install is best-effort */ });
+  });
+}
+</script>
+</body>
+</html>
