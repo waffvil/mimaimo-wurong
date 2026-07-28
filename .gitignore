@@ -13,3 +13,7 @@ index.src.html
 
 # full local backup of everything (never published)
 backup/
+
+# local archive of retired screens (never published)
+store.html
+extract-store.js
