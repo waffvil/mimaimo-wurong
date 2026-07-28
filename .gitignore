@@ -10,3 +10,6 @@ index.src.html
 
 # macOS
 .DS_Store
+
+# full local backup of everything (never published)
+backup/
