@@ -17,3 +17,7 @@ backup/
 # local archive of retired screens (never published)
 store.html
 extract-store.js
+
+# web-push VAPID keypair (private key must never publish)
+vapid.secret.json
+*.secret.json
