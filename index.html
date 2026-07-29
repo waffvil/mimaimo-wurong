@@ -406,6 +406,9 @@
   .wall-title { font-family: "Snell Roundhand","Segoe Script","Brush Script MT",cursive; font-size: 34px; color: #cc6488; line-height: 1.25; }
   .wall-count { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #ab7c8f; }
   .wall-notes { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; }
+  /* phone: keep the overlapping scattered look, but flow it downward in a scrollable column */
+  .wall-notes.stack { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+  .wall-notes.stack .wnote { touch-action: pan-y; }   /* a drag over a note scrolls the wall */
   .wnote { position: absolute; cursor: pointer; touch-action: none; }
   .wnote.movable { cursor: grab; }
   .wnote-card { transition: box-shadow 0.25s ease; }
@@ -757,7 +760,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"iZ/q8sygoNCBZ5TJ63I3rw==","iv":"xkcs5VtLd/QZXKI7","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"Pt0a+Vmk5EkL69+jt/Ww3Q==","iv":"z+CcqRqUB2EOaUy2","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1113,7 +1116,7 @@
     if (json) h["Content-Type"] = "application/json";
     return h;
   }
-  var STYLE_KEYS = ["color","inkColor","paper","edge","folded","doodle","fasten","pin","pinColor","tape","tapePat","tilt","size","strokes"];
+  var STYLE_KEYS = ["color","inkColor","paper","edge","folded","doodle","fasten","pin","pinColor","tape","tapePat","tilt","size","rank","strokes"];
   function noteRowToObj(r) {
     var s = r.style || {}, o = { id: r.id, body: r.body, author: r.author, x: r.x, y: r.y, locked: true };
     STYLE_KEYS.forEach(function (k) { o[k] = s[k]; });
@@ -1166,6 +1169,8 @@
   function stW(o) { var s = ""; for (var k in o) { if (o[k] == null) continue; var kk = k.charAt(0) === "-" ? k : k.replace(/[A-Z]/g, function (m) { return "-" + m.toLowerCase(); }); s += kk + ":" + o[k] + ";"; } return s; }
   function escW(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function hshW(s) { var x = 0; s = s || ""; for (var i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) | 0; return Math.abs(x); }
+  // stable order key for the phone grid — explicit random rank wins; older notes fall back to a hash (never re-shuffles)
+  function noteRank(n) { return n.rank != null ? n.rank : hshW((n.body || "") + "|" + (n.author || "")); }
   function hexRgbW(h) { h = h.replace("#", ""); if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2]; return parseInt(h.substr(0,2),16)+","+parseInt(h.substr(2,2),16)+","+parseInt(h.substr(4,2),16); }
 
   // resolve a note's full style — explicit fields win, anything missing is derived from a hash (samples)
@@ -1217,7 +1222,7 @@
       var pts = st.pts.map(function (p) { return (p[0] * 100).toFixed(1) + "," + (p[1] * 100).toFixed(1); }).join(" ");
       return '<polyline points="' + pts + '" fill="none" stroke="' + st.color + '" stroke-width="' + st.w + '" stroke-linecap="round" stroke-linejoin="round"/>';
     }).join("");
-    return '<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4">' + polys + "</svg>";
+    return '<svg viewBox="0 0 100 100" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4">' + polys + "</svg>";
   }
 
   // the deco + card markup (positioning is provided by the parent wrapper)
@@ -1283,6 +1288,9 @@
     var bw = wallNotes.clientWidth || 340;
     var bh = wallNotes.clientHeight || 500;
     var noteW = Math.min(190, Math.max(148, bw * 0.44));
+    var PHONE = window.innerWidth < 600;        // phones flow the scatter downward into a scrollable column
+    wallNotes.classList.toggle("stack", PHONE);
+    if (PHONE) NOTES.forEach(function (n) { n.locked = true; });  // order is by rank — nothing is draggable
 
     if (!renderWall._ctx) renderWall._ctx = document.createElement("canvas").getContext("2d");
     var ctx = renderWall._ctx;
@@ -1305,8 +1313,8 @@
       return total;
     }
 
-    // any note without a saved spot gets a tidy starting position (x, y are both % of the board)
-    (function ensurePos() {
+    // desktop only: any note without a saved spot gets a tidy starting position (x, y are both % of the board)
+    if (!PHONE) (function ensurePos() {
       var cols = bw < 520 ? 2 : (bw < 820 ? 3 : 4), placed = 0;
       for (var k = 0; k < NOTES.length; k++) {
         var nn = NOTES[k];
@@ -1319,20 +1327,52 @@
       }
     })();
 
+    // render order: natural scatter on desktop; sorted by each note's stable rank on phone
+    var order = NOTES.map(function (n, i) { return i; });
+    if (PHONE) order.sort(function (a, b) { return noteRank(NOTES[a]) - noteRank(NOTES[b]); });
+
+    // phone layout: two overlapping columns flowing downward — a scrollable version of the scatter
+    var pColW = Math.round(bw * 0.54);          // wide notes so the columns kiss in the middle
+    var pRowStep = Math.round(pColW * 0.62);    // each row overlaps the one above by ~38%
+    var pLeftX = Math.round(bw * 0.015);
+    var pRightX = bw - pColW - pLeftX;
+    var pBottom = 0;
+
     renderWall._meta = [];
     var html = "";
-    for (var i = 0; i < NOTES.length; i++) {
-      var n = NOTES[i], s = resolveNoteStyle(n);
+    for (var oi = 0; oi < order.length; oi++) {
+      var i = order[oi], n = NOTES[i], s = resolveNoteStyle(n);
       var szf = { s: 1, m: 1, l: 1.26 }[s.size] || 1;         // "small"=medium size, "large"=bigger
-      var nW = Math.round(noteW * szf), noteH = nW;           // square (keeps drawings undistorted)
-      var left = Math.round(Math.max(0, Math.min(bw - nW, n.x / 100 * bw - nW / 2)));
-      var top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh)));
-      var wrap = { position: "absolute", left: left + "px", top: top + "px", width: nW + "px", zIndex: 10 + i, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
-
+      var nW, noteH, wrap;
+      if (PHONE) {
+        var col = oi % 2;
+        var jx = (hshW(n.body) % 9) - 4;                       // ±4px horizontal jitter
+        var jy = (hshW((n.author || "x") + "!") % 11) - 5;     // ±5px vertical jitter
+        var x = (col ? pRightX : pLeftX) + jx;
+        var y = Math.floor(oi / 2) * pRowStep + (col ? Math.round(pColW * 0.32) : 0) + jy; // stagger the right column down so they interlock
+        if (y < 0) y = 0;
+        nW = noteH = pColW;                                    // uniform squares keep the overlap tidy
+        pBottom = Math.max(pBottom, y + noteH);
+        wrap = { position: "absolute", left: x + "px", top: y + "px", width: nW + "px", zIndex: 10 + oi, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
+      } else {
+        nW = Math.round(noteW * szf); noteH = nW;             // square (keeps drawings undistorted)
+        var left = Math.round(Math.max(0, Math.min(bw - nW, n.x / 100 * bw - nW / 2)));
+        var top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh)));
+        wrap = { position: "absolute", left: left + "px", top: top + "px", width: nW + "px", zIndex: 10 + i, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
+      }
       renderWall._meta.push({ body: n.body, author: n.author, bg: noteCardBg(s), ink: WPADS[s.color].ink, curved: s.curved });
       html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH) + "</div>";
     }
+    if (PHONE) html += '<div style="position:relative;width:1px;height:' + (pBottom + 40) + 'px;pointer-events:none"></div>'; // spacer gives the scroll its height
     wallNotes.innerHTML = html;
+
+    // phone: scroll to a just-added note so you watch your new entry land in the column
+    if (PHONE && renderWall._scrollTo != null) {
+      var pos = order.indexOf(WALL_NOTES.indexOf(renderWall._scrollTo));
+      var target = pos >= 0 ? wallNotes.children[pos] : null;
+      if (target) requestAnimationFrame(function () { target.scrollIntoView({ behavior: "smooth", block: "center" }); });
+      renderWall._scrollTo = null;
+    }
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
 
@@ -1349,7 +1389,7 @@
           "</div>" +
           '<div class="wm-tools">' +
             '<button class="wm-tool" data-act="close" title="close">✕</button>' +
-            '<button class="wm-tool" data-act="move" title="move it">✥</button>' +
+            (PHONE ? "" : '<button class="wm-tool" data-act="move" title="move it">✥</button>') +
             '<button class="wm-tool" data-act="edit" title="edit">✎</button>' +
             '<button class="wm-tool" data-act="delete" title="remove">🗑</button>' +
           '</div>' +
@@ -1555,14 +1595,19 @@
       patchNote(n, { body: row.body, author: row.author, style: row.style }); // persist the edit
     } else {
       WALL_NOTES.forEach(function (n) { n.locked = true; });   // lock everything…
+      var onPhone = window.innerWidth < 600;
       var note = {
         body: body, author: addDraft.author, color: addDraft.color, inkColor: addDraft.inkColor,
         paper: addDraft.paper, edge: addDraft.edge, folded: addDraft.folded, doodle: addDraft.doodle,
         fasten: addDraft.fasten, pin: addDraft.pin, pinColor: addDraft.pinColor, tape: addDraft.tape,
-        tapePat: addDraft.tapePat, tilt: addDraft.tilt, size: addDraft.size, strokes: addDraft.strokes, locked: false,
-        x: 50, y: 10    // % of board — lands centre-top; drag it anywhere, which saves the spot
+        tapePat: addDraft.tapePat, tilt: addDraft.tilt, size: addDraft.size,
+        rank: Math.floor(Math.random() * 1e9), // stable random slot in the phone grid
+        strokes: addDraft.strokes, locked: false, // desktop: the single movable note (phone render re-locks everything)
+        // phone: no board spot (the column places it by rank). desktop: lands centre-top, drag to save the spot.
+        x: onPhone ? null : 50, y: onPhone ? null : 10
       };
-      WALL_NOTES.push(note);   // …the new one is the single movable note
+      WALL_NOTES.push(note);   // …the new one is the single movable note (desktop)
+      if (onPhone) renderWall._scrollTo = note; // …and on phone the grid scrolls to wherever its rank lands it
       saveNewNote(note);       // persist to Supabase + backfill its id
     }
     addDraft.body = "";
@@ -1589,7 +1634,7 @@
   function renderDraw() {
     var s = resolveNoteStyle(addDraft);
     var sBg = {}; for (var kk in s) sBg[kk] = s[kk]; sBg.strokes = []; // note look, minus the drawing (canvas handles that)
-    var size = Math.round(Math.min(window.innerWidth * 0.84, 340));
+    var size = Math.min(340, window.innerWidth - 56); // identical to the creator preview, so the note never rescales when toggling draw mode
     drawStrokes = (addDraft.strokes || []).map(function (st) { return { color: st.color, w: st.w, pts: st.pts.slice() }; });
 
     function sw(list, key, val) { return list.map(function (o) { var v = key === "color" ? o : o.w; var sel = v === val ? " sel" : ""; if (key === "color") return '<span class="opt-swatch' + sel + '" data-dc="' + o + '" style="background:' + o + '"></span>'; return '<button class="opt' + sel + '" data-dw="' + o.w + '">' + o.label + "</button>"; }).join(""); }
