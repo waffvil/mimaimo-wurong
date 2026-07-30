@@ -406,6 +406,9 @@
   .wall-title { font-family: "Snell Roundhand","Segoe Script","Brush Script MT",cursive; font-size: 34px; color: #cc6488; line-height: 1.25; }
   .wall-count { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #ab7c8f; }
   .wall-notes { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; }
+  /* phone: notes stack straight down in a scrollable column */
+  .wall-notes.stack { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+  .wall-notes.stack .wnote { touch-action: pan-y; }   /* a drag over a note scrolls the wall */
   .wnote { position: absolute; cursor: pointer; touch-action: none; }
   .wnote.movable { cursor: grab; }
   .wnote-card { transition: box-shadow 0.25s ease; }
@@ -757,7 +760,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"iadTAe6PtblrLavXCGYzug==","iv":"hSGxvxgp0KzJwS35","ct":"pMLlD0ZygszmzlFHB//yE1LvkEuTNPtA12r3W5JR0bSFrEIwLeU9bPF95ZvMVHGyut/LK1Hv9ZvTOagNqZ1nZH6ZVpuZzWHZ4m4kxx3IpeRK4H3YSBx0cRyXfi8G7qHGnMKKKW04kNrBOil2bAnzXIo2m2ohRLXhnSD4LA2GW8brWa3yZcR7MNSnPAbxjCcwZMfKV52CkgyJZDy9Of8e3b83jAikrsGZrGCYnoDh9TCtLsY6k4p5Vq2qdObgyIrjJChw+AgJ0cCFzHnu0zMVyQXpUAPQ4Kh4Uj6Noh1KtHYI6+McJ5IjlzhgvTmuEk+KWmXyQXeflfdGDg1UuxZYVZIJaVtD/5uOnzIAXWrePe0wSUvKWzYoA2hWlL3fPSfjtnxTyKYBBhrgwXFOLYvYQNFuqWzVrqj9kqkk3skNKya2XLR84SIce8pEfznmfrf9Val2La9MFLaXTDHoHzLwHnBzCSEpq2W2BoQ3Tpw4Wt8tHHV4hPUCH74SomAFDfDn9GlF++aSbVN8cGzRyCLHOtNjze3kad+MgZ3aldgkJwXr2xzOJ8SmA/gUQyxCZjwZmN8IAaA2B56I8n5pjIELpnd4k3jwLArED1QCrOhJ/PV7poXt1EiTlvjxlwwLwj9qI3HjLyBZImb9/9JMWR+5E5tCw/ieHwdL71aEptlgwIje2N2BbwMHQ9fCPQXeezSTGtBlOKZO7roSzSOHKiYWXn3GKbzhx94GflNPWH+32akgvUI2icnLz6Z0mtTQdPmvefS4W9LgvIhDIYzdZ8TRqRG2M9+YxPpUIoTETTNmpcSBrMhrbXdHp5Md+QPCvfeFufv+9XTeWLxwFLsC9oQ53pv9FiyKARA26AnxqMLGYrS8+S+Xr0lisWYcmxrhPmghEMopGVYYLxsS1KFa15I24kDjUNVE7QEjC8W5W9AGsWQRFGbMnLUulr9RHSgpnHWLdXjM5MPMq8pamc8ud335K65VJrTzqKghA/f06pQlxsLweSepZEY/vbVueeuKgDN7VL6jU3G/vSW+itxCI/jbAlDFz7EdbG//TSqr5v7Y8bjQGNCeDu1At4f+j39b7D8p8WW3RBdbG2Gtqs6ObyTy2kLxaFBYAk29Q1jbHK+fuQKDhR2kHIdNvpdyefYEudN0THwn6XeCpggbSAevo8eliRpp6RZIr24YpSyNMiv4MLz7MTAZwzy9jwS7d857wVgOmLEG3+bJ2U43rYcuYKr76yIrX+dJskhyNB3ElcbKL9/C42kEXTENzUi9IsP+1zBHpDTwSJbiDyPb7+fYS4q16o4X0+R7cKQhVZP4iJbXBV5w+yDXr1mBve/jVR3h96WGUhSZfAt2Lak6mTZGX7Lx5dkmt+PrReL/psaZ7+XwW4rJBuhnaILgBa0FXm8axW5dnHaTtmVraD1coX2VaH4oyFhc5jOPreYinn6/eNwALqEdqbzM2sQxL4NRGj2NyYMklel1OD6b7pkfGabtmCiGHHtB7faAtzXunmql2AwghtlChEFK5aJ75z6W5rSM5XcrunOPibBvMJlca28XuC85NBfmoNxjUN5wkB7m3AoiZ6GdMn+29NWKFwclHzy9AStchWl7+LCKJemh+8Zinh8mlFCdT1kx8o1lFdosEc5w2VIP0gwERk24Gvc6HJypFOtFzwhlZ4pxUkvbDblQajcQOQqDzH7AnVKJ6GT2qWTemM6iTguSoc9+ypX+caqHkftUak4h69KXPXHTd3xvK0ay3ZDSV2klZB4BnM7Fw0SukcFUM96+H8CZt37fySZUWMsIfF949difdFts8GbkZ1lmFMJAu5+F2KPt3VR5mBcEBwf0bdC7r/5CMUkDQHRRVv9C657g9LaYDz2jEpYtqBp65roX+UZpFAIWki0aC8LSNxuBz4t+W9U8GgTDToBxTBvGxc39ZiLesyGiHvhxIhd83XlU7uSZhQccrnEVrcVn/ebPYWQ4qH5F5yptWkk38SfCAPUubrtfaibsMa6aNDwmowW5fBXgfYXPgECZj0rdd/s2zm/gY5UjGMYGIs75npLrIMlGl6L/w7+uAvciGrqIl3GeC8aFylgabgJdsa53nNd1jfu/KOU7hXahOAbB0T1hEPOkgU1iM0mM1QR3/Z09OUHwPEJqovbQ+WdUkc+7IjrPv49ke3II0B04u40JRulrL6XISOh6bMtalfnd0VlvkachFoyIv/ysrNp8r8PqSK0VcFulcnqbFos885FACy3DGmUCjHQpnL0bQMqAgKxjyVbH+hFT/w1dA6UjLLknbmhuEvDhFRfk3BZUNm0LoCPIONr54mgBOng9PT9OKvFugRDwBKZCUOoDy2KV6bNJy977Mz2NGvIDZghnjCvYwI9M6FRLt4lEFTIqfvZ7Fsr3JVY4+upbc/UPkDKU7vnVPGQOo84enrDtom5MS/jhloGzAij+V+PtHjdPQJXATOW0EtgzgOUy+fEkIXUvyvJBUKr/ltGwwr8GrFr9PbevupCGaE4x6gGJvJ+whdymCcLnWmOhxgt5NHlpTRZGH/qUTbLMfhL5danREUqlrdG+s1nZyOY0NprQlG3xUCsJFOZ/XG5KxiX3M7fCgJ9mnS606clZ48ef2acuXSMg7z/QZG6k41XVeT+9NJo2RbuamX1KT/Ae8/fuVuKy2ePhe2+9btzuOmSrWjiOmH9NzHi28Guy/0+r9oL76AheRRIwcKcQfNvhJQnLP3pB2HmgssmLSf0oG15/reEazMX5L2+wFjOKWifg4J+C1dbDiW0WYPXcBrb7vMTNC0jQmX0vaJ8F6Buqj822URznIIulM+D2v0dBt+DMiCnWS0aMU8OMJmAjWG83cpkCil4LaC4JHsPl10KYLFBnJR2pEhZMtkP5Suib+RCWgyGC2AFfDLVYrb7Br3A6NTzBBwU7xVyXFptTZgPMNjX2QP46s4IdB7CkARUIe1+Pdx+fGxQAQuMVYmuNrd+6Leqt3EloqeMn3RVyCww9Ai4AAHqMxp4pfdPGriBbqhWoxj+GHCK+lS0RWJSa2dAcP6d+l/8KviO9W2bD0XLfobHbt7/3PzbgWzJjsCwaYCV+gBabDClU51IR8zOrVDn3OWYthtnJ/67v6d9G6UA1EvUOhtDOlC1kKgj3mK+n/xN6otxuyYPgGX0RD9j/DJ01e0D1929EVSkLpxw9CUPbo/5Uqkz6VVtlAb5lSVfCB4nvJfX6w1gkDnB4OI4CWgSmctSHuBSCq1Ispd5wXYaUMCTpVYGF9cRW/tTI7rtdoSX8mGlPnMl2SL4qYbjIpw4WpaPTSrhstoIuU1xjlc4YPFWUrl+WCPScocVo35vNPTeFePpwS7w286PgqFpIOWZVu3Xpn1VDSrxx","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"ZaFwWPZamNtFFE7S3kuB5w==","iv":"1WW0/6/dUl4QTZ8O","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1320,8 +1323,10 @@
     })();
 
     // phone: notes can't be placed/moved — they present systematically, in the order a
-    // left→right, top→bottom scan of the desktop board hits them (desktop stays the free layer).
+    // left→right, top→bottom scan of the desktop board hits them, then stack straight down
+    // in a scrollable 2-column column (desktop stays the free layer).
     var PHONE = window.innerWidth < 600;
+    wallNotes.classList.toggle("stack", PHONE);
     if (PHONE) NOTES.forEach(function (n) { n.locked = true; });
     var order = NOTES.map(function (n, i) { return i; });
     if (PHONE) {
@@ -1334,21 +1339,26 @@
     }
 
     renderWall._meta = [];
-    var html = "";
+    var html = "", pBottom = 0;
     for (var oi = 0; oi < order.length; oi++) {
       var i = order[oi], n = NOTES[i], s = resolveNoteStyle(n);
       var szf = { s: 1, m: 1, l: 1.26 }[s.size] || 1;         // "small"=medium size, "large"=bigger
       var nW = Math.round(noteW * szf), noteH = nW;           // square (keeps drawings undistorted)
-      var px, py;
-      if (PHONE) { var c = oi % 2, r = Math.floor(oi / 2); px = c === 0 ? 14 : 86; py = 8 + r * 26; } // tidy 2-col, like the original
-      else { px = n.x; py = n.y; }                            // desktop: the saved, draggable spot
+      var px, py, top;
+      if (PHONE) {
+        var c = oi % 2, r = Math.floor(oi / 2); px = c === 0 ? 14 : 86;
+        top = Math.round((8 + r * 26) / 100 * bh);            // rows step down ~26% each, UNCLAMPED so it keeps going + scrolls
+        pBottom = Math.max(pBottom, top + noteH);
+      } else {
+        px = n.x; top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh))); // desktop: the saved, draggable spot
+      }
       var left = Math.round(Math.max(0, Math.min(bw - nW, px / 100 * bw - nW / 2)));
-      var top = Math.round(Math.max(0, Math.min(bh - noteH, py / 100 * bh)));
       var wrap = { position: "absolute", left: left + "px", top: top + "px", width: nW + "px", zIndex: 10 + oi, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
 
       renderWall._meta.push({ body: n.body, author: n.author, bg: noteCardBg(s), ink: WPADS[s.color].ink, curved: s.curved });
       html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH) + "</div>";
     }
+    if (PHONE) html += '<div style="position:relative;width:1px;height:' + (pBottom + 40) + 'px;pointer-events:none"></div>'; // spacer gives the scroll its height
     wallNotes.innerHTML = html;
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
