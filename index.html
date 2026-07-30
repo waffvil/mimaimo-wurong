@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>M ♡ V</title>
 <!-- PWA: installable, fullscreen, instant-launch on iPhone (Safari → Share → Add to Home Screen) -->
 <link rel="manifest" href="manifest.json">
@@ -406,9 +406,6 @@
   .wall-title { font-family: "Snell Roundhand","Segoe Script","Brush Script MT",cursive; font-size: 34px; color: #cc6488; line-height: 1.25; }
   .wall-count { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #ab7c8f; }
   .wall-notes { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; }
-  /* phone: overlapping pile flowing downward in a scrollable column (order comes from the desktop scan) */
-  .wall-notes.stack { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
-  .wall-notes.stack .wnote { touch-action: pan-y; }   /* a drag over a note scrolls the wall */
   .wnote { position: absolute; cursor: pointer; touch-action: none; }
   .wnote.movable { cursor: grab; }
   .wnote-card { transition: box-shadow 0.25s ease; }
@@ -760,7 +757,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"BL/wT+63G7tnHaDZ/GiQ6A==","iv":"qMJTIwSz/mxV/mwE","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"AO+AKPYtNBuwXVAlLTBOMA==","iv":"1ODlgpe/HH2UezTI","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1308,101 +1305,34 @@
       return total;
     }
 
-    // a note's square side (px) — "large" is a touch bigger than "small"
-    function noteWidth(nn) { var szf = { s: 1, m: 1, l: 1.26 }[resolveNoteStyle(nn).size] || 1; return Math.round(noteW * szf); }
-    function rectOf(nn, w) { var l = nn.x / 100 * bw - w / 2, t = nn.y / 100 * bh; return { l: l, t: t, r: l + w, b: t + w }; }
-
-    // find an empty gap and drop the note at a random spot inside it — a little overlap is fine,
-    // but never fully buried. occ = rectangles already taken (built up as we place each note).
-    var occ = [];
-    function placeInGap(w) {
-      var xmin = w / 2, xmax = Math.max(xmin, bw - w / 2), ymax = Math.max(0, bh - w);
-      var best = null, bestOv = Infinity;
-      for (var t = 0; t < 140; t++) {
-        var cx = xmin + Math.random() * (xmax - xmin), ty = Math.random() * ymax;
-        var l = cx - w / 2, tp = ty, r = cx + w / 2, b = ty + w, ov = 0;
-        for (var q = 0; q < occ.length; q++) {
-          var o = occ[q];
-          var ix = Math.max(0, Math.min(r, o.r) - Math.max(l, o.l));
-          var iy = Math.max(0, Math.min(b, o.b) - Math.max(tp, o.t));
-          ov = Math.max(ov, ix * iy);
+    // any note without a saved spot gets a tidy starting position (x, y are both % of the board)
+    (function ensurePos() {
+      var cols = bw < 520 ? 2 : (bw < 820 ? 3 : 4), placed = 0;
+      for (var k = 0; k < NOTES.length; k++) {
+        var nn = NOTES[k];
+        if (nn.x == null || nn.y == null) {
+          var c = placed % cols, r = Math.floor(placed / cols);
+          nn.x = cols === 1 ? 50 : 14 + c * (72 / (cols - 1));
+          nn.y = 8 + r * 26;
+          placed++;
         }
-        var ratio = ov / (w * w);
-        if (ratio <= 0.16) { best = { cx: cx, ty: ty }; break; }   // slight overlap OK → accept
-        if (ratio < bestOv) { bestOv = ratio; best = { cx: cx, ty: ty }; } // else remember the least-buried spot
       }
-      occ.push({ l: best.cx - w / 2, t: best.ty, r: best.cx + w / 2, b: best.ty + w });
-      return { x: best.cx / bw * 100, y: best.ty / bh * 100 };
-    }
-    // pass 1: register notes that already have a saved spot; pass 2: gap-place the ones that don't (and persist)
-    NOTES.forEach(function (nn) { if (nn.x != null && nn.y != null) occ.push(rectOf(nn, noteWidth(nn))); });
-    NOTES.forEach(function (nn) {
-      if (nn.x == null || nn.y == null) {
-        var p = placeInGap(noteWidth(nn));
-        nn.x = p.x; nn.y = p.y;
-        if (nn.id) patchNote(nn, { x: nn.x, y: nn.y });   // save the spot so it never re-shuffles
-      }
-    });
-
-    // phones can't drag on the full canvas, so they show a systematic grid instead of the scatter.
-    // order = the sequence a left→right, top→bottom scan of the desktop board would hit the notes in.
-    var PHONE = window.innerWidth < 600;
-    wallNotes.classList.toggle("stack", PHONE);
-    if (PHONE) NOTES.forEach(function (n) { n.locked = true; });
-    var order = NOTES.map(function (n, i) { return i; });
-    if (PHONE) {
-      var scan = NOTES.map(function (n, i) { return { i: i, x: n.x || 0, y: n.y || 0 }; });
-      scan.sort(function (a, b) { return a.y - b.y; });          // top → bottom
-      var rows = [], cur = null, tol = 12;                       // notes within 12% of each other in y = one row
-      scan.forEach(function (o) { if (!cur || o.y > cur.top + tol) { cur = { top: o.y, items: [] }; rows.push(cur); } cur.items.push(o); });
-      order = [];
-      rows.forEach(function (r) { r.items.sort(function (a, b) { return a.x - b.x; }); r.items.forEach(function (o) { order.push(o.i); }); }); // left → right within each row
-    }
-    // phone pile: two side-by-side columns; the top row sits level, each row below overlaps the one above
-    var pBase = bw * 0.47, pMargin = Math.round(bw * 0.015);
-    function pSzf(idx) { return { s: 1, m: 1, l: 1.26 }[resolveNoteStyle(NOTES[idx]).size] || 1; }
-    var rowTop = [], acc = 0;                                    // top y of each 2-up row (cumulative, overlapping)
-    for (var r2 = 0; r2 * 2 < order.length; r2++) {
-      rowTop[r2] = acc;
-      var hA = pBase * pSzf(order[r2 * 2]);
-      var hB = order[r2 * 2 + 1] != null ? pBase * pSzf(order[r2 * 2 + 1]) : 0;
-      acc += Math.round(Math.max(hA, hB) * 0.68);                // next row overlaps this one by ~32%
-    }
-    var pBottom = 0;
+    })();
 
     renderWall._meta = [];
     var html = "";
-    for (var oi = 0; oi < order.length; oi++) {
-      var i = order[oi], n = NOTES[i], s = resolveNoteStyle(n);
-      var szf = { s: 1, m: 1, l: 1.26 }[s.size] || 1;            // "small" vs "large"
-      var nW, noteH, wrap;
-      if (PHONE) {
-        var col = oi % 2, row = Math.floor(oi / 2);
-        nW = noteH = Math.round(pBase * szf);                    // reflect the note's size in the pile
-        var jx = (hshW(n.body) % 7) - 3, jy = (hshW((n.author || "x") + "!") % 7) - 3; // gentle jitter
-        var leftPx = (col ? (bw - nW - pMargin) : pMargin) + jx; // left column hugs left, right hugs right → side by side
-        var topPx = rowTop[row] + jy; if (topPx < 0) topPx = 0;
-        pBottom = Math.max(pBottom, topPx + nW);
-        wrap = { position: "absolute", left: leftPx + "px", top: topPx + "px", width: nW + "px", zIndex: 10 + oi, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
-      } else {
-        nW = noteWidth(n); noteH = nW;                           // square (keeps drawings undistorted)
-        var left = Math.round(Math.max(0, Math.min(bw - nW, n.x / 100 * bw - nW / 2)));
-        var top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh)));
-        wrap = { position: "absolute", left: left + "px", top: top + "px", width: nW + "px", zIndex: 10 + i, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
-      }
+    for (var i = 0; i < NOTES.length; i++) {
+      var n = NOTES[i], s = resolveNoteStyle(n);
+      var szf = { s: 1, m: 1, l: 1.26 }[s.size] || 1;         // "small"=medium size, "large"=bigger
+      var nW = Math.round(noteW * szf), noteH = nW;           // square (keeps drawings undistorted)
+      var left = Math.round(Math.max(0, Math.min(bw - nW, n.x / 100 * bw - nW / 2)));
+      var top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh)));
+      var wrap = { position: "absolute", left: left + "px", top: top + "px", width: nW + "px", zIndex: 10 + i, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
+
       renderWall._meta.push({ body: n.body, author: n.author, bg: noteCardBg(s), ink: WPADS[s.color].ink, curved: s.curved });
       html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH) + "</div>";
     }
-    if (PHONE) html += '<div style="position:relative;width:1px;height:' + (pBottom + 40) + 'px;pointer-events:none"></div>'; // spacer gives the scroll its height
     wallNotes.innerHTML = html;
-
-    // phone: after adding, scroll to your new note wherever the scan-order slotted it
-    if (PHONE && renderWall._scrollTo != null) {
-      var pos = order.indexOf(WALL_NOTES.indexOf(renderWall._scrollTo));
-      var target = pos >= 0 ? wallNotes.children[pos] : null;
-      if (target) requestAnimationFrame(function () { target.scrollIntoView({ behavior: "smooth", block: "center" }); });
-      renderWall._scrollTo = null;
-    }
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
 
@@ -1419,7 +1349,7 @@
           "</div>" +
           '<div class="wm-tools">' +
             '<button class="wm-tool" data-act="close" title="close">✕</button>' +
-            (PHONE ? "" : '<button class="wm-tool" data-act="move" title="move it">✥</button>') +
+            '<button class="wm-tool" data-act="move" title="move it">✥</button>' +
             '<button class="wm-tool" data-act="edit" title="edit">✎</button>' +
             '<button class="wm-tool" data-act="delete" title="remove">🗑</button>' +
           '</div>' +
@@ -1629,12 +1559,10 @@
         body: body, author: addDraft.author, color: addDraft.color, inkColor: addDraft.inkColor,
         paper: addDraft.paper, edge: addDraft.edge, folded: addDraft.folded, doodle: addDraft.doodle,
         fasten: addDraft.fasten, pin: addDraft.pin, pinColor: addDraft.pinColor, tape: addDraft.tape,
-        tapePat: addDraft.tapePat, tilt: addDraft.tilt, size: addDraft.size,
-        strokes: addDraft.strokes, locked: false,   // the new note is the single movable one
-        x: null, y: null   // no spot yet → the board drops it into a random empty gap (then saves it)
+        tapePat: addDraft.tapePat, tilt: addDraft.tilt, size: addDraft.size, strokes: addDraft.strokes, locked: false,
+        x: 50, y: 10    // % of board — lands centre-top; drag it anywhere, which saves the spot
       };
-      WALL_NOTES.push(note);
-      renderWall._scrollTo = note; // phone: scroll to it once it's gap-placed + slotted into the scan order
+      WALL_NOTES.push(note);   // …the new one is the single movable note
       saveNewNote(note);       // persist to Supabase + backfill its id
     }
     addDraft.body = "";
