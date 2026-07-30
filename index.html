@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>M ♡ V</title>
 <!-- PWA: installable, fullscreen, instant-launch on iPhone (Safari → Share → Add to Home Screen) -->
 <link rel="manifest" href="manifest.json">
@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="M + V">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; height: 100%; }
@@ -384,7 +384,7 @@
   .wall {
     position: fixed; inset: 0; z-index: 6; display: none;
     overflow: hidden;
-    padding: 30px 22px 22px; color: #74505c;
+    padding: calc(30px + env(safe-area-inset-top)) 22px calc(22px + env(safe-area-inset-bottom)); color: #74505c;
     background-color: #fffaf1;
     background-image:
       radial-gradient(circle at 20% 10%, rgba(255,240,190,0.34), transparent 48%),
@@ -760,7 +760,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"mIDZfKuePuo3MfNPiMNvBg==","iv":"L1Ce2552JL2LLeLx","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"BL/wT+63G7tnHaDZ/GiQ6A==","iv":"qMJTIwSz/mxV/mwE","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1358,9 +1358,17 @@
       order = [];
       rows.forEach(function (r) { r.items.sort(function (a, b) { return a.x - b.x; }); r.items.forEach(function (o) { order.push(o.i); }); }); // left → right within each row
     }
-    // phone pile: two overlapping columns flowing downward, in the scan order, sizes reflected
-    var pBase = bw * 0.52, pMargin = Math.round(bw * 0.01);
-    var colY = [0, Math.round(pBase * 0.30)], pBottom = 0;       // right column starts lower so the two interlock
+    // phone pile: two side-by-side columns; the top row sits level, each row below overlaps the one above
+    var pBase = bw * 0.47, pMargin = Math.round(bw * 0.015);
+    function pSzf(idx) { return { s: 1, m: 1, l: 1.26 }[resolveNoteStyle(NOTES[idx]).size] || 1; }
+    var rowTop = [], acc = 0;                                    // top y of each 2-up row (cumulative, overlapping)
+    for (var r2 = 0; r2 * 2 < order.length; r2++) {
+      rowTop[r2] = acc;
+      var hA = pBase * pSzf(order[r2 * 2]);
+      var hB = order[r2 * 2 + 1] != null ? pBase * pSzf(order[r2 * 2 + 1]) : 0;
+      acc += Math.round(Math.max(hA, hB) * 0.68);                // next row overlaps this one by ~32%
+    }
+    var pBottom = 0;
 
     renderWall._meta = [];
     var html = "";
@@ -1369,12 +1377,11 @@
       var szf = { s: 1, m: 1, l: 1.26 }[s.size] || 1;            // "small" vs "large"
       var nW, noteH, wrap;
       if (PHONE) {
-        var col = oi % 2;
+        var col = oi % 2, row = Math.floor(oi / 2);
         nW = noteH = Math.round(pBase * szf);                    // reflect the note's size in the pile
-        var jx = (hshW(n.body) % 9) - 4, jy = (hshW((n.author || "x") + "!") % 9) - 4; // gentle jitter
-        var leftPx = (col ? (bw - nW - pMargin) : pMargin) + jx; // left column hugs left, right column hugs right → they overlap in the middle
-        var topPx = colY[col] + jy; if (topPx < 0) topPx = 0;
-        colY[col] = topPx + Math.round(nW * 0.64);               // advance the column, leaving ~36% overlap with the next
+        var jx = (hshW(n.body) % 7) - 3, jy = (hshW((n.author || "x") + "!") % 7) - 3; // gentle jitter
+        var leftPx = (col ? (bw - nW - pMargin) : pMargin) + jx; // left column hugs left, right hugs right → side by side
+        var topPx = rowTop[row] + jy; if (topPx < 0) topPx = 0;
         pBottom = Math.max(pBottom, topPx + nW);
         wrap = { position: "absolute", left: leftPx + "px", top: topPx + "px", width: nW + "px", zIndex: 10 + oi, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
       } else {
