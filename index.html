@@ -13,7 +13,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; height: 100%; }
+  /* height: 100vh, NOT 100% — this is the fix for the iOS "chin gap" (the white bar above the home
+     indicator). With viewport-fit=cover + apple-mobile-web-app-status-bar-style: black-translucent,
+     WebKit offsets the whole view up by the status-bar height (~59px) but does NOT grow the viewport, so
+     a 100%-height html/body ends ~59px short of the screen bottom and the webview's own white shows
+     through there. No page paint can reach it — that zone is outside the document box. 100vh resolves
+     against the real viewport instead of the containing block, so the document covers the full screen.
+     100dvh does NOT fix it. Keep this even if the meta tags change later; it costs nothing. */
+  html, body { margin: 0; padding: 0; height: 100vh; }
   /* ROOT SKINS — no bottom strip, on any screen.
      iOS paints the bottom safe-area (home-indicator) zone from the ROOT background, so whatever <html>
      carries IS that zone. Two rules kill the visible band:
@@ -35,11 +42,7 @@
      .boardbg instead, which FADES OUT into this exact colour before the bottom edge, so there is no hard
      edge anywhere for the eye to read as a bar. This is the belt-and-braces version: it does not depend
      on knowing which layer iOS samples for that zone. */
-  /* DIAGNOSTIC (temporary — revert to #fffaf1): lime makes the root's paint unmistakable, so one phone
-     screenshot answers whether the bottom strip is the ROOT BACKGROUND (page-controlled → fixable in CSS)
-     or system chrome outside the page (not fixable in CSS). Paired with the mask disabled below, so the
-     boundary is a hard edge instead of a fade. */
-  html.rt-board { background: #00ff00; }
+  html.rt-board { background: #fffaf1; }
   /* the checkered board pattern, masked to dissolve into the flat cream above the bottom edge.
      Phone only (desktop screens keep their own opaque backgrounds); shown on the board screens via the
      root skin, so the wall and the add/draw creators all share one layer. */
@@ -435,7 +438,7 @@
      dashed frame. The banner/ears/frame are pinned; the header + notes scroll underneath them.
      Rules scoped under .wall so they out-specify the base .wall-* rules later in this stylesheet. */
   @media (max-width: 600px) {
-    html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+    html, body { height: 100vh; overflow: hidden; overscroll-behavior: none; }   /* 100vh — see the chin-gap note up top */
     /* THE anti-strip layer. position:fixed inset:0 anchors it to the viewport, so its pattern aligns with
        nothing in particular — it is the only copy. The mask ramps the whole pattern to fully transparent
        over the last 130px, revealing the flat html.rt-board cream underneath, so the pattern never meets
@@ -451,10 +454,8 @@
         repeating-linear-gradient(90deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px),
         repeating-linear-gradient(0deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px);
       background-position: 0 0, 0 0, 8px 8px, 8px 8px, 0 0, 0 0;
-      /* DIAGNOSTIC: mask disabled so the pattern runs to a HARD edge (restore the two commented lines) */
-      background-color: #fffaf1;
-      /* -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 130px), transparent 100%);
-         mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 130px), transparent 100%); */
+      -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 130px), transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 130px), transparent 100%);
     }
     /* TRANSPARENT on phone: html.rt-board (see the root skins at the top) is the ONE layer that paints
        the board, and because it is background-attachment:fixed it paints the safe-area zone too. One
@@ -894,7 +895,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"CqFPQ2S6L/v2boF/iKZHwA==","iv":"W4RBR433FfLTq4Ph","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"wyN8pJ0YxoVesGIOdr0i4w==","iv":"foAC2N/EfzYUg0fL","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1215,7 +1216,7 @@
   }
 
   // ---------- shared note styling (used by BOTH the wall and the add-a-note creator) ----------
-  var MV_BUILD = "17";   // TEMPORARY: bump on every deploy while diagnosing the bottom strip
+  var MV_BUILD = "18";   // TEMPORARY: bump on every deploy while diagnosing the bottom strip
   var WFONT = "'Bradley Hand','Segoe Print','Comic Sans MS',cursive";
   var WSCRIPT = "'Snell Roundhand','Segoe Script',cursive";
   var WPADS = [
