@@ -29,20 +29,17 @@
          background-attachment: fixed; }
   /* home + site: matches .home-site / .site */
   html.rt-warm { background: linear-gradient(160deg, #fff6f2 0%, #fff8f0 100%) #fff8f0; background-attachment: fixed; }
-  /* note board + add/draw: the checkered board. On phone those screens go transparent (see the media
-     query) so THIS is the single layer painting every pixel — board and safe-area zone alike. */
-  html.rt-board {
-    background-color: #fffaf1;
-    background-image:
-      radial-gradient(circle at 20% 10%, rgba(255,240,190,0.34), transparent 48%),
-      radial-gradient(circle at 84% 34%, rgba(255,214,228,0.30), transparent 48%),
-      repeating-linear-gradient(90deg, rgba(244,150,178,0.055) 0 30px, transparent 30px 60px),
-      repeating-linear-gradient(0deg, rgba(244,150,178,0.055) 0 30px, transparent 30px 60px),
-      repeating-linear-gradient(90deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px),
-      repeating-linear-gradient(0deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px);
-    background-position: 0 0, 0 0, 8px 8px, 8px 8px, 0 0, 0 0;
-    background-attachment: fixed;
-  }
+  /* note board + add/draw: FLAT cream, deliberately pattern-free. Whatever iOS decides to paint into the
+     bottom safe-area zone, the only colour it can possibly get is this one flat value — there is no
+     pattern to misalign and no gradient to fall short. The board's checkered pattern is painted by
+     .boardbg instead, which FADES OUT into this exact colour before the bottom edge, so there is no hard
+     edge anywhere for the eye to read as a bar. This is the belt-and-braces version: it does not depend
+     on knowing which layer iOS samples for that zone. */
+  html.rt-board { background: #fffaf1; }
+  /* the checkered board pattern, masked to dissolve into the flat cream above the bottom edge.
+     Phone only (desktop screens keep their own opaque backgrounds); shown on the board screens via the
+     root skin, so the wall and the add/draw creators all share one layer. */
+  .boardbg { display: none; }
   body {
     font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
     color: #6f4a54;
@@ -435,6 +432,24 @@
      Rules scoped under .wall so they out-specify the base .wall-* rules later in this stylesheet. */
   @media (max-width: 600px) {
     html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+    /* THE anti-strip layer. position:fixed inset:0 anchors it to the viewport, so its pattern aligns with
+       nothing in particular — it is the only copy. The mask ramps the whole pattern to fully transparent
+       over the last 130px, revealing the flat html.rt-board cream underneath, so the pattern never meets
+       the bottom edge with a visible boundary. If iOS's fixed viewport stops short of the home indicator,
+       the fade simply finishes earlier and the zone is that same flat cream — seamless either way. */
+    html.rt-board .boardbg {
+      display: block; position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(255,240,190,0.34), transparent 48%),
+        radial-gradient(circle at 84% 34%, rgba(255,214,228,0.30), transparent 48%),
+        repeating-linear-gradient(90deg, rgba(244,150,178,0.055) 0 30px, transparent 30px 60px),
+        repeating-linear-gradient(0deg, rgba(244,150,178,0.055) 0 30px, transparent 30px 60px),
+        repeating-linear-gradient(90deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px),
+        repeating-linear-gradient(0deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px);
+      background-position: 0 0, 0 0, 8px 8px, 8px 8px, 0 0, 0 0;
+      -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 130px), transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 130px), transparent 100%);
+    }
     /* TRANSPARENT on phone: html.rt-board (see the root skins at the top) is the ONE layer that paints
        the board, and because it is background-attachment:fixed it paints the safe-area zone too. One
        layer covering every pixel makes a seam geometrically impossible — no second copy of the pattern
@@ -805,6 +820,9 @@
 </style>
 </head>
 <body>
+  <!-- checkered board pattern for the phone board screens, fading out before the bottom edge so the
+       iOS safe-area zone is only ever the flat cream underneath (see "ROOT SKINS" / .boardbg in the CSS) -->
+  <div class="boardbg"></div>
   <!-- persistent living backdrop (gradient base on <body>) — shows behind every screen -->
   <div class="backdrop" id="backdrop">
     <div class="shimmer"></div>
@@ -870,7 +888,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"2OQQsUOflm6yiozS2qSIPQ==","iv":"B4H1fle3FuETOZbX","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"XTcmkJLfmcU20TT+T0Jxzw==","iv":"f6oJHQwmXeFEUoiH","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
