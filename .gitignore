@@ -21,3 +21,6 @@ extract-store.js
 # web-push VAPID keypair (private key must never publish)
 vapid.secret.json
 *.secret.json
+
+# local-only phone preview (references the plaintext source)
+phone-preview.html

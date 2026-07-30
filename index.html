@@ -400,38 +400,75 @@
   }
   .wall.show { display: flex; flex-direction: column; }
   .wall-frame { position: absolute; inset: 18px; z-index: 0; pointer-events: none; border-radius: 20px; border: 2px solid rgba(214,150,178,0.6); box-shadow: inset 0 0 0 5px rgba(255,255,255,0.4), 0 6px 20px rgba(204,100,136,0.06); }
-  /* phone: the ENTIRE page scrolls as one document (header + notes move together);
-     only the + stays pinned. The board is NOT a fixed inner-scroll window — it flows in
-     normal document flow so there is no clipped viewport, no hard top/bottom edge, and
-     nothing peeks through underneath (no pink chunk). */
+  /* phone-only cute chrome — hidden on desktop (desktop keeps the plain .wall-frame) */
+  .wall-banner, .wall-banner-scallop, .wall-banner-hearts, .wall-ears, .wall-curtain-deco, .ws-heart { display: none; }
+  .wall-sheet { display: contents; }   /* desktop: transparent to layout; phone turns it into the framed sheet */
+
+  /* PHONE VIEW (exclusive): scalloped pink banner + ears round the Dynamic Island + a scalloped,
+     dashed frame. The banner/ears/frame are pinned; the header + notes scroll underneath them.
+     Rules scoped under .wall so they out-specify the base .wall-* rules later in this stylesheet. */
   @media (max-width: 600px) {
-    html, body { height: auto; min-height: 100%; overflow: visible; overflow-x: hidden; overscroll-behavior-y: none; }
-    .wall {
-      position: relative; z-index: 6;                        /* flows in the page → the whole thing scrolls */
-      top: auto; left: auto; right: auto; bottom: auto;
-      height: auto; min-height: 100dvh;                      /* always fills at least the screen (cream to every edge) */
-      overflow: visible; padding: 0;                         /* no container = no fixed frame/window */
+    html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+    .wall.show {
+      display: block; position: fixed; inset: 0;
+      height: 100dvh; overflow: hidden; padding: 0;
+      --bh: max(58px, env(safe-area-inset-top), var(--sat, 0px));   /* banner height clears the notch */
     }
-    .wall.show { display: block; }
-    .wall-notes { flex: none; }                              /* natural (tall) height → the document scrolls */
-    .wall-frame { display: none; }                           /* replaced by a soft border on the content below */
-    .wall-inner {
-      flex: none;
-      border: 2px solid rgba(214,150,178,0.6); border-radius: 40px;
-      box-shadow: inset 0 0 0 5px rgba(255,255,255,0.4);
-      /* safe-area is consumed ONCE here (as the gap above the frame) so the frame starts cleanly
-         below the notch / Dynamic Island on every iPhone; inside is a plain fixed padding. */
-      margin: max(10px, env(safe-area-inset-top)) 10px max(16px, env(safe-area-inset-bottom));
-      padding: 22px 12px 30px;
+    .wall .wall-frame { display: none; }
+
+    /* pink scalloped banner across the very top */
+    .wall .wall-banner { display: block; position: absolute; top: 0; left: 0; right: 0; height: var(--bh); z-index: 6;
+      background: linear-gradient(180deg, #ffe6ee 0%, #ffd8e6 100%); }
+    .wall .wall-banner-scallop { display: block; position: absolute; top: var(--bh); left: 0; right: 0; height: 16px; z-index: 6;
+      background-image: radial-gradient(circle 11px at 11px 0, #ffd8e6 10.4px, rgba(255,255,255,0) 10.9px);
+      background-size: 22px 16px; background-repeat: repeat-x; }
+    .wall .wall-banner-hearts { display: flex; position: absolute; top: calc(var(--bh) + 13px); left: 0; right: 0; height: 12px; z-index: 6;
+      justify-content: space-around; padding: 0 12px; font-size: 9px; line-height: 9px; color: rgba(214,110,145,0.7); }
+
+    /* ୨♡୧ flourish sits on the curtain, centred just under the island */
+    .wall .wall-curtain-deco { display: block; position: absolute; top: calc(var(--bh) - 12px); left: 0; right: 0; z-index: 8;
+      text-align: center; font-size: 12px; letter-spacing: 3px; color: #c17a97; }
+    .wall .wall-head .wall-deco { display: none; }   /* moved onto the curtain; don't repeat it in the header */
+
+    /* cat-ears flanking the Dynamic Island */
+    .wall .wall-ears { display: block; }
+    .wall .wall-ear { position: absolute; z-index: 7; transform-origin: bottom center; }
+    .wall .ear-lo { top: 0; left: 50%; margin-left: -82px; width: 34px; height: 36px; background: #111; transform: rotate(-12deg);
+      clip-path: path('M18,1 C25,9 30,20 31,27 C31,31 27,32 22,31 C16,30 10,30 5,31 C1,32 0,30 1,27 C3,19 10,8 18,1 Z'); }
+    .wall .ear-li { top: 10px; left: 50%; margin-left: -74px; width: 17px; height: 16px; transform: rotate(-12deg);
+      background: linear-gradient(165deg,#ffc8db,#ef94b3);
+      clip-path: path('M8,1 C11,5 14,10 14,12 C14,14 11,14 7,13 C4,13 2,14 1,12 C1,10 4,5 8,1 Z'); }
+    .wall .ear-ro { top: 0; left: 50%; margin-left: 48px; width: 34px; height: 36px; background: #111; transform: rotate(12deg);
+      clip-path: path('M14,1 C21,8 29,19 31,27 C32,30 31,32 27,31 C22,30 16,30 10,31 C5,32 1,31 1,27 C2,20 7,9 14,1 Z'); }
+    .wall .ear-ri { top: 10px; left: 50%; margin-left: 57px; width: 17px; height: 16px; transform: rotate(12deg);
+      background: linear-gradient(195deg,#ffc8db,#ef94b3);
+      clip-path: path('M8,1 C12,5 14,10 15,12 C15,14 12,13 9,13 C5,13 2,14 2,12 C2,10 5,5 8,1 Z'); }
+
+    /* the scroller fills the screen under the curtain; it doesn't draw the frame itself */
+    .wall .wall-inner {
+      position: absolute; width: auto; margin: 0; flex: none; border: none; box-shadow: none;
+      top: var(--bh); left: 0; right: 0;
+      bottom: max(8px, calc(max(env(safe-area-inset-bottom), var(--sab, 0px)) - 10px));
+      display: block; border-radius: 0; z-index: 4; padding: 0;
+      overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
     }
-    .wall-floaters, .wall-corner { display: none; }          /* decorative fixed layers would float over scrolled content */
-    .wall-place { position: fixed; }
-    /* + becomes a bottom-right floating button on phone: always reachable, never collides with the
-       centred header, and sits above the home-indicator safe-area. */
-    .wall-add {
+    /* the SHEET carries the dotted frame and GROWS with the notes — its bottom (with the ♡ corners)
+       only appears once you scroll to the last note. Sides run straight up into the curtain. */
+    .wall .wall-sheet {
+      display: block; position: relative; min-height: 100%;
+      margin: 0 8px; padding: 10px 14px 30px;
+      border: 2px dotted rgba(222,150,180,0.6); border-top: none; border-radius: 0 0 20px 20px;
+    }
+    .wall .ws-heart { display: block; position: absolute; bottom: 11px; font-size: 14px; color: rgba(226,150,180,0.75); }
+    .wall .ws-hl { left: 14px; } .wall .ws-hr { right: 14px; }
+    .wall .wall-head { margin-bottom: 14px; }
+    .wall .wall-notes { flex: none; }
+    .wall .wall-floaters, .wall .wall-corner { display: none; }
+    .wall .wall-place { position: fixed; }
+    .wall .wall-add {
       position: fixed; top: auto; left: auto;
-      right: 20px; bottom: calc(20px + env(safe-area-inset-bottom));
-      width: 56px; height: 56px; z-index: 9;
+      right: 26px; bottom: calc(40px + max(env(safe-area-inset-bottom), var(--sab, 0px)));
+      width: 58px; height: 58px; z-index: 10;
     }
   }
   .wall-floaters { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
@@ -796,7 +833,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"/07kuNKy+ujqYTQymiOncw==","iv":"5YG3ynja+dIoeWjU","ct":"TzZDpwPu7TydJQj4ziyaWBWqU7FC1bgLbX2VTchvL494UvQV+5UvCyU5Fw5OJvQy3t7ZtkcG2/9ZY0g24vACckJ+3bJmJk7HZ0Bxv/dadQYoWkTamvIQV/LAUlo9SQAqxoj29nzsULyidfmPTHAAv5UA5GnQ7BgjGqw43A6PL++EwRbDk14bQSPBtdy8rsBxXGun4N4koFvTsMQEI1wSyEfp3H7ZFdN1tF9LkXCYnx/eptTPshdfaW16j9lT/8gT3W2kqTGaFUa1AN9SjcRZfHlTSL8YBL0F7h1KZnt7rHsv7lqRtUok6FJMRZ7WiID0sjrHpNJAwEhm32nEGLzH0Q8ef8jyEzA2hNBdqxGXukviybisQdU53/L2xZqL1WAFQH0hDtVpM/4HvFpsH7lXb9bDOpHdfvrMuHT/Yfj9ClOLhkE4V9HWYdAXP+u/YRqWPptnUjIGrVlvV95YqpwJv2GctT/u0j6kQPqtGGu4ZzR9iePYR+jRfBm2iSWvgi26ZVOgIOGqWZQGoZY5Pr7+Kwu3q9jjsrQJxb6/nB7TgUW2pjHEdOqvwg5Rrfe5PQpi7lRY/38qcBWTX4CfjYe4XWNGVf8OfDmePz0Z4IBGygHsHh67okhtzeW1UNu1su14o2CTEEDs2upbtmdMmSfWSwv37gQbGZVvrHoubm4LTyG4v50ATH4+qsb822CwaZrpDspy3pGD5k0KB0ex4v3uhvZ0wyBJW1/H7z4ysro9xmYnX5SFX+vdkzboA8dVN1wzMHinzsLjooFa8Xb3Hu5UKtI928h5eD8DFo1eYr4darxmKp7Txx5ikbYllV2ns9QNNrkJpE90V/aFGLjLnGFoBb2TcSCyQ7YEHowSaYg0bD9WgnY/WJUpzGEuZo3rHkswF7s1/I7v8amqD/sRROGKgiZaV5gbwSF/imSeh/EqGgjENp50JlzF4P5+2LInlLaa39kt1xaUwoj0R1cj2ZyF0GGeFc2tAy8dSaV7bkqsYDtA9AblSpjdH+LFXOEU0puYv/rBtTQCXADaKQNayqcwj1POmsZ4uDW8ROlSyHaGKe0IE0czWB5OpJuuj4rXMQkvMgrMpRdOJNOjNeRfbpZ2r6v2Gq/ifOaEDBY07Uxm1tpyS9zw1yxqefUR4wmE36GQexMXy6UMmFzaiKBRs74pghZfaG+zY/BsTXhwpS4U/qPR2j/7XkBwEnWIPZfYzOwqi9zfHjiwXpyRTPIT84xjYmp8cc/rATfB9X1ofKjE63KqWi9Nw3gqLx3lHdn3Qi8n8XDPKBaHlSpWt0iEvMDYsrGoJj/KJLqHu5EO3z0aGqEMWA9nY2tbL4GKrnJ5tO1CG0o3GJV5exMZqEVjO1/FCBbHAaScbLpQc/2cgc8lh29G+gmUe9/IXO3fyFqoX9mxCwIYOF/cyxJfmpoFSkC0PeX40hv4bPmwIhMSE4wPD6eeP+l2q9SWT3IxLgLjO0bIRZ4ibGilypcEl8Buc7UitZJ53OPzUp0JSmt9HyQsROvg6PCqERuG6r/B8y88NtIPWNelHRkO2uRhBTVGZniu29OQSSjujX7OK/LEbXtlb9diAKlKdANKj3YRzRdKATddzcAK6DQa1l7DBFcjCmW8NQrThdX2v9IlZDOrtqIv0t1mwm/9zfoo+auHgk5dLjeDO77PcKw1rWFIeP7nJLJwOvKlOSGLeNRoJW3tnAZ7AIdlHxxIDPzQojlJgKOgyjes5uuof4GLQQjWdixHkguMmR3VwwkF0rlv0Tu6uF6MBIKjGVhsvwx7yY71qs8NLg01SEo362taJEt1/Cm7RpdjfbjsLKLlokW6BEgCCbZaASOneaaiBhDXqRUngwWMeOssZvhCZV3+6qQ1BWwZzZh+2k1t+G256mHR45NzWi900NHJxYlLIBgFYk4btQtnWWtWvI9PdOjIOmLJdlqjYBefiba+7cJSIenUbqjQK8DxjeT2C4KqNzwtBrHuugls1jyYONTttDit65y193mQIekmULGTjPcyJSvdyCZeE7fK0D91pThCAsUDzP7w1FoxKXKHYG90qrEW4kdw0DmPCBuEF2hTxl9cu0c95HfbgA4upKHzyAXiLniDaZoiTbWdlbNOObV5//OxOM0KFIuBrsZwmFWxSJ3gRl625arOU7+NWOf9IlnIZtZbxJl0yOnCoSmEPKevrfRzdPd0rEfcaHv6ciuBZbsaOUboOLDtDGyMRcp28GlBJg1xp1aLo2XQ5woso2CaEnwhX91RRlExYCkhnlbJzhd92Mg04duEaPbpsrhKAQnvR+rjN1LnZBL+qtLG8nT0GFiFzbpXdDxxEA7kUWUFF5Oqm5pdQGdoH0Bl8beuFi1n4QaY0ArsiKEANSKT12mYLl0cFH5eZ6wB6K3K4vnR/K+h2jVsFw6w8XQCDoWZDu3cWdwN8DyCFv8gjMxl7dxq3rVV71MY8RoLUp8rV2tXVApp2tMzj/MqOHHF/9D7ZBbe0S3DyWUy5ZpSGybDQyb8wiCiyMlurFIH7c9Zv0nIFH64KEbbubqvtTDJJkc6dsSpUFdmEnRk0LyCya8/Zl/g+CxyqIW2wkKk56dhnRhSWeI8KzTEus4qFeByP7Sq9WwWmdL9ASLC3BloyinJyUdeNr/1dzCn1lHfSZi2EBTL8UT6X16MlF7vPO8Sv4q0YuDp6ZZDdsmzNVHGaVe/UioddDOjmAvilVopP0ZQtVes1Ld9FkbKQGvh3srnP86LNdQ44Dw1gpPPEQKU/R4XJ46xIQIHBF1blY8Qee4Yx2oc280mvdwit/jSNR4MFM4g2X0hnGNN1CXatitvloeDYkwfqPJjQfTRa21GyVpRFq+zZoahdbLxnmpjlPn5OP1cHMDzOxPX+q/GJukrCW2u+u1O3pzHi+c3MqeO5iTxGzD8y26KnjD61GxeFJR05tJ90wr4SRRn14ZMXMR0HGAMwSpsbNbUemsUt5I+6oG97X8PckYhZcABJwK9YZ4lU6Y3ur1eToW4Pke4HwDl2EtDTTG8CqnhkHD6nHXy/dp2kno84Ay9xtxIx2ADeanR/sfGOfsPL/CB8BmwyJT4nNwoOeS4e+xbPoVgOtWMJ+3pJ+U4oJmKxNXACLkBS6AbVDPeAJazCoXZZ9lk09GRM234v8wIdN1UM1+IPT5SzY8kx0+VLDjnepxQU+OsupOlQfMRWFSqoLit/Htu7zbAaI86E8r1QeePmBvwPZDjfOLRN0BD0mndxRlwGuSYshGJESJKAXYzcZmMqvMPKH6Kyi+TrbfpbjQH9uaShQLIOjcHOdQG3/uctI4X0adTLY/TPsQiTTsaiK7FXG3DG7KJZMcvtzkq5TLyQCpadTG5HI1uiQmQdBkZa75RQ1BV","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"wMhb9uRG0t3zcrFucUAPCQ==","iv":"l2kq9HYpNUq32fET","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1099,7 +1136,9 @@
     renderWall();
     // NB: no re-fetch here — showWall() also runs right after adding a note, and re-fetching
     // would clobber the just-added (not-yet-committed) note. Fresh pulls happen on unlock.
-    document.body.style.overflow = "hidden";
+    // Phone scrolls the whole document (see the max-width media query), so DON'T lock body overflow
+    // there; "" clears the inline lock and lets the CSS (vertical scroll, no horizontal) win.
+    document.body.style.overflow = (window.innerWidth < 600) ? "" : "hidden";
     markDebug("wall");
   }
 
@@ -1281,6 +1320,52 @@
       "</div>";
   }
 
+  // the real top safe-area inset in px (notch / Dynamic Island height), honouring the preview's --sat override
+  function readSafeTop() {
+    var p = document.createElement("div");
+    p.style.cssText = "position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top);visibility:hidden;pointer-events:none";
+    document.body.appendChild(p);
+    var h = p.offsetHeight;
+    document.body.removeChild(p);
+    var v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sat")) || 0;
+    return Math.max(h, v);
+  }
+
+  // draw the pinned board frame as an SVG stroke: rounded rect that dips down around the Dynamic Island.
+  function drawNotchedFrame() {
+    var frame = wallEl.querySelector(".wall-frame");
+    if (!frame) return;
+    var W = frame.clientWidth, H = frame.clientHeight;
+    if (!W || !H) return;
+    var topInset = readSafeTop();          // frame top sits at 8px, so island bottom ≈ topInset - 8 in frame coords
+    var hasNotch = topInset > 30;          // notch/island devices only; plain rect on Touch-ID phones
+    var r = 36, cx = W / 2, d;
+    if (hasNotch) {
+      // a soft, symmetric valley: ease gently down, a rounded flat bottom under the island, ease back up
+      var fb = 68;                          // flat-bottom half-width (clears the island)
+      var nhw = fb + 42;                    // full dip half-width (includes the gentle eases)
+      var nd = Math.max(28, topInset - 6);  // dip depth, just under the island
+      var ec = (nhw - fb) * 0.55;           // bezier handle length → smooth, flat tangents (cute, not sharp)
+      d = "M" + r + ",0"
+        + " H" + (cx - nhw)
+        + " C" + (cx - nhw + ec) + ",0 " + (cx - fb - ec) + "," + nd + " " + (cx - fb) + "," + nd
+        + " H" + (cx + fb)
+        + " C" + (cx + fb + ec) + "," + nd + " " + (cx + nhw - ec) + ",0 " + (cx + nhw) + ",0"
+        + " H" + (W - r) + " Q" + W + ",0 " + W + "," + r
+        + " V" + (H - r) + " Q" + W + "," + H + " " + (W - r) + "," + H
+        + " H" + r + " Q0," + H + " 0," + (H - r) + " V" + r + " Q0,0 " + r + ",0 Z";
+    } else {
+      d = "M" + r + ",0 H" + (W - r) + " Q" + W + ",0 " + W + "," + r
+        + " V" + (H - r) + " Q" + W + "," + H + " " + (W - r) + "," + H
+        + " H" + r + " Q0," + H + " 0," + (H - r) + " V" + r + " Q0,0 " + r + ",0 Z";
+    }
+    frame.innerHTML =
+      '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">'
+      + '<path d="' + d + '" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="6"/>'
+      + '<path d="' + d + '" fill="none" stroke="rgba(214,150,178,0.7)" stroke-width="2"/>'
+      + '</svg>';
+  }
+
   function renderWall() {
     var NOTES = WALL_NOTES;
     var floaters = "";
@@ -1303,18 +1388,33 @@
       '<span class="wall-corner" style="bottom:22px;left:24px;">♡</span>' +
       '<span class="wall-corner" style="bottom:22px;right:24px;">♡</span>';
 
+    // phone-only cute chrome (scalloped pink banner + ears round the island + scalloped dashed frame).
+    // Hidden on desktop via CSS; the desktop keeps the plain .wall-frame.
+    // phone-only cute chrome: the pink "curtain" (banner) stays pinned at the top; the dotted
+    // frame is a border on the SCROLLING sheet, so its bottom sits after the last note.
+    var phoneChrome =
+      '<div class="wall-banner"></div>' +
+      '<div class="wall-banner-scallop"></div>' +
+      '<div class="wall-curtain-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
+      '<div class="wall-ears">' +
+        '<span class="wall-ear ear-lo"></span><span class="wall-ear ear-li"></span>' +
+        '<span class="wall-ear ear-ro"></span><span class="wall-ear ear-ri"></span>' +
+      '</div>';
     wallEl.innerHTML =
       '<div class="wall-floaters">' + floaters + "</div>" +
-      '<div class="wall-frame"></div>' + corners +
+      '<div class="wall-frame"></div>' + corners + phoneChrome +
       '<button class="wall-add" id="wallAdd" title="add a note"><span>+</span></button>' +
       '<button class="wall-place" id="wallPlace">place it here ♡</button>' +
       '<div class="wall-inner">' +
-        '<div class="wall-head">' +
-          '<div class="wall-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
-          '<div class="wall-title">our note wall</div>' +
-          '<div class="wall-count">✧ ' + NOTES.length + ' little notes so far ✧</div>' +
+        '<div class="wall-sheet">' +
+          '<div class="wall-head">' +
+            '<div class="wall-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
+            '<div class="wall-title">our note wall</div>' +
+            '<div class="wall-count">✧ ' + NOTES.length + ' little notes so far ✧</div>' +
+          "</div>" +
+          '<div class="wall-notes" id="wallNotes"></div>' +
+          '<span class="ws-heart ws-hl">♡</span><span class="ws-heart ws-hr">♡</span>' +
         "</div>" +
-        '<div class="wall-notes" id="wallNotes"></div>' +
       "</div>" +
       '<div class="wall-modal" id="wallModal"></div>';
 
@@ -1376,7 +1476,7 @@
 
     // mobile layout is in pixels (the page scrolls, so it can't lean on a fixed board height):
     // two edge-hugging columns, rows stepping down and overlapping a little.
-    var pW = [], pRowTop = [], pMargin = Math.round(bw * 0.02);
+    var pW = [], pRowTop = [], pMargin = Math.round(bw * 0.05);   // side gap so notes don't hug the frame
     if (PHONE) {
       pW = order.map(function (idx) { var z = { s: 1, m: 1, l: 1.26 }[resolveNoteStyle(NOTES[idx]).size] || 1; return Math.round(noteW * z); });
       var accY = 8;
@@ -1392,17 +1492,18 @@
       var i = order[oi], n = NOTES[i], s = resolveNoteStyle(n);
       var szf = { s: 1, m: 1, l: 1.26 }[s.size] || 1;         // "small"=medium size, "large"=bigger
       var nW = PHONE ? pW[oi] : Math.round(noteW * szf), noteH = nW;   // square (keeps drawings undistorted)
-      var left, top;
+      var wrap = { position: "absolute", width: nW + "px", zIndex: 10 + oi, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
       if (PHONE) {
         var c = oi % 2, r = Math.floor(oi / 2);
-        left = c === 0 ? pMargin : (bw - nW - pMargin);      // hug the left / right edge
-        top = pRowTop[r];
-        pBottom = Math.max(pBottom, top + noteH);
+        // anchor left column by its LEFT edge, right column by its RIGHT edge — the browser fixes
+        // each margin against the real container, so the right edge can never overshoot the frame.
+        if (c === 0) wrap.left = "2%"; else wrap.right = "2%";
+        wrap.top = pRowTop[r] + "px";
+        pBottom = Math.max(pBottom, pRowTop[r] + noteH);
       } else {
-        left = Math.round(Math.max(0, Math.min(bw - nW, n.x / 100 * bw - nW / 2)));
-        top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh))); // desktop: the saved, draggable spot
+        wrap.left = Math.round(Math.max(0, Math.min(bw - nW, n.x / 100 * bw - nW / 2))) + "px";
+        wrap.top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh))) + "px"; // desktop: saved, draggable spot
       }
-      var wrap = { position: "absolute", left: left + "px", top: top + "px", width: nW + "px", zIndex: 10 + oi, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
 
       renderWall._meta.push({ body: n.body, author: n.author, bg: noteCardBg(s), ink: WPADS[s.color].ink, curved: s.curved });
       html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH) + "</div>";
