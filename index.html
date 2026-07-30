@@ -36,17 +36,9 @@
          background-attachment: fixed; }
   /* home + site: matches .home-site / .site */
   html.rt-warm { background: linear-gradient(160deg, #fff6f2 0%, #fff8f0 100%) #fff8f0; background-attachment: fixed; }
-  /* note board + add/draw: FLAT cream, deliberately pattern-free. Whatever iOS decides to paint into the
-     bottom safe-area zone, the only colour it can possibly get is this one flat value — there is no
-     pattern to misalign and no gradient to fall short. The board's checkered pattern is painted by
-     .boardbg instead, which FADES OUT into this exact colour before the bottom edge, so there is no hard
-     edge anywhere for the eye to read as a bar. This is the belt-and-braces version: it does not depend
-     on knowing which layer iOS samples for that zone. */
+  /* note board + add/draw: flat cream matching those screens' own base colour. The screens paint their
+     own checkered pattern on top; this is just the backstop the safe-area zone shows. */
   html.rt-board { background: #fffaf1; }
-  /* the checkered board pattern, masked to dissolve into the flat cream above the bottom edge.
-     Phone only (desktop screens keep their own opaque backgrounds); shown on the board screens via the
-     root skin, so the wall and the add/draw creators all share one layer. */
-  .boardbg { display: none; }
   body {
     font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
     color: #6f4a54;
@@ -439,37 +431,17 @@
      Rules scoped under .wall so they out-specify the base .wall-* rules later in this stylesheet. */
   @media (max-width: 600px) {
     html, body { height: 100vh; overflow: hidden; overscroll-behavior: none; }   /* 100vh — see the chin-gap note up top */
-    /* THE anti-strip layer. position:fixed inset:0 anchors it to the viewport, so its pattern aligns with
-       nothing in particular — it is the only copy. The mask ramps the whole pattern to fully transparent
-       over the last 130px, revealing the flat html.rt-board cream underneath, so the pattern never meets
-       the bottom edge with a visible boundary. If iOS's fixed viewport stops short of the home indicator,
-       the fade simply finishes earlier and the zone is that same flat cream — seamless either way. */
-    html.rt-board .boardbg {
-      display: block; position: fixed; inset: 0; z-index: 1; pointer-events: none;
-      background-image:
-        radial-gradient(circle at 20% 10%, rgba(255,240,190,0.34), transparent 48%),
-        radial-gradient(circle at 84% 34%, rgba(255,214,228,0.30), transparent 48%),
-        repeating-linear-gradient(90deg, rgba(244,150,178,0.055) 0 30px, transparent 30px 60px),
-        repeating-linear-gradient(0deg, rgba(244,150,178,0.055) 0 30px, transparent 30px 60px),
-        repeating-linear-gradient(90deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px),
-        repeating-linear-gradient(0deg, rgba(255,206,110,0.05) 0 3px, transparent 3px 60px);
-      background-position: 0 0, 0 0, 8px 8px, 8px 8px, 0 0, 0 0;
-      -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 130px), transparent 100%);
-      mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 130px), transparent 100%);
-    }
-    /* TRANSPARENT on phone: html.rt-board (see the root skins at the top) is the ONE layer that paints
-       the board, and because it is background-attachment:fixed it paints the safe-area zone too. One
-       layer covering every pixel makes a seam geometrically impossible — no second copy of the pattern
-       can drift, differ in alpha, or stop short of the bottom edge. */
+    /* The WALL paints its own checkered pattern (see the base .wall rule) — it must, because the
+       bloom→board heart reveal masks this element: the pattern has to travel with the mask so the heart
+       opens onto a real board. Painting it on the root instead would leave the revealed heart pattern-less
+       until the reveal finished. html.rt-board is a flat backstop for the same cream, nothing more. */
     .wall.show {
-      display: block; position: fixed; inset: 0; background: transparent;
-      height: auto; overflow: hidden; padding: 0;   /* let inset:0 span to the true screen bottom (100dvh can fall short of the home-indicator edge) */
+      display: block; position: fixed; inset: 0;
+      height: auto; overflow: hidden; padding: 0;   /* let inset:0 span to the true screen bottom */
       --bh: max(58px, env(safe-area-inset-top), var(--sat, 0px));   /* banner height clears the notch */
     }
     .wall .wall-frame { display: none; }
-    .wall .wall-safebot { display: none; }   /* superseded by html.rt-board */
-    /* same deal for the creator screens — the root carries the identical board pattern */
-    .add, .draw { background: transparent; }
+    .wall .wall-safebot { display: none; }   /* the document reaches the bottom edge now; nothing to patch */
 
     /* pink scalloped banner across the very top */
     .wall .wall-banner { display: block; position: absolute; top: 0; left: 0; right: 0; height: var(--bh); z-index: 6;
@@ -509,17 +481,21 @@
       display: block; border-radius: 0; z-index: 4; padding: 0;
       overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
     }
-    /* the SHEET carries the dotted frame and GROWS with the notes. On phone it is OPEN-ENDED: no bottom
-       border, no radius, no bottom padding and no bottom margin — the dotted sides and the notes run
-       straight off the physical bottom edge. Any closing edge / padding / safe-area margin here reads as
-       a blank pale "white bar" under the last note once you scroll to the end, which is exactly the
-       artefact we're removing. Sides likewise run straight up into the curtain. */
+    /* the SHEET carries the dotted frame and GROWS with the notes — its closing edge (rounded corners +
+       the ♡ pair) appears once you scroll to the last note. Sides run straight up into the curtain.
+       The bottom margin keeps that edge clear of the home indicator. NB: this trailing space is only
+       safe now that the chin gap is fixed — while the document was 100% tall it stacked on top of the
+       webview's white and read as one big pale bar. Keep it tight for the same reason. */
     .wall .wall-sheet {
-      display: block; position: relative; min-height: 100%;
-      margin: 0 8px; padding: 10px 14px 0;
-      border: 2px dotted rgba(222,150,180,0.6); border-top: none; border-bottom: none; border-radius: 0;
+      display: block; position: relative;
+      min-height: calc(100% - max(8px, max(env(safe-area-inset-bottom), var(--sab, 0px))));
+      margin: 0 8px max(8px, max(env(safe-area-inset-bottom), var(--sab, 0px)));
+      padding: 10px 14px 34px;
+      border: 2px dotted rgba(222,150,180,0.6); border-top: none; border-radius: 0 0 20px 20px;
     }
-    /* the ♡ corners anchored that closing edge — there is none now, so they stay hidden (base rule) */
+    /* ♡ corners on the closing edge */
+    .wall .ws-heart { display: block; position: absolute; bottom: 11px; font-size: 14px; color: rgba(226,150,180,0.75); }
+    .wall .ws-hl { left: 14px; } .wall .ws-hr { right: 14px; }
     .wall .wall-head { margin-bottom: 14px; }
     .wall .wall-notes { flex: none; }
     .wall .wall-floaters, .wall .wall-corner { display: none; }
@@ -827,9 +803,6 @@
 </style>
 </head>
 <body>
-  <!-- checkered board pattern for the phone board screens, fading out before the bottom edge so the
-       iOS safe-area zone is only ever the flat cream underneath (see "ROOT SKINS" / .boardbg in the CSS) -->
-  <div class="boardbg"></div>
   <!-- persistent living backdrop (gradient base on <body>) — shows behind every screen -->
   <div class="backdrop" id="backdrop">
     <div class="shimmer"></div>
@@ -895,7 +868,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"318CdUp05afGd6zTQG8f6Q==","iv":"w1x8s1KCXt2W0Qil","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"kxgOhC21tUvC9gh4kfaq7g==","iv":"oq8aaLz7mWUve24n","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -948,7 +921,7 @@
   function onUnlockSuccess() {
     status = "success";
     renderDots();
-    loadWallNotes();  // fetch the board now, during the ~5s bloom, so it's ready on reveal
+    wallLoadP = loadWallNotes();  // fetch the board now; the bloom waits on this before revealing
     // 1) M and V draw together (heart swells); 2) keypad fades; 3) the blossom begins
     if (monoEl) monoEl.classList.add("together");
     setTimeout(function () {
@@ -1075,6 +1048,10 @@
 
   // ---------- sequence timers (so switching screens cancels a running bloom) ----------
   var bloomTimers = [];
+  var wallLoadP = null;        // the in-flight notes fetch, kicked off the moment the passcode is accepted
+  // is the board currently built in the DOM? asked instead of tracking a flag, because every screen
+  // switch empties wallEl and a flag would go stale in one of the seven places that do it.
+  function wallIsBuilt() { return !!wallEl.querySelector(".wall-inner"); }
   function bTimer(fn, ms) { bloomTimers.push(setTimeout(fn, ms)); }
   function clearBloomTimers() { bloomTimers.forEach(clearTimeout); bloomTimers = []; }
   function resetSite() {
@@ -1141,19 +1118,54 @@
     document.body.style.overflow = "hidden";
     markDebug("bloom");
 
-    // choreography: bloom → hold → shrink to nothing → soft-heart reveal of the site
+    // choreography: bloom → hold → shrink to nothing → soft-heart reveal of the site.
+    // The board is BUILT early (prewarm, invisible) and the reveal WAITS for the notes, so the heart
+    // never opens onto a half-built board — see prewarmWall() / wallReady().
+    bTimer(prewarmWall, 500);
     bTimer(function () {
       var b = bloomEl.querySelector(".blossom");
       if (b) b.classList.add("shrink");
     }, 2900);
-    bTimer(heartRevealToWall, 3650);
+    bTimer(function () {
+      wallReady(2600).then(function () {
+        if (!bloomEl.classList.contains("show")) return;   // user navigated away mid-wait
+        heartRevealToWall();
+      });
+    }, 3650);
+  }
+
+  // Mount and render the board DURING the bloom, masked to nothing so it stays invisible. This moves the
+  // expensive part — building ~N note DOM trees, laying them out, decoding the paper/heart tile images and
+  // loading the cursive webfonts — into the blossom's idle seconds instead of the frame right before the
+  // reveal, which is what made the reveal stutter and the notes appear to pop in late.
+  function prewarmWall() {
+    if (wallEl.classList.contains("show")) return;   // already up (or already prewarmed)
+    wallEl.classList.add("show", "heart-reveal");
+    wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
+    wallEl.style.webkitMaskSize = wallEl.style.maskSize = "0% 0%";   // fully hidden
+    void wallEl.offsetWidth;    // real dimensions, so notes size and place correctly
+    renderWall();
+  }
+
+  // Resolve once the board is genuinely ready to be shown: notes fetched AND webfonts loaded (late fonts
+  // reflow every note's text). Capped by maxWait so a slow connection delays the reveal rather than
+  // blocking it forever — a board that fills in a moment later beats a spinner that never ends.
+  function wallReady(maxWait) {
+    var gates = [wallLoadP || Promise.resolve()];
+    if (document.fonts && document.fonts.ready) gates.push(document.fonts.ready);
+    return Promise.race([
+      Promise.all(gates),
+      new Promise(function (res) { setTimeout(res, maxWait); })
+    ]);
   }
   // bloom → soft-heart reveal straight onto the note board (lock → bloom → wall).
   // mask-size is grown in a JS rAF loop — CSS mask-size transitions hard-cut in some browsers.
   function heartRevealToWall() {
-    wallEl.classList.add("show");
-    void wallEl.offsetWidth;   // give the board real dimensions...
-    renderWall();               // ...so notes size/place correctly before the reveal
+    if (!wallIsBuilt()) {          // prewarm was skipped (e.g. straight from the debug bar) — build it now
+      wallEl.classList.add("show");
+      void wallEl.offsetWidth;     // give the board real dimensions...
+      renderWall();                // ...so notes size/place correctly before the reveal
+    }
     wallEl.classList.add("heart-reveal");
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
     var t0 = null, dur = 1300, to = 650;
@@ -1164,8 +1176,8 @@
       var sz = (to * e).toFixed(1) + "%";
       wallEl.style.webkitMaskSize = wallEl.style.maskSize = sz + " " + sz;
       if (p < 1) requestAnimationFrame(grow);
-      else showWall();                          // heart filled the screen → settle
-    }
+      else showWall({ keepRendered: true });    // heart filled the screen → settle (don't rebuild the DOM
+    }                                          // we just revealed; that would blink the notes)
     requestAnimationFrame(grow);
   }
   function showSite() {
@@ -1188,8 +1200,10 @@
     loadNotes();
   }
 
-  // 📝 note-wall preview (debug tab for now)
-  function showWall() {
+  // 📝 the note board. opts.keepRendered = the board is already built and on screen (the bloom just
+  // revealed it), so skip the rebuild — re-running renderWall() there blinks every note and restarts
+  // the sway animations for no reason.
+  function showWall(opts) {
     clearBloomTimers();
     editingNote = null;
     successEl.classList.remove("show");
@@ -1204,8 +1218,10 @@
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = "";
     wallEl.style.webkitMaskSize = wallEl.style.maskSize = "";
     wallEl.classList.add("show"); // show first so the board can be measured
-    void wallEl.offsetWidth;
-    renderWall();
+    if (!(opts && opts.keepRendered) || !wallIsBuilt()) {
+      void wallEl.offsetWidth;
+      renderWall();
+    }
     // NB: no re-fetch here — showWall() also runs right after adding a note, and re-fetching
     // would clobber the just-added (not-yet-committed) note. Fresh pulls happen on unlock.
     // Phone scrolls the whole document (see the max-width media query), so DON'T lock body overflow
@@ -1275,13 +1291,14 @@
     var s = {}; STYLE_KEYS.forEach(function (k) { s[k] = n[k]; });
     return { body: n.body, author: n.author || null, x: n.x == null ? null : n.x, y: n.y == null ? null : n.y, style: s };
   }
+  // ALWAYS returns a promise (resolved even on failure) so the bloom can wait on it — see wallReady().
   function loadWallNotes() {
-    if (!SUPABASE_URL || !SUPABASE_KEY) return; // creds only exist after a correct unlock
-    fetch(notesEndpoint() + "?select=*&order=created_at.asc", { headers: wallHeaders(false) })
+    if (!SUPABASE_URL || !SUPABASE_KEY) return Promise.resolve(); // creds only exist after a correct unlock
+    return fetch(notesEndpoint() + "?select=*&order=created_at.asc", { headers: wallHeaders(false) })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (rows) {
         WALL_NOTES = rows.map(noteRowToObj);
-        if (wallEl.classList.contains("show")) renderWall(); // refresh if the board is on screen
+        if (wallEl.classList.contains("show")) renderWall(); // refresh if the board is on screen (incl. prewarm)
       })
       .catch(function (e) { console.error("[wall] load failed", e); });
   }
