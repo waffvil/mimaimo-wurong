@@ -1,6 +1,6 @@
 // M+V service worker — makes the site installable & instant, without ever serving stale content
 // or touching Supabase. Bump CACHE when you ship a new build to retire the old shell.
-const CACHE = "mv-v14";
+const CACHE = "mv-v15";
 const SHELL = [
   "./",
   "./index.html",
@@ -34,8 +34,11 @@ self.addEventListener("fetch", (e) => {
   // The page itself: network-first, so a fresh deploy is picked up as soon as there's signal;
   // fall back to the cached shell when offline.
   if (req.mode === "navigate" || url.pathname.endsWith("/index.html") || url.pathname.endsWith("/")) {
+    // cache: "reload" bypasses the HTTP cache. GitHub Pages serves index.html with max-age=600, so a
+    // plain fetch() here can hand back a ten-minute-old build — which made "did the fix land?" untestable
+    // (an installed PWA keeps its own copy on top of that). This forces the real network copy every launch.
     e.respondWith(
-      fetch(req)
+      fetch(new Request(url.href, { cache: "reload", credentials: "same-origin" }))
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put("./index.html", copy));
