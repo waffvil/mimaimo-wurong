@@ -400,8 +400,14 @@
   }
   .wall.show { display: flex; flex-direction: column; }
   .wall-frame { position: absolute; inset: 18px; z-index: 0; pointer-events: none; border-radius: 20px; border: 2px solid rgba(214,150,178,0.6); box-shadow: inset 0 0 0 5px rgba(255,255,255,0.4), 0 6px 20px rgba(204,100,136,0.06); }
-  /* on a phone-shaped screen, soften the frame corners so they echo the iPhone's screen curve */
-  @media (max-width: 600px) { .wall-frame { inset: 14px; border-radius: 40px; } }
+  /* phone: the whole board scrolls as one page; only the + (and the decorative frame) stay pinned.
+     also soften the frame corners so they echo the iPhone's screen curve. */
+  @media (max-width: 600px) {
+    .wall { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .wall-inner, .wall-notes { flex: none; }                 /* natural (tall) height → the page scrolls, not an inner window */
+    .wall-frame { position: fixed; inset: 14px; border-radius: 40px; }
+    .wall-floaters, .wall-corner, .wall-add, .wall-place { position: fixed; }
+  }
   .wall-floaters { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
   .wall-floaters span { position: absolute; }
   .wall-corner { position: absolute; z-index: 3; pointer-events: none; font-size: 14px; color: rgba(226,150,180,0.75); }
@@ -411,9 +417,8 @@
   .wall-title { font-family: "Snell Roundhand","Segoe Script","Brush Script MT",cursive; font-size: 34px; color: #cc6488; line-height: 1.25; }
   .wall-count { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #ab7c8f; }
   .wall-notes { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; }
-  /* phone: notes stack straight down in a scrollable column */
-  .wall-notes.stack { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
-  .wall-notes.stack .wnote { touch-action: pan-y; }   /* a drag over a note scrolls the wall */
+  /* phone: the whole board scrolls (see the max-width media query); let a touch over a note scroll it too */
+  .wall-notes.stack .wnote { touch-action: pan-y; }
   .wnote { position: absolute; cursor: pointer; touch-action: none; }
   .wnote.movable { cursor: grab; }
   .wnote-card { transition: box-shadow 0.25s ease; }
@@ -765,7 +770,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"IFdkbbYFzIX0wlSAvhkYsw==","iv":"/sC8U2yqmQ4ZV0l5","ct":"c++Xkp/vfhRMJMRBwVL6oNdCWNoymWos84kdeHidaZF4+OLlnyzYYZhiedB5LzHtNuzvirsXCGI9TM0rzd1nD5QTgzX7M5vX+jGQCTfLxmzQ0L0EInoXBRWX6kkk6GR2Fn8mW5nOZn+nIYXYcI/Mea31T8jNSYHoxtIfX3pL9LjWhcuqRiHTwyi5SdSRvNa3b3fwCoO96vSJKHTW6mz8BEQOPy92LfewjDxWD7ubrAAvKEiEFS3UEQjBLS/K/1sxevZb4aIW2QBfD1eXnBMaiImVlFvKGOBdXo80FopEDnMZWOZHZxqCGH2YlqRk1yhDHWGqkMpsD9jJDkKDbNLHfeSDu3eJFyTWQsRV8tG3Q2pZSnofcJIzfK7eS5aOEt03o3/BkhuJeWdeUk7zJA/cXqiMaF4ctG0sqDSiOYnWHH3VMo3vBJTfy5pTx0Ny2vad/kE/yrxAoFiuI9Ws1ldqlsqmtBhdR89fDb5p2sY83hH9Ad9x3EUfKmP2EGM6hcEIxuhNQ6Yqbnyc4NO/kzjm4P/6R8uuCiDqhN0w+uu+Xm7LH2TCgAeCkgLDlviOg0ynsbWtz3zTnlo5KGwDVbaaXCo6qTrg1/jZUSA3vHmooDnkvSx3aDJ9m5JDiCkbnkIjjo6iqZTRUFj48GPnFxFvU9UUzIObaaKNWUZuJambTbhh9g3kZgTlnUZgWx11DoHtqwokJ9ih1QbHKy7Nb6OkHSBLWeNQ3o+oSca5EyMVZ2zFiAYlodirobFFtBPWpxpkbgF9AKkq7toQk54XdCo3rogiu1FSymgX76QIpfIrUULvSym9pelRHH6zNe15oFURDG43aX7NWwTIn7n3tyRuCtAuGsd0uTE6ouaSN5l6LB4ArzNJTLLR0NjQ36vcrquHkY18iaEHGvd1AF4wb0fbFFzvw4FcBUURBkZTo7rWXhgvH+Lzk4+ugYLoWPZidbjgcPTxoHJ976VrD4Rqb34ZIO1uiRs5X1rPLp5HIuPdxMZk2LXQ9C/Qk9OfhQK5P3di9L/yu0VF+H2PDVF7/ACEqGPDw/U0nOwn2fPXD+/qnuvcgG6sSOJ/bXzDkOJKLJo43fxFLHhvOBxHMQE2UWtZQ5wOvTo6mT5EWllJkwr3WT6wBLYHK5VzJquvfrenW4NcHXFysuTvUwRg1ikWKqYZiQsEwCBCvBe+wNrtIa80aU/RzAds1Bv4sv/fgcJtLJIaN2z6bSE8INkAgvlgIWbIYVraE0rH6jWue3naoRLEL0Xz66Wa82s1HyYWurs77rpwxgZqfoovCFNnODwQ52RiJT/DUecFz2toKM5AdMDZFxQu5OI1zW7BaIqRK/X0CCJuftBQcGrzaW+IjWCHWtzokeqcpyu/gmD2GIhkic7IH71V8vGgMz2Xq+bff/Wk6m5cQNqPH3PWq73pnUSIcf+bzGo/EYCkrB792sNoa3/YrbIVmStgMgq7jEMphn2not79DXwq1+3glP9qPCFPhkRHHMGHFMLw88q5U9i/8wxDMljIjFmG+qqtp41zA6OQmt8Pmu1Lxf8JzocFuuXujDi5acR0ebawOsV1fez0rEMj+c7w9tUdPfPo/B3KnGg4iersOnAKWE2rg/z3bzby0JDEmn7Cj55ZgcVArr41lh+pH2S9s04l9WEFigkokVj0JnPIr+4zHd21BE46zXAqocF4QZXnlASk+jP33yCvXhpgfZqqUEcbp9JWBhB2pWLkLXeGIbY584dqYYtWw/ccnrAst4yvwxEpVysdAQEF26Y8zX6pu2lB/dqVihCmOKAv6bqooAzGNDdynAKlxAyvl2+X8xKuvEgNZ//1CK3OlD3XdrA0uqto30I3u0h1e5Ri27t5VOG91hLLgestrii7eKPzWdWTPSL8DJ3khA1v/StQJv3IS+kEQZkPKbctHuVn2JKszEee7r8A804JM/I4mGxqtNavXB4QdeoOTNNfvfUAZguzZPo7IOv4IoJsOVnKleziziYeSJjN4+1dnitR4TzMRo78yfEqAWaW0sWQFvPAiVWDJIS2ZalgvdczXB/60TiI4z/kSyXFtvgCxyZKgw3MC4UCMLXLS8lfAjPS8RF+A1mKkGDhfIDccx2omlPqnWSuHNNF4VcMGUTELK/EcEHeQRaPhJLzjFx4SOYLmiH1UDy86+mLR5US6urTB39g2fDfw7LUImCO2IVz2pC7GRKyv82wqV0vEOcP3ZjYRE2lMVXmJv9tGdBMi2aS6VHE4A0vxrBVv0LAlnPpFa0phBcMm+zg9WbSsv+Bs8lh13C4phH1ti16Xsi4qdGk02haerQaUHn2Wh+LfonGwi9HKSp/PrKwYbNjxjXMHXnaN3vknWWVQ2+nw4nyVeEJ33IPimb8ma3OXMJByzdX0Yjx0e6mmkqiTXO7Qai6yAUdz+Fc0uj3jj0QAaZdRiPPZGpEjL+SaAJbxVxPUsSSWfE90PT3As/mLjRxfLzO5DMxascqUHHannx4DNB/mOxHaRBp0EJTZAfz7s48oGVGqrkeRknQeoceaiL3rYN5EDj9dUROzBpfzbMZfAflEngrlcHWYQFxyS7alHdQPTnN2hOR7hmzeJyamV/rzTxN02U/Pwi5KptZpci4hAkA5IBlew8r7+o5D8t7LxM63IemrQbjZMzNIBBClaTgx/b5eGvJ0dVKr8HwKeGQUvcn+4q2kWDUlqry9gIqccxNd91/GW6GWLXhMEJN92f/a4CS/0B4rHtC1dgMG4fJARP9u2cHadftvjKMbjWaiCfWxf/8Wt8NWOZWz9qarzzYEfJe6435LKUwurF9bWfQXkMcvadkYTJkJJ+pemFkjLcAIduv5OOv1vw4oA3vx4cR5e8uawudWcdFoi8S2rnrlcDZjdSatGn4sLCH8VHbdi1myqGqhqc/A/VI0ennz6eC8+EG3C5pmBIJWC9JOZooNI4mJplahFDzqq3so7u3h7crb1Ehk6r+iwqyKpwxpzQJiovmB54ZgJiJAONXxkfMRlN/3xT8rNqg21dk48uP7iA0HD3zLKLvsWG0eQVtaTOAxYM6tJtTOjCPKe8X0M38rhizazxn9QED5BSRfwp3BzV1dnJ7edELkZfpZ+kP+OjxGs+VkbTCSRaHTsdGtc4EJVl/96FVrtaHLTexDiLf57Ha5LUBtmCneNzap/HpvtPl9BHpMLtRsJQS+FfWJWJKCmFGY3En+2O+HREI9q3+T+dXESUAvRUEisFX03prIH2SqOpRnktxmkvkxisSpRtPE9lg3r5qd1Ts6Oz3N0PXjE2RLpsXbysTh4UWpQPER+lYqjXeFOoP2+U+Y0z10e/RVRJPV6PVzyyWfsVF/9HDgL8G58sizPznRYUbY6BuNQR/TT0ooRwp","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"oN1IJbzSKCzJv9npklfvsA==","iv":"AGo3SpSOEtwlEq2M","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1328,8 +1333,8 @@
     })();
 
     // phone: notes can't be placed/moved — they present systematically, in the order a
-    // left→right, top→bottom scan of the desktop board hits them, then stack straight down
-    // in a scrollable 2-column column (desktop stays the free layer).
+    // left→right, top→bottom scan of the desktop board hits them, then stack straight down.
+    // the WHOLE board scrolls as one page (see the max-width media query); only the + stays pinned.
     var PHONE = window.innerWidth < 600;
     wallNotes.classList.toggle("stack", PHONE);
     if (PHONE) NOTES.forEach(function (n) { n.locked = true; });
@@ -1343,27 +1348,40 @@
       srows.forEach(function (r) { r.items.sort(function (a, b) { return a.x - b.x; }); r.items.forEach(function (o) { order.push(o.i); }); }); // left → right within each row
     }
 
+    // mobile layout is in pixels (the page scrolls, so it can't lean on a fixed board height):
+    // two edge-hugging columns, rows stepping down and overlapping a little.
+    var pW = [], pRowTop = [], pMargin = Math.round(bw * 0.02);
+    if (PHONE) {
+      pW = order.map(function (idx) { var z = { s: 1, m: 1, l: 1.26 }[resolveNoteStyle(NOTES[idx]).size] || 1; return Math.round(noteW * z); });
+      var accY = 8;
+      for (var rr = 0; rr * 2 < order.length; rr++) {
+        pRowTop[rr] = accY;
+        accY += Math.round(Math.max(pW[rr * 2], pW[rr * 2 + 1] || 0) * 0.78);  // next row overlaps ~22%
+      }
+    }
+
     renderWall._meta = [];
     var html = "", pBottom = 0;
     for (var oi = 0; oi < order.length; oi++) {
       var i = order[oi], n = NOTES[i], s = resolveNoteStyle(n);
       var szf = { s: 1, m: 1, l: 1.26 }[s.size] || 1;         // "small"=medium size, "large"=bigger
-      var nW = Math.round(noteW * szf), noteH = nW;           // square (keeps drawings undistorted)
-      var px, py, top;
+      var nW = PHONE ? pW[oi] : Math.round(noteW * szf), noteH = nW;   // square (keeps drawings undistorted)
+      var left, top;
       if (PHONE) {
-        var c = oi % 2, r = Math.floor(oi / 2); px = c === 0 ? 14 : 86;
-        top = Math.round((8 + r * 26) / 100 * bh);            // rows step down ~26% each, UNCLAMPED so it keeps going + scrolls
+        var c = oi % 2, r = Math.floor(oi / 2);
+        left = c === 0 ? pMargin : (bw - nW - pMargin);      // hug the left / right edge
+        top = pRowTop[r];
         pBottom = Math.max(pBottom, top + noteH);
       } else {
-        px = n.x; top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh))); // desktop: the saved, draggable spot
+        left = Math.round(Math.max(0, Math.min(bw - nW, n.x / 100 * bw - nW / 2)));
+        top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh))); // desktop: the saved, draggable spot
       }
-      var left = Math.round(Math.max(0, Math.min(bw - nW, px / 100 * bw - nW / 2)));
       var wrap = { position: "absolute", left: left + "px", top: top + "px", width: nW + "px", zIndex: 10 + oi, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
 
       renderWall._meta.push({ body: n.body, author: n.author, bg: noteCardBg(s), ink: WPADS[s.color].ink, curved: s.curved });
       html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH) + "</div>";
     }
-    if (PHONE) html += '<div style="position:relative;width:1px;height:' + (pBottom + 40) + 'px;pointer-events:none"></div>'; // spacer gives the scroll its height
+    if (PHONE) html += '<div style="position:relative;width:1px;height:' + (pBottom + 40) + 'px;pointer-events:none"></div>'; // spacer sets the scroll height
     wallNotes.innerHTML = html;
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);

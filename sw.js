@@ -1,6 +1,6 @@
 // M+V service worker — makes the site installable & instant, without ever serving stale content
 // or touching Supabase. Bump CACHE when you ship a new build to retire the old shell.
-const CACHE = "mv-v2";
+const CACHE = "mv-v3";
 const SHELL = [
   "./",
   "./index.html",
