@@ -406,6 +406,9 @@
   .wall-title { font-family: "Snell Roundhand","Segoe Script","Brush Script MT",cursive; font-size: 34px; color: #cc6488; line-height: 1.25; }
   .wall-count { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #ab7c8f; }
   .wall-notes { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; }
+  /* phone: a systematic, scrollable two-column grid (order comes from the desktop scan) */
+  .wall-notes.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34px 14px; align-content: start; justify-items: center; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 20px 12px 40px; }
+  .wall-notes.grid .wnote { position: relative; touch-action: pan-y; }
   .wnote { position: absolute; cursor: pointer; touch-action: none; }
   .wnote.movable { cursor: grab; }
   .wnote-card { transition: box-shadow 0.25s ease; }
@@ -757,7 +760,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"vOEQOMbyxT4lbgjMEA031A==","iv":"PLaslLbdv5PyMtJ7","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"ALUQGdwsWjNVB9QF3lvaOQ==","iv":"DvlCfmJU3m9Z1Yrv","ct":"9ZOK8aYRR7AQ42O106CHYbWtB7UO+1BK35Fxb45qx92Yl31rBL+iG5XBlrBzlnHjXKngWyxvCdBMXcxb1RQxgC8tQjc5Bd4YpRBFivJYG4yxvktKstatfEkb0qi9ZM2tcpVkbtpc4il1ccRWcVKe19yHERWfAICEdehVTOc1fpLbSgJVbZ4atgCU0EHHVLWryaX74ZmkeUIJepqurP9mYk6CrsfGjE//bQi8SBIjgs9lAvOKxOdkwU/HoYJQmDcUR5UlyQ8PhJhDPzsYPjs5a0Yxm4XdlH7pz4XYE9X3D5UG6mxXDVTL+24brn5DDRTjCPZ0kQtK2QiCsXYC0j0esefbY//IQKekfsSw4t0hDCWGknZmqLipAYDdlXwiGNAb4AXGOoMidcHrOnMZlKvKZ+lMUbxVpeVctTua9kb04dXJVjnIz1MHPkteWWlkY59CEz6hfClkLCm2a34jUkZk7/FlVxd8oIck6p3XAFa1DZ4kJmIb8BcQDYSkPbvtNfysfBPXaQ5Ii1XMG9HPhcA8TnTvJHEjluAWkN5aBFL/yH/RdJPcNqNA2C/GwmmVeCqExMQFTr2RjLmO71n8pP9Y2/MYuxjRCJJocJv7NKSK19HMTjvi5ciEjokMqBFZF8D52H8u6a709QACqq7nj7hwNYjJ38DpO+nbOfJBrYqpzWeLku20IQ+vgVD1Ialahx/1lzZ0PnoUNIURFPvRibFCOmZ3ySnR2JnFDDNumUWPZsAxUskWTydWBB1I3Lb9bfbTO4RVugTXWbLw65cKzzI+bP+2/YtwrOEPh32OSBarT/AqBuxlNrpG01htTf6r2IADO76UvdtNKARnoZgthayi5qdRDw4J9Yyvj57RX3Xu22MMeoiWsFkJwKHPv0EeHk4IxFjM4g99J/+V1QOpTzs1D0dJbhgC0+I8MvqiNzuClnAJmnnqE2bnTnwbSIHYeuxZ6V404CN8K7lkxsEwi5zdYCAf1bbIFvBnzvIAnsfY26gxohgWBF8GzLIcJkY9rf8nPXvk6X58oAwZIKbyaoMrOjKL+2REHKD2RvNPJq3BRF2CSZFiiGK47M1xgnRKy/C7vrXz5433KfjBl1lDfQx15hNM/Yd9CrzRMPHPciQC4YMQl9/kXo8RgxhT7xxSW248kNS1JbjLFGDHEyb5uyIkVIdDGZBUhhA15nB0nMOQsbL/GfwPXRY05GqKxb2y2Crv6+/NpbceyqJMLJbr5skLqsNXfPd9JPcOeXNvyFKuzpb2sWAEIIKWKve6UJRsskFbLilu1JgT/nRPXMqmUo/+Teg/N1lUGxA9x2uK2fbBlYmjOcr5ilU5wYgIRVKXpvNadgQSmDKJIwtyeGZqK9Dfm43ywO6C+6gbXO1twwVGyEU1pzL4TusmBWeu8hib2Efz9UoYjNdkXTvcCAIqQCOYja7vMpS2IkssUlfu2ru2sf+RfA9/PCNR6e7Tw1aZVZCryrStev57eUyuk2wnQEo3++ns5vYfCJeQHaOCIZ9a/2q4roWVocbAWIwri4t9+UT8Xn9c90dH9FMU7JGqs7amMARQbcnf1+HqIAnJ1FeTq84uVSoxL0bfpGrZ1eClnnVNeMV9Eao8qlgGPgjU5NTa3R82PlqiXvkJurzJRrrEnq9X7+M34+ycta0L5iCm3Qusu/Qe2AEcdosipe8YZF2OgPsC9WJhvztl23S4JnCw5oDl/DpkhRLUEXEJS/2wmvyYYw/6H2oydNb9pRSskcdckw4yyfNEbhEad3KWDEBUj7u/6uFrspJjvM5GcuR9oRYgYgfSYog/DP39KvtHC7nwLe1O6/oCLqbIqTuoQs32y53WuOl6uYz368x4eWgzOG7Yo0BsAP6DHtXD2NFEhNM6ymVDOLT+tvt6+2H5+vPooFK1N2wJzBzT7hI4B3Gb/B+YZAhz3DKYT3wuOIvJyFOTwsKL5tAy1lld98YDnLibul616wEUJncGQoXxco88xXrp4wXIiMzy4YUE57UCDdS7rqV6nW+6qMkSOmzku5q8bJSzqMtc2KQfB7tLt3DYTuQ4TbI5qkaRz8COcQPmAkBz1+PPPhJ4Mi5f62djbZZDpSzEFzROeaal9gGrKza/c8/Y1WzUYcanict7LUGmMIV3ut974eBCCtjhVAd46Bhdir6EBkvljn7IFJr5IHPxYqF8GCDzYQ1/crXYrzdGkvMZqypQsccIgo1oRe+4w8uDzxGUFyPfNydkClEl00y5Va6cBhO//wcEjasPTseXe5upUl+7Pz503O9+swh3oROuIJdYc/8Id/S7laWaSeaCS7auhrhmQFPEnYjVSFfrEzU1nZhBGXsJpyo8yLSLqV5QKDbIRZmdePzfx1bsN9SpnU6mca1oD/qlk70WFhsfcCjN1Q+380sAkErJgcOBpYhcb7UgT36oV9agia5kksAp+2musBg+08gTaFkzSYuwIcKAss1yEi4GjhgyB3kYlWhZLprnJVtXLPjbHz3xmLwgq6I/TNDltRP6OFq8Sj0WAtLBgBj0ixTTGGCxF8NoDxeUXD1uGYPJ/WKC66SF9a3OK8UTIswqDEzEs1XZ5MXEu4wNvjkN8Y0LU4ME7+oKJ35agwHr5FTLs915QRNiVF1bpmqmfZ0g3BZQ4obLFwVqhcKGFD5ZkRl8NxcXJ8EuTbev0stRgKlmRVIzS/IUSkiXfHsQbg7RQjQv04k6RN+MC8BPpRRuins3ARYVWVf0lpNeaG3nH8aWKx1Um91o8BniSwGi3CV2yPiMSwyxKvE1427oQ1AJDksN7VaSrc3NjeR5V6otpY3iW5Fe+XGiU+q9udi5ODBQikv1w0c25eVcV0sC1NyfbhUih3jepAntLK+bCRmU+oL5a1xrkMHXYEDxJpHxkzJvs9EhDxfA4RCYkLt7sC98D7l49aB4mCoYoRfFeEOVhx15xCXufIvy2iufvzhzsBiUKt3hjQ4bGu/jCquymh/uJbAOhdt+4wtNyiR2JynhHNLZOzc5PLmlPEJ1uzrdjL7G2VNLJUELg3pRMxKL6QU2UWd3OLMPZ9bB4iWuTd0uD9qHZz33fDsH54TYXnuNFvWPjKHG1gJRzlWoi7oVJl1V0fOLXK0XE2CWwmUuyFDaUmT3naoKrw2S44NVx5cUW5tZlQRH7UEqqNBGqUHd8gaeCYlPHkPXxw4CF+uCe1z/7g63IGGGLiuENWzehy3sDU123GVe5rrlQYQ2UVo+JlNb3MTVJmBFCFUwq3mNMISg3cXfKomzQO4lbWAtIP/Z9o/bmR2reL0wuKQ4s8MGBRRxUdskoYDxTJ321yCtVkpJE2Kxt3X/nErMLsbBasbcJ6AZS/PBCxT0qvdlk1+XSuYMjD9VM9m4Qthc","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1341,19 +1344,48 @@
       }
     });
 
+    // phones can't drag on the full canvas, so they show a systematic grid instead of the scatter.
+    // order = the sequence a left→right, top→bottom scan of the desktop board would hit the notes in.
+    var PHONE = window.innerWidth < 600;
+    wallNotes.classList.toggle("grid", PHONE);
+    if (PHONE) NOTES.forEach(function (n) { n.locked = true; });
+    var order = NOTES.map(function (n, i) { return i; });
+    if (PHONE) {
+      var scan = NOTES.map(function (n, i) { return { i: i, x: n.x || 0, y: n.y || 0 }; });
+      scan.sort(function (a, b) { return a.y - b.y; });          // top → bottom
+      var rows = [], cur = null, tol = 12;                       // notes within 12% of each other in y = one row
+      scan.forEach(function (o) { if (!cur || o.y > cur.top + tol) { cur = { top: o.y, items: [] }; rows.push(cur); } cur.items.push(o); });
+      order = [];
+      rows.forEach(function (r) { r.items.sort(function (a, b) { return a.x - b.x; }); r.items.forEach(function (o) { order.push(o.i); }); }); // left → right within each row
+    }
+    var cellW = Math.floor((bw - 44) / 2);                       // two grid columns (accounts for padding + gutter)
+
     renderWall._meta = [];
     var html = "";
-    for (var i = 0; i < NOTES.length; i++) {
-      var n = NOTES[i], s = resolveNoteStyle(n);
-      var nW = noteWidth(n), noteH = nW;                       // square (keeps drawings undistorted)
-      var left = Math.round(Math.max(0, Math.min(bw - nW, n.x / 100 * bw - nW / 2)));
-      var top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh)));
-      var wrap = { position: "absolute", left: left + "px", top: top + "px", width: nW + "px", zIndex: 10 + i, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
-
+    for (var oi = 0; oi < order.length; oi++) {
+      var i = order[oi], n = NOTES[i], s = resolveNoteStyle(n);
+      var nW, noteH, wrap;
+      if (PHONE) {
+        nW = noteH = cellW;                                      // uniform squares, filled left→right, top→bottom
+        wrap = { position: "relative", width: nW + "px", justifySelf: "center", transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
+      } else {
+        nW = noteWidth(n); noteH = nW;                           // square (keeps drawings undistorted)
+        var left = Math.round(Math.max(0, Math.min(bw - nW, n.x / 100 * bw - nW / 2)));
+        var top = Math.round(Math.max(0, Math.min(bh - noteH, n.y / 100 * bh)));
+        wrap = { position: "absolute", left: left + "px", top: top + "px", width: nW + "px", zIndex: 10 + i, transformOrigin: "center", "--tilt": s.tilt.toFixed(1) + "deg", transform: "rotate(" + s.tilt.toFixed(1) + "deg)", animation: "swayNote " + (5 + (hshW(n.body) % 40) / 10).toFixed(1) + "s ease-in-out infinite" };
+      }
       renderWall._meta.push({ body: n.body, author: n.author, bg: noteCardBg(s), ink: WPADS[s.color].ink, curved: s.curved });
       html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH) + "</div>";
     }
     wallNotes.innerHTML = html;
+
+    // phone: after adding, scroll to your new note wherever the scan-order slotted it
+    if (PHONE && renderWall._scrollTo != null) {
+      var pos = order.indexOf(WALL_NOTES.indexOf(renderWall._scrollTo));
+      var target = pos >= 0 ? wallNotes.children[pos] : null;
+      if (target) requestAnimationFrame(function () { target.scrollIntoView({ behavior: "smooth", block: "center" }); });
+      renderWall._scrollTo = null;
+    }
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
 
@@ -1370,7 +1402,7 @@
           "</div>" +
           '<div class="wm-tools">' +
             '<button class="wm-tool" data-act="close" title="close">✕</button>' +
-            '<button class="wm-tool" data-act="move" title="move it">✥</button>' +
+            (PHONE ? "" : '<button class="wm-tool" data-act="move" title="move it">✥</button>') +
             '<button class="wm-tool" data-act="edit" title="edit">✎</button>' +
             '<button class="wm-tool" data-act="delete" title="remove">🗑</button>' +
           '</div>' +
@@ -1585,6 +1617,7 @@
         x: null, y: null   // no spot yet → the board drops it into a random empty gap (then saves it)
       };
       WALL_NOTES.push(note);
+      renderWall._scrollTo = note; // phone: scroll to it once it's gap-placed + slotted into the scan order
       saveNewNote(note);       // persist to Supabase + backfill its id
     }
     addDraft.body = "";
