@@ -462,27 +462,25 @@
 
     /* the scroller runs from under the curtain to the TRUE screen bottom (bottom:0). It must NOT stop
        short of the safe-area — an inset there reads as a blank cream bar under the notes, with the
-       cards clipped mid-card and the dotted frame stopping early. The home-indicator clearance is
-       carried by the SHEET's bottom margin instead, so the board pattern stays continuous to the edge. */
+       cards clipped mid-card and the dotted frame stopping early. Notes simply scroll off the bottom edge
+       (under the home indicator) like any native list, so the board reads continuous to the edge. */
     .wall .wall-inner {
       position: absolute; width: auto; margin: 0; flex: none; border: none; box-shadow: none;
       top: var(--bh); left: 0; right: 0; bottom: 0;
       display: block; border-radius: 0; z-index: 4; padding: 0;
       overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
     }
-    /* the SHEET carries the dotted frame and GROWS with the notes — its bottom (with the ♡ corners)
-       only appears once you scroll to the last note. Sides run straight up into the curtain.
-       margin-bottom keeps that closing edge (and the last note) clear of the home indicator without
-       putting a gap in the scroller itself. */
+    /* the SHEET carries the dotted frame and GROWS with the notes. On phone it is OPEN-ENDED: no bottom
+       border, no radius, no bottom padding and no bottom margin — the dotted sides and the notes run
+       straight off the physical bottom edge. Any closing edge / padding / safe-area margin here reads as
+       a blank pale "white bar" under the last note once you scroll to the end, which is exactly the
+       artefact we're removing. Sides likewise run straight up into the curtain. */
     .wall .wall-sheet {
-      display: block; position: relative;
-      min-height: calc(100% - max(8px, max(env(safe-area-inset-bottom), var(--sab, 0px))));
-      margin: 0 8px max(8px, max(env(safe-area-inset-bottom), var(--sab, 0px)));
-      padding: 10px 14px 30px;
-      border: 2px dotted rgba(222,150,180,0.6); border-top: none; border-radius: 0 0 20px 20px;
+      display: block; position: relative; min-height: 100%;
+      margin: 0 8px; padding: 10px 14px 0;
+      border: 2px dotted rgba(222,150,180,0.6); border-top: none; border-bottom: none; border-radius: 0;
     }
-    .wall .ws-heart { display: block; position: absolute; bottom: 11px; font-size: 14px; color: rgba(226,150,180,0.75); }
-    .wall .ws-hl { left: 14px; } .wall .ws-hr { right: 14px; }
+    /* the ♡ corners anchored that closing edge — there is none now, so they stay hidden (base rule) */
     .wall .wall-head { margin-bottom: 14px; }
     .wall .wall-notes { flex: none; }
     .wall .wall-floaters, .wall .wall-corner { display: none; }
@@ -855,7 +853,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"UbwWEYqvVATUmCZhUO2BfQ==","iv":"1xvF3eRGbx6oeAop","ct":"FDjv+99Ach7BMUTR01aILOT7duavb8qKAzosZxAlCKV+E1oTadEpXsAklQ7FYWCkrO7SjF3K2pRFpgM7r/xjeixSuTLfku5LX+ACPpwP44qzY9TWds+e9bFg0jWTyNbZGsNosOcFVR2f9B0N9MzOZEzEatr0fHF6l8Q2/7MlPWJUPF76M11B6yUcacviTlbrvbCtGqWjCX40DD4Y7pVZ8vVRaL153q9G+kckkqn1LoHjStWrq3xY5pLKAEGEgg4aIyeOVaax/ix5TY2WOO+z+gD1/kIHxGXz3rT4ix+SrIk2x5rtiNFnpWu8ZbavDaq45h73lCR90f2YLAioGqZb7TCspNvE5YR+VNILJaBM+Wlog1AghJsiRziJpp6eMI9NjbR0U3iJUhsKN/1RTSfG/ZkyllzsEcUFXLnHzpkckf4DPRhwYn+WvPVxd6A4U9EDL7MI6xUCBChhqQCaCQmTcWCYtLW18pf2MBGZVAXhE17HyOYW8PPqOm6XHDSaH/QXVjcufc6qgKNeD1w5Xyy2xyMA8aIX4j8Vf0ZRphUp1eUDZUa8P/FmRNeWuzX5LVOTo3BvM/GdwJmXZiuvd3yeq7alxawusDt83xwc434SE5dx9pOH0OzsPB/ayzHNmZAMeHzccP2eJCvU8EsqfKQ+t9mYpmAYUt6gFtzO8ufrhAy3Tio8rKA0Dd5Q6oOV2uQriD9ncGXfSpFqSV/bdseQeJFA3JPYqdHeD1DwG/8+wurtuXBlkgooc4wgJkASBmeZRsMfioEhQr0/p5MEFdZxv+9u5d0N+Du8U/zsKly88El70DApqzp4nAAra35Pm/QPRlp6h1OHZUgSZfuHfaq3vVJLT6zqWEdz89fsC/fxI6POYGuJ5byDXJLJeKOBrSklFoRZrTzYmBPlG3O5iDxsV4pv3bglICTbb4ylSph6ImxgO2jp3YR9zx1HmuxxJRF26oB3vYhOAPdkKUs/sNMelAFkIeCgzPOSYvnjwBTVLRWj9qO8xN/EZom3Dej92C4k0W8295osXAaz/zdWpNfHv7W/a0Okpeok+lF39Xms9X++4Kc5ohgclp3CjgiJOu1KUoguJpK7A0vqS/b5hvY6WdqjQyUBfKME24z+IZYWwsFSfpXujBEPUTFgY9IIH6cISuIefViFeDpi/sj5eii13IsM2n1oeF9nQLQzSZWrLB67WqLJD0cAJ9wOM4fJVA7OB4wfmurNzIeGgHy5fih4bt+OzeOG3weqX5ItkUfK0lovc1MCi6CAR8uec/XUE+q1ZydW5ZVs44lAOV6kmKIlHGRgi3aSYp0SA8Lcs/RxqBL3uVZtVZ3As0VDx4arSXG7cuSDUddi+P+mUq0mFvrGVqOChGtzl7DvUpkH2wuELZj1wuXamLbKKuMC+CGuzi6ChOnDKF/yGByUaHEmvNSIdUHwLkGlZA8PJlWxI26+ww7NBuxS4UXtCSWFVtRJlUk66iT0o0YkJPvpkcR/RgkPCFgTe9bRUP5zIFJUTxyRnBDFocJ++DYChHmhPyGFXeSAh8oLQ0MJZ4cRPf5WRhzkgAFhNCm0bbdkDpfsodT2gejU20/PBmsejbrSGCwtpQaCmeVemISlT1/5yQoFDwzpKS58//3dLLvj3kco7jffELGoZj0UspvVCUzChOhPIGhgjLeI3Vm3+8nve84vNcwKRQZeHAi7pxSQyhNTX0P+EzwjFG2k90hWsmdvnoaBI+TRvNvr91Jutgp7SMD5VI3tfiXbQALvcppSGeLBO77uGfxbXiXLz3m/MbJ7dElUkH+QlV8cC1mu7/AiQbYrxEaqEWHZNNX+2IwOjUSTa/P3K4kOdtspgbo/wTwD+FRTbcQGgSVqI7R067VS4ZxBBACsfdKcV/FpBnIz1y1bb9OBhef5Qby9JL7Pc8em5NNrAsSXTyXUfluG0CFseKXvSNoCk1xJRsFTgYr/uHD0HSSMtVqVhiqccIey7KNhBn6nAs4Jn6fHM4gjaAgKUERgARpdMmblwrd5HP6lY6H3NabA4dTHqAWQlAxVGuHqksV3yvReNZNY5MrQwKfZxrdLNkJGF7jRjlI+e4YnAAbedu0jLQnKfkjxu2WrtmoBPPObeur21FfW+bZ4E2/JjRlLkUSlwLaWDoN0sutulmSW934i0sFSkA5p/F3m48fZLZr0lPhDH6ozTjD4A96dm2mipLEz1r4F8IZvAeZqy3RQUmeRXjsvEzQuYWZtzAlOPsOXbFcr6T0hHD8oAaRH0Hva/HvlC0vDQr/1pDsJL33Ts3bfsmP4rb3cfia1U6LN7Q9RcY2iAd0Cy3zwU5q+rcp8EKdf01hMt1duuuaB8fIHKjAgx+EvM1ID+D4Pg4fmPoV66+nhxxN+3x8rGJy+feZx1cQzchil59a+aVfdLMUcFS7nnRENxnv8D9TjawaZM7vYakkwRSBA6TOd9sEAE6CnmLnpwEbPBButnp+UQDYv/dOJlXnf0fDJl4UXnGtsZZ67xfTG3IQ0AsanrKOJAe/4IpbO7AZxE0TO0koUG65Nce7ZIQkQmN5IHID4jcH++OPn31fj9JcVPYxg+40RD2L26IyQy0Mg9CoF63mU5g8E1ykSaLM0RRF4Xf4PNRtP2/r6/0L0a7H0NQa8MRzSx+dEwJ9NB7yAUD6JcwTDQxVM1CSPRP0FtLyJF49gW2qJ2tLbtp1P/VfnS3kEZ6icNhPkdsSqKhdfyHmMhtvxxNw7BX9CTUte6udcqSA8gYhQViOv0mGjICwRqjJRGekv2pUqEhxHaettbWY17lC2u90S4exXfkEj59j0iAwGVl2YUP/aJUDrWGUS4+bkA+OVHn99t8mozJJWMza3EwSS9zYb9ExGB00hFs6cLS3Ifu+rPw5MVO6gAh6S5luU3gVvtcwnxctIZ368+PmFbZpBouLL4q3n9Nx0xnnKQg6+FlPG/yNk9UweK5xA44dN2x7CYULfJHJV7yIfgp9qJh+ACN1nS1ar31ZgBzcXVmyMeElE+T6seixfa1aKKGqOnRtv7tp8lzO7UidLYsuyWfEmZFXEIqPaCZ3EiLVlQcNmVWja2S90/mt1mNNVEf5ux5N0d7BFwaUnNB1U5tRb64gECTZblcm1jNjTRrr0imdGUZh3J5yclKOv+PBJyrwbMiLkiLHhYuUGGfhVZOrrOj9ZYNK9Q6Y9Kd/IcL8svPWIjLo4i3zDnTfSD2Bckcod1Ea9bupFSHfLntKGVhDlVaqfMr1lXjOtqPPjA7L5jxY662rwJ4nj+PNCUlk6Z7tB0VriT08wxZnQyIdTcMrtuclg+PVD8O7nTjFowwmIN5VtnnFrnS7NTXOLo4iWLZz2XQ4SYCLpKVGuPG5rvKlsPymxpIe7","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"72PVUkXQKoPXedzhCXG2EA==","iv":"hoXiSCaDRZlfEbOt","ct":"be/F5cmxavEXL2Y1RmP9zyhWS5DN35gjLnOOUQtraNeAZk/nmqbqeOlR44H90ygWaC54d/WekYkcGfCyAV614s6gZhc/3Lkot1A7XP/24ai/fjVD02sT+/YIMf2fHs3DA7gU4/TQ+FnKN5Z93VWSJoeLAVEr0emd6NJPoLlhIv2Wqj/mNB1U4kMbmnoK55+dDtmjf3G0/IDdE3eYvO4uK8K7Dn5s3Q/Gq4R8VvpJblm6K7YhZJE6GL9cEFqP4woImG+ASwPw4ACggPazvfFQ9uT6TvSLi02Re0UQ3d/D9JFKHth9MB92SiMrAYxWFLmwkbHeJgq0CY2+8rBEOEmTJb75IXcXj+MpkJQ1dSnelwiBVhV+tI5ZfIRg90O6XQpTaZHZDI/V7iHDqGmRCxLSaxYMn3kotSfWsK+F6EKOOYGJyMAe2aG7ecbaACSVFxpbHmoX3Csz2PgNrAh6Flt8vTE3Bc52eWrp3unPrUPJ4a+Z/Le6eDM2EsG35zjhs70g/LFbaHs1cDviS2p2t22VdBjHdIusCNVOVdJ54bdAuqbJV5ns1J7UGaOBffeDoI2ersqpN12ecPsdghNqT+pnUS7/ImbTSKgv1+h3IU61EteetTvGhSfqzgyi4+brIi1oK+GejZqH3Ka+LDWMZG+uFRnogMiwlgAsBtgkYrqSa+zHR1zJ8rvBhlpWSb9tvwyPL6/oHrpqJ81NPbxTGaYVUldTyUpta3LmGJ0Z4IFQiIXFhT+xvKLIUChIGyC+cHJJmZk0OPU3jAG8gN6aYwpl0s6/9cZ6WthlSpjE6B8ghy93WbSPVeaC53Xcx7801NcOQ7WIiLH+TF/VNid3Q+yeVBH+2OjhG4LWkchKBIyVyO9Rx2705mHolrmx6wtD2OMYaRwRQ5YubOxkhuoEg7UthG5qvGd+e9MLR/1h1R2oIUdBMBxramnjWWA0hYsC8ydfRakl8BDMuV4hRytSxv78rjzPPiER1JxdmE3tdesejzZegdl95MKowjrzLQoWfxArC55t6TbadazjhuixxC8rp1N+rwoxjG3Fzr0yRUMvrRXGMkIIYJzS5NonFr6dCInEWRXO5vO5EeA4faSSmHIymvmcI184RWxxyKPXEwz/IG1NUTEt6idl5vTGZy42CfpGjG3MxpLppYonEJd2yF4fqRyv43mIaYutcS9qz68QfBQoAf/eiX0biV+6Tj91Adff1lWIqErAWTFT7ahw97hbkC26WyLUl/Xga4YcJ1Jl0N28zJzlwylZczsfa5SsIqOYEGFqDd0VG3MVeqch7DYwXF6mdja9u9XZqs5t1yafHDUQ7NuRnQ72Y+eIWVdnmAB5N8MZDIL4L8BCiAhfG4N36FJiZG22f/eecksQZBvQmzzcXZkNx+ObFr1TnJRvlDAV2lUA/IHwY6RTjnVqfWoXh0fxdFJdA+m4wf8WjAsC0Bg7zv0TJkdSRYkYY4smKyi8g8qtbX/jTBW/uP9rPAmlco2EetfrxIE0NBEHdtxiyedGt/vjAaCHrLTfsSNt7rcHYTJMGbdZXENZRSaLCHbK2gm+eFsBOtechDmtLg123ZVWlrZbWOhPgUFyjPKEOCFWhVrGWC1yJsv1XzbcCBuXBooW/1I7dJiDeeGQz4TKbbGfhL53zQQqHT0B4La5oLxoTlw0vMnwT3gsEad4KCVKbbzLxEEj2fiPsosYRt58vE2IckIbHQjPvmwDcteVi+D7diOQiPQ8evmsh2aTlRpla7nM9+nFkTe1/PqHgZ72dH9rGU68kT4Sfd/IEjNLKJ9xsO94Pv5aIG0HIS6Cp8hshhhB7m0UHQzpS+ypdIfHRxucbs5wTZ6tUcCvX/67TlRpcJJn24TJL76jPBHPnWdetb0CgdQf0JEHO+dau86w3M2NsjXeiXpryYuch0VRsxSaQwp+KPUOhVDFvT1fZJeKa/IhJmq2dm1ZhJGJELhAs1MbIXxjsphjEL8GbUdFqjWaN2HFMtonjmxPubRNziURyAz2nSgpPqwnsWyj9hFcVzwUKN5XbXeEuqx1/m7x/MpvBGwuONLqxjC8YekdEEO9mFvCYNUD3pvrN91B1lsvgGrNwYnntfG26NwaTRvYQf3CmOYAvyUp4O+y6gq165/nQdQ7+Ww+6npPVi6+5Hj0kxYE+IWZfWh/MTyRrXOY0ps8eV11PqHl/3ZnD3up8r4ur0m1lAnujB1/MEN9mPH6525QHb+T4MvciTFsPFja65hMscmFkKP7BPyOFyELlj+n0VgpKvUYLsPwGj//mp5oHQGzjvPP8UrP/Mc8EnoxfkUUHVuNywq/3fd0J/Xl3Kdf+Gslp5ypvkdErBQnnADEHoXq7/biD7YnvhDeR0Rl/UBa8pMdDdKqGoH4GQLMzHbEkVlhqiIuR/haSchEuSlcZg8nLbNH0el86UsrwzdiiN5514x3mDmXWPjLHPDXDczHUDqX5bg8acsw3cktOWBulYJBjHzyGX5ClCcT6K+7zPG4HP2cwrC99ltPdr9oOVEeYpOfv1vgG6EdfTMFNZWPKLfmp0K0hMXQq1/+mks9a5cb1WIuTuAxgyJcTz7oQpZC0ecUWmtM+ptAu6a6DGmZyACihbSpSkl9sTzZyru49FhVtXM4BQ1uRUcIc8LBXHepEVKyQvjdJQACPs9h9tOJ/9wip5kWtI/ZWUx1vKCiC6JDQ+Ow52NoaBQXePx1FqexJuwBq5eBeTKPI+iBqz8MIktVLqOTkIFWgn599nneTZVBKuG9/+e7vmycYUyVLVEk/JeCKSs5Qz6cBMv3cx5M2etrf8WmDgv1+RefedPLtKswAWIP69W15GFVXRdAUP7eXY2RblgV5/Rku7kRS2MB0ghdU1w4E6a+hsgD05lzc8wL9KW21vkKcPCCzI88r2llrwq8+x8TVzVFErmP2RLo7iVgZAwywH/mqllrG5fJLza70Nna1cgsWbLIlxg/cnMJBY8AAAHlW2+4+AhcAHkWupIf4yG3RIIZ/y2DxkkGqZdf2zJpLFe76NV9N3NJORt+uB9EhzjO23kisLgxwcjf0ognz+DwKsCjlsyacIdjrs2VzcUYoeFpt7YCD+oGkNFu+w50pJ3v+u5W6WAVjrksF/Idi9+e0z778O1d/plB3uoBzjn0Xuw6KbJ2qknCMy17ba6Bsw8b9SvJzMeETz8R3KkbjaJ/JpdkLrJpaxBdUrEpKZ3W9PqBmYt/scvunFr/D6BgKE1CE52a5gw2m82YzlYOJFHHqFOfEQ/JKNb6bI2UclgqQHQPer2YkAhGAKT68onPEkWReNKSuIG34YilgD5X8Jl4lMSTp+86ZyuSUYsCZAoDUFUCFp8newIP6U5p2nO46p3nhb7Xt3ag","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1549,7 +1547,9 @@
       renderWall._meta.push({ body: n.body, author: n.author, bg: noteCardBg(s), ink: WPADS[s.color].ink, curved: s.curved });
       html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH) + "</div>";
     }
-    if (PHONE) html += '<div style="position:relative;width:1px;height:' + (pBottom + 40) + 'px;pointer-events:none"></div>'; // spacer sets the scroll height
+    // spacer sets the scroll height. It ends EXACTLY at the last note's bottom edge — any trailing room
+    // here shows up as a blank pale strip under the last note when scrolled to the end (the "white bar").
+    if (PHONE) html += '<div style="position:relative;width:1px;height:' + pBottom + 'px;pointer-events:none"></div>';
     wallNotes.innerHTML = html;
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
