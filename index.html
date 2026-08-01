@@ -801,6 +801,40 @@
   .add-preview { display: flex; align-items: center; justify-content: center; min-height: 340px; padding-top: 24px; margin-bottom: 4px; }
   .add-preview .pv { position: relative; display: inline-block; transition: transform 0.2s ease; }
   .add-hint { text-align: center; font: 13px "Bradley Hand","Segoe Print",cursive; color: #b98aa0; margin-bottom: 16px; }
+
+  /* ---------- the little pinned preview ----------
+     The options list is long, so once the big note has scrolled away this taped-up miniature takes over:
+     you keep seeing what you're making while you change it. It's a REAL note (same noteInner markup, just
+     scaled), never a redrawn approximation, so it can't drift from the real thing.
+     It lives as a direct child of .add, not inside .add-inner — .add-inner has a backdrop-filter, and that
+     makes it the containing block for fixed children, which would pin this to the card instead of the screen. */
+  .add-mini {
+    position: fixed; z-index: 12; cursor: pointer;
+    top: calc(12px + max(env(safe-area-inset-top), var(--sat, 0px))); right: 13px;
+    width: 110px; padding: 9px 9px 5px; border-radius: 15px;
+    background: rgba(255,253,250,0.97);
+    border: 1.5px dashed rgba(228,168,190,0.8);
+    box-shadow: 0 12px 26px rgba(200,120,150,0.28);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    /* hidden state: tucked up and small, so it drops in rather than blinking */
+    opacity: 0; transform: rotate(-3deg) translateY(-10px) scale(0.82); pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .add-mini.show { opacity: 1; transform: rotate(-3deg) translateY(0) scale(1); pointer-events: auto; }
+  .add-mini:active { transform: rotate(-3deg) scale(0.95); }
+  /* a scrap of washi tape holding it to the screen */
+  .am-tape {
+    position: absolute; top: -8px; left: 50%; margin-left: -19px; width: 38px; height: 15px; border-radius: 2px;
+    transform: rotate(-5deg); background: repeating-linear-gradient(45deg, rgba(255,255,255,0.8) 0 4px, rgba(255,205,222,0.95) 4px 8px);
+    box-shadow: 0 1px 3px rgba(170,120,140,0.28);
+  }
+  /* the window is a few px taller than the note is wide, because the tape/pin decoration sits ABOVE the
+     card (top:-9k in noteDecoHTML) — without the headroom the miniature's own tape would be clipped off. */
+  .am-window { position: relative; width: 92px; height: 99px; overflow: hidden; margin: 0 auto; }
+  .am-shrink { position: absolute; top: 7px; left: 0; width: 300px; height: 300px; transform-origin: top left; }
+  .am-cap { display: block; text-align: center; margin-top: 3px; letter-spacing: 0.6px;
+    font: 10px "Bradley Hand","Segoe Print",cursive; color: #c08fa2; }
+  @media (max-width: 620px) { .add-mini { width: 98px; } .am-window { width: 80px; height: 87px; } }
   .note-edit { outline: none; }
   .note-edit:empty:before { content: attr(data-ph); opacity: 0.45; }
   .add-row { margin: 13px 0; }
@@ -1004,7 +1038,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"62RD27twS2PvRqyaq4g9Pw==","iv":"W74NH18sKeT7HhNR","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"wkuISzNa7MK6D6wUbqB9TA==","iv":"qlDBe1rLczELLU8M","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2143,6 +2177,10 @@
     backdropEl.style.display = "none";
     renderAdd();
     addEl.classList.add("show");
+    // Only now can anything be measured: the miniature's scale and its show/hide test both need real
+    // rects, and renderAdd() ran while this screen was still display:none.
+    renderMini();
+    if (bindMini._check) bindMini._check();
     document.body.style.overflow = "auto";
     markDebug("add");
   }
@@ -2181,6 +2219,12 @@
           "</div>" +
         "</div>" +
         '<div class="add-actions"><button class="add-btn primary" id="addSave">pin it to the wall 💗</button></div>' +
+      "</div>" +
+      // pinned miniature — deliberately OUTSIDE .add-inner (see the .add-mini comment in the stylesheet)
+      '<div class="add-mini" id="addMini" title="back to the big one">' +
+        '<span class="am-tape"></span>' +
+        '<div class="am-window"><div class="am-shrink" id="addMiniInner"></div></div>' +
+        '<span class="am-cap">your note</span>' +
       "</div>";
 
     if (!renderAdd._bound) {
@@ -2202,8 +2246,63 @@
     document.getElementById("addCancel").addEventListener("click", showWall);
     document.getElementById("addSave").addEventListener("click", submitNote);
     document.getElementById("drawOpen").addEventListener("click", showDraw);
+    bindMini();
     toggleSub();
     updatePreview();
+  }
+
+  // The miniature is the SAME note markup as the big preview, rendered at a fixed 300px and scaled down to
+  // fit its window — so whatever the real note does (paper, tape, doodle, drawing) it does here too, and
+  // there is no second rendering path that could disagree with the first.
+  var MINI_BASE = 300;
+  function renderMini() {
+    var inner = document.getElementById("addMiniInner");
+    if (!inner) return;
+    // Zero while .add is still display:none — renderAdd() runs BEFORE the screen is shown. Rendering at a
+    // guessed width there produced a miniature scaled to the wrong size (and the phone media query narrows
+    // this window, so the guess was wrong by 15%). showAdd() calls again once the screen is up.
+    var win = inner.parentNode.clientWidth;
+    if (!win) return;
+    inner.innerHTML = noteInner(resolveNoteStyle(addDraft), addDraft.body, addDraft.author, MINI_BASE);
+    // No tilt here: the whole card is already tilted by CSS, and rotating inside a clipped window would
+    // slice the note's corners off.
+    inner.style.transform = "scale(" + (win / MINI_BASE) + ")";
+  }
+  // Bound once on the persistent .add element — renderAdd() replaces its innerHTML on every open, so the
+  // handler looks its elements up each time it runs rather than closing over ones that get thrown away.
+  function bindMini() {
+    function check() {
+      var mini = document.getElementById("addMini");
+      var anchor = addEl.querySelector(".add-preview");
+      if (!mini || !anchor) return;
+      var r = anchor.getBoundingClientRect();
+      // A hidden screen measures as a zero-height box at the origin, which reads as "scrolled past" and
+      // popped the miniature up the instant the creator opened. No height means don't decide anything yet.
+      if (!r.height) { mini.classList.remove("show"); return; }
+      // "the big one is gone" = its bottom has passed above the top strip of the screen. On desktop the left
+      // column is sticky, so this never becomes true and the miniature simply never appears — which is right,
+      // because up there the real preview is always on screen already.
+      mini.classList.toggle("show", r.bottom < 96);
+    }
+    bindMini._check = check;
+    
+    if (!bindMini._bound) {
+      bindMini._bound = true;
+      var pending = false;
+      addEl.addEventListener("scroll", function () {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(function () { pending = false; check(); });
+      }, { passive: true });
+      window.addEventListener("resize", check);
+      // tap it to go back up to the full-size note
+      addEl.addEventListener("click", function (e) {
+        if (!e.target.closest("#addMini")) return;
+        if (addEl.scrollTo) addEl.scrollTo({ top: 0, behavior: "smooth" });
+        else addEl.scrollTop = 0;
+      });
+    }
+    check();
   }
 
   function toggleSub() {
@@ -2225,8 +2324,17 @@
       p.setAttribute("contenteditable", "true");
       p.setAttribute("spellcheck", "false");
       p.setAttribute("data-ph", "write something sweet…");
-      p.addEventListener("input", function () { addDraft.body = p.innerText; });
+      p.addEventListener("input", function () {
+        addDraft.body = p.innerText;
+        // keep the miniature in step with the typing, but at most once a frame — re-rendering a note on
+        // every keystroke is wasted work, and this one is off screen half the time anyway
+        if (!updatePreview._pend) {
+          updatePreview._pend = true;
+          requestAnimationFrame(function () { updatePreview._pend = false; renderMini(); });
+        }
+      });
     }
+    renderMini();
   }
   function submitNote() {
     var body = (addDraft.body || "").trim();
