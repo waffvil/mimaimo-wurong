@@ -846,9 +846,13 @@
   .add-msg {
     width: 100%; box-sizing: border-box; border: 1.5px solid rgba(216,105,138,0.28); border-radius: 14px;
     padding: 11px 13px; font: 16px "Bradley Hand","Segoe Print",cursive; color: #6a4a54;
-    min-height: 74px; resize: vertical; background: #fffdfc; outline: none; display: block;
+    min-height: 84px; resize: vertical; background-color: #fffdfc; outline: none; display: block;
+    white-space: pre-wrap; overflow-wrap: anywhere;   /* the note's <p> uses exactly these */
   }
   .add-msg:focus { border-color: #ff9dc2; }
+  /* currentColor = the note's ink, which styleWriteField() sets */
+  .add-msg::placeholder { color: currentColor; opacity: 0.42; }
+  .add-msg::-webkit-input-placeholder { color: currentColor; opacity: 0.42; }
   /* ---------- customisation ----------
      A two-column grid (label · choices) rather than a label ABOVE each set of choices: that alone saves a
      line per setting, and it lines every set of choices up on one left edge so the eye runs straight down.
@@ -861,7 +865,7 @@
   /* Every glyph picker is a square the same size as a swatch, so each row keeps one rhythm.
      34px is a THUMB size, not a cursor size — an earlier pass had these at 22px, which fitted more on a
      line and was miserable to actually tap on a phone. Rows are allowed to wrap instead. */
-  .cust .opt[data-g="doodle"], .cust .opt[data-g="pin"], .cust .opt[data-g="tapePat"] {
+  .cust .opt[data-g="doodle"], .cust .opt[data-g="pin"] {
     width: 34px; height: 34px; padding: 0; font-size: 18px; border-radius: 10px;
     display: inline-flex; align-items: center; justify-content: center;
   }
@@ -881,9 +885,14 @@
   /* The miniature is pinned over the scrolling card, so the full-width things underneath it keep clear of
      its corner. The grid rows are short and left-aligned, so they simply pass under the empty part of it. */
   @media (max-width: 620px) {
-    .add-inner { padding-top: 16px; }
-    .add-title { text-align: left; margin-left: 44px; padding-right: 116px; font-size: 26px; }
-    .add-msg { padding-right: 118px; }
+    /* Every millimetre here goes into the writing field, because its type size is now derived from its
+       width (exact wrapping — see styleWriteField). At the old paddings the field came out at 12.8px,
+       which is too small to write in; trimming the two gutters and the miniature's reserved strip to
+       just what it actually overlaps buys ~40px of width and puts the type back to ~16px. */
+    .add { padding: 26px 14px 70px; }
+    .add-inner { padding: 18px 18px 22px; }
+    .add-title { text-align: left; margin-left: 44px; padding-right: 104px; font-size: 26px; }
+    .add-msg { padding-right: 104px; min-height: 108px; }
   }
   .add-actions { display: flex; gap: 10px; margin-top: 24px; }
   .add-btn { flex: 1; border: none; border-radius: 14px; padding: 14px; font: 600 15px -apple-system, system-ui, sans-serif; cursor: pointer; transition: transform 0.12s ease; }
@@ -1064,7 +1073,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"sXEBb8ekmhgp9USecKBxHQ==","iv":"NyY4WkW8uoXZtZeh","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"/iCcHefo0sD8lAXkhC7oZg==","iv":"9hI0F8yX23mgkJKD","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1707,6 +1716,14 @@
     if (s.paper === "hearts") return "url('" + heartTile(pad.ink) + "'), " + pad.bg;
     return pad.bg;
   }
+  // What a piece of tape looks like. ONE definition, used both by the note itself and by the picker chips,
+  // so a chip cannot show something the note wouldn't.
+  function tapeBg(tapeIx, pat) {
+    var tc = WTAPE_HUES[tapeIx];
+    if (pat === "plain") return tc;
+    if (pat === "check") return "repeating-linear-gradient(0deg, rgba(255,255,255,0.5) 0 4px, transparent 4px 8px), repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0 4px, transparent 4px 8px), " + tc;
+    return "repeating-linear-gradient(45deg, rgba(255,255,255,0.82) 0 5px, " + tc + " 5px 10px)";
+  }
   function noteDecoHTML(s, k) {
     k = k || 1;
     if (s.fasten === "pin") {
@@ -1715,11 +1732,7 @@
       var glyph = s.pin === "heart" ? "♥" : s.pin === "star" ? "★" : "❀"; // flower
       return '<span style="' + stW({ position: "absolute", top: (3 * k) + "px", left: "50%", transform: "translateX(-50%)", zIndex: 5, fontSize: (17 * k) + "px", lineHeight: (17 * k) + "px", color: pc, textShadow: "0 2px 3px rgba(120,80,95,0.35)" }) + '">' + glyph + "</span>";
     }
-    var tc = WTAPE_HUES[s.tape];
-    var tbg = s.tapePat === "plain" ? tc
-      : s.tapePat === "check" ? "repeating-linear-gradient(0deg, rgba(255,255,255,0.5) 0 4px, transparent 4px 8px), repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0 4px, transparent 4px 8px), " + tc
-      : "repeating-linear-gradient(45deg, rgba(255,255,255,0.82) 0 5px, " + tc + " 5px 10px)";
-    return '<span style="' + stW({ position: "absolute", top: (-9 * k) + "px", left: "50%", marginLeft: (-27 * k) + "px", width: (54 * k) + "px", height: (18 * k) + "px", zIndex: 5, transform: "rotate(-3deg)", background: tbg, boxShadow: "0 1px 3px rgba(120,80,95,0.22)", borderRadius: "1px" }) + '"></span>';
+    return '<span style="' + stW({ position: "absolute", top: (-9 * k) + "px", left: "50%", marginLeft: (-27 * k) + "px", width: (54 * k) + "px", height: (18 * k) + "px", zIndex: 5, transform: "rotate(-3deg)", background: tapeBg(s.tape, s.tapePat), boxShadow: "0 1px 3px rgba(120,80,95,0.22)", borderRadius: "1px" }) + '"></span>';
   }
   // freehand drawing rendered as an SVG overlay (vector strokes, x/y are 0–1 of the note)
   function strokesSVG(strokes) {
@@ -2265,7 +2278,13 @@
     var tapeRow =
       grp(swatches("tape", WTAPE_HUES, function (c) { return "background:" + c; })) +
       '<span class="cgap"></span>' +
-      grp(chips("tapePat", [{ v: "stripe", label: "▨" }, { v: "plain", label: "▬" }, { v: "check", label: "▦" }]));
+      grp(["stripe", "plain", "check"].map(function (p) {
+        // real tape in the chosen colour rather than the glyphs ▨▬▦ — those were three different shapes
+        // and weights (the solid one especially), so the row never looked like one set of choices.
+        var sel = addDraft.tapePat === p ? " sel" : "";
+        return '<span class="opt-swatch' + sel + '" data-g="tapePat" data-v="' + p + '" title="' + p + '" style="' +
+          "background:" + tapeBg(addDraft.tape, p) + '"></span>';
+      }).join(""));
 
     return '<div class="cust">' +
       cell("paper", grp(paper) + '<span class="cgap"></span>' + grp(edge)) +
@@ -2287,7 +2306,7 @@
         '<div class="add-title">✎ leave a note</div>' +
         // Text and drawing are left exactly as they were on purpose — they become their own expanding
         // sections next. The words live here now rather than inside the (removed) big note preview.
-        '<textarea class="add-msg" id="addBody" placeholder="write something sweet…" spellcheck="false"></textarea>' +
+        '<textarea class="add-msg" id="addBody" placeholder="leave a note" spellcheck="false"></textarea>' +
         '<button class="draw-open" id="drawOpen">✎ ' + (addDraft.strokes && addDraft.strokes.length ? "edit drawing" : "add a drawing") + "</button>" +
         '<div id="custHost">' + custHTML() + "</div>" +
         '<div class="add-actions"><button class="add-btn primary" id="addSave">pin it to the wall 💗</button></div>' +
@@ -2313,6 +2332,7 @@
         if (g === "tape" || g === "tapePat") addDraft.fasten = "tape";
         var host = document.getElementById("custHost");
         if (host) host.innerHTML = custHTML();   // redraw the lot: nothing left to keep in sync by hand
+        styleWriteField();                       // ink/paper/colour changes show in the field too
         renderMini();
       });
     }
@@ -2349,16 +2369,51 @@
   }
   // Bound once on the persistent .add element — renderAdd() replaces its innerHTML on every open, so the
   // handler looks its elements up each time it runs rather than closing over ones that get thrown away.
+  /* The writing field IS the note's paper: same background, same ink, same handwriting, and the same line
+     breaks. That last part is the useful bit and it falls out of one ratio — a note's text box is
+     (210 - 2x12) wide with 14px type at k=1, so it is ALWAYS 13.29 times its own font-size wide, whatever
+     size the note gets drawn at. Give the field that same width-to-type ratio and every line wraps in
+     exactly the same place as it will on the note. On a phone that works out around 14px of type, which is
+     larger than the notes on the board actually are. */
+  var NOTE_TEXT_EMS = (210 - 24) / 14;
+  var WRITE_FS_MAX = 20;              // a comfortable ceiling — on a wide screen the ratio would give 60px
+  function styleWriteField() {
+    var ta = document.getElementById("addBody");
+    if (!ta) return;
+    var cs = getComputedStyle(ta);
+    var padL = parseFloat(cs.paddingLeft), padR = parseFloat(cs.paddingRight);
+    var bw = parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+    // Measure the CONTAINER, never the field itself: this sets the field's own width below, and reading
+    // that back would shrink it a little further on every call.
+    var par = ta.parentNode, pcs = getComputedStyle(par);
+    var room = par.clientWidth - parseFloat(pcs.paddingLeft) - parseFloat(pcs.paddingRight) - padL - padR - bw;
+    if (!(room > 0)) return;                      // hidden screen: nothing measurable yet
+    var st = resolveNoteStyle(addDraft);
+    // Type size is capped, and then the FIELD is narrowed to keep the ratio exact — the wrapping is the
+    // thing being preserved, so when the two fight, the width gives way rather than the ratio.
+    var fs = Math.min(WRITE_FS_MAX, room / NOTE_TEXT_EMS);
+    var textW = fs * NOTE_TEXT_EMS;
+    ta.style.width = (textW + padL + padR + bw).toFixed(1) + "px";   // box-sizing is border-box
+    ta.style.fontFamily = WFONT;
+    ta.style.fontSize = fs.toFixed(2) + "px";
+    ta.style.lineHeight = (fs * 18 / 14).toFixed(2) + "px";   // 18/14 is the note's own line-height ratio
+    ta.style.color = st.inkColor >= 0 ? WINK[st.inkColor] : WPADS[st.color].ink;
+    ta.style.backgroundImage = noteCardBg(st);
+  }
+
   // With the big preview gone the miniature IS the preview, so it is simply always on. (It used to appear
   // only once the big note scrolled away, which is why it had a scroll listener and a visibility test.)
   function showMini() {
     var mini = document.getElementById("addMini");
     if (mini) mini.classList.add("show");
+    styleWriteField();
     renderMini();
   }
   window.addEventListener("resize", function () {
-    // the phone/desktop breakpoint changes the miniature's window size, so its scale has to be recomputed
-    if (addEl.classList.contains("show")) renderMini();
+    // the breakpoint changes the miniature's window and the field's width, so both have to be recomputed
+    if (!addEl.classList.contains("show")) return;
+    styleWriteField();
+    renderMini();
   });
 
   function submitNote() {
