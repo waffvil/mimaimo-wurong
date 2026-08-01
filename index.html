@@ -646,6 +646,8 @@
   .pn-go[disabled] { opacity: 0.55; }
   .pn-msg { min-height: 16px; margin-top: 10px; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; line-height: 1.4; color: #a5808d; }
   .pn-msg.bad { color: #c2566f; }
+  .pn-sep { height: 1px; margin: 16px 2px 14px; background: repeating-linear-gradient(90deg, rgba(214,150,175,0.5) 0 4px, transparent 4px 8px); }
+  .pn-twho button { font-size: 13px; }
   .pn-close { margin-top: 8px; border: none; background: none; cursor: pointer; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; color: #b892a1; }
   .wall-notes { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; }
   /* phone: the whole board scrolls (see the max-width media query); let a touch over a note scroll it too */
@@ -1002,7 +1004,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"zmHDuoA1wQdZC3hUNqQ5CA==","iv":"pdimqBmyg00aLMuZ","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"YExKKYEOFZxig50NlU6rhw==","iv":"ZIWvMOeRWk1s4kr1","ct":"f/3Zev9gs+gytrfdvCNAbyg81fSNQGsTPNofS2+eLIboa06onuLAwo0M61JDGeyMte1rk5rZdeVnwwcjawhXDvlw42rXS15HbHgYybQpMc2hmsr205uocwi7NhfII/nBiyXiTAlaOME8dYnTC8Rcu2c3/Be8Lapk1beBrNZljhdcjI6XlNu2J7LALpg/43vdUWjh1qjWnBbCAyCjZ53/i6VbMdTZ+K6kXlQdDkQTNHgy66NU0KjpTqExR0K07+Ib8j0o1lF/mH+nR8cjhi5OyRFeUXhpJNr+wIhL5d69D87rC9kZ9a2GwUxWoMSqVvi5cDXbbhObXv34PqPB52dbJYSFo5rv3M4Log70/s6MEEQl9powHx8nhKN287R4khTYtZCBryzGN70Uin3GGL66oHZF/8TN5sQZeHw6zfnZRfXGOA8Dium2WRuz78S4a6y6eImkhvmhtnHN5f/JS2WztBgcUhGvCxKCuL+OvAxidYHNF8s9ps//Jh42Q9GVOZZbF17xW+A8E5qglW3pniBiPWmLSFKtRTe1j3UanV5XfRYSqRCHHyWXlh/k01RQVvoQy1lDAkQNrV5FyI92i6pBvnJpUauH4yiBGKZw0CqGYL7TpWeagDu5XB/B1oF6f/CutnZmPyo4Gz4i3G9OZmsNL/PEP04686u0I4zt1IKIS3U4uRh7h1WMOnkpm4JW9r4Mv+jjxoFvYmOFs1/xfE04ryEp+1j9jVDIN28m1NdRNw00o70/ioOgtr4KuPCNuKz00vGH89k8B2VZuPw8wTqQGeKKxqNvKQccOb2O5I/096C15g32qTnatVs6BFHcgEdYc2A6oNThPJo6mm24WMH9urIyv3VnSRbFGLoigtkKiIkxqotjabwoRuMIlx3xuv2/3EgK+d24o9q+N2CDULLowTCb9FxkyqDmqNz2M3lUpGY/ERJB4U7W9LDfhCzW/Xm+TlUs0s4EyQZECucPYeU87BiCB8l4qKQBuCNHgT7LMGfeFAkM69i978F7P33z/DyLzgVN8Jr6HLC/9fDg1nenvrPkzo/tx1immIU4RxlClEN0ZOOrfhYNRTXmDn+aoB5LyPyBNqgwrotoGIGKeUPSH8xUuxqDC70VSyEdyIPx7PvJ1o/MnRH5RZ3DUXRyGwDXUIBNMMu8/sN9ZXkmov7Xi+/VWiOZS4NLLHcBlNZfB3e9GdD579N5x44t/unzGeoTlFV/+5fiF2DM0OHr0bKTCr7uBqrP+L7cpGKpw+hw/vQRxYS60e+5UTVk94TLkVQ7sq9crJGfP3KJp4n6n2bYYSr6JvcL+QcedcM42dz6geSLxpt54OyOCmXhKgeg8Edtpb9oC9YG4FPOpt0PtsPp8xLLh2vH4CrtW74m9Ly5uE/exvsffhYDkAnO9ONWE6TWozwb8vzT6AX1fI9v/TWVOafo7vQZZZ04x3Swviv9WPFvv9rZsUK4EJMMTy1YzxU8iJF82JoIwh5SWWzPpVPS7HzfV/zngqQsqk/mRlDhLPDWIHjKSKEvNY8UbwAmbLVlCGgGD+kCJfJS+aR+YUPvZvVjLrcK3BV1U+Mrzvxt7jzgfg7LL8qq1QFvi2Dk/ErTkhyh7CT0lo6r8SKU+ATqCfuk87MRASdI6uvT5yzC1dT0O2cIaFxr2pLMZHoubA7mtF7oorAjP9+i9dRK51Yzi1f0Wi6Ye9mMPPkzI94NTmEDlalgv09ExZP449nST1NbVLq84OG8cd0fM8Ryz4FkveKN3SG8qY86cCnvZ+1XClNt2zOi+Y5DcGVLZot8kzsTMOipYzj29/aUSBpYavqKzL2bYhmmzPhFzX9NJJpWGhIg6DEEQMAp0D4xREefYeGrGnG9PvmX3JVqYA6HmH6+L2hgHlQmUdS56XMs+BXywz9qDHWBivlcOURa/uAKu9s5YkM+t1DJViLlxmhzuhz3VfNT6yJNqtIZ43m/bWAzcL8QKVI6PmsZZCzcY0HkPNtYFkFkWVn1RvgseH2TXTJRe2SDxg9h8kGE2KpEHfnlXYo/b1ozNFdDFu3XBDQxt8RvvEsGOPvZlCsqI01QISR22lGtycGt4IFHI/DAiPFmDYA0qle8zPCHICpdnLz728i5FpUCY/COjbOtOxGh2ZDiXbwYZomrXO6oVKohUpqU3vN7qwF/TtOuKDkBs9U7gE4Zer91u1U12rPt7jxdy9C8UhdzmDpG5npbufu8MxSLYFTeOB1jG54oWSOkI5qkV0oDBtjhVWw+RcfndlXupC8BHtrdDAVBdVRAwvfG0dIBVYt+MmNdaJWwq9M7ADQuBdJ5KMhWv0qmaFqO3Hf3VMSpAus5gYziSKUSa1184PZzIWwAknpum9HhOv5jm+7jIxg/V29M7gObV1+/41Zy9Ib9EYeoh575QfApXdtQXoEHhttPcrdMVDgyi5/5z9OoDcR0ZCaP4DX8BX7A+JxDIx9f40b7EKGFW5jQc/YVK0FOqTliCk7Bnlwnd7r6t0ZbM7ClCKxGoz3Sh3PeqX1NS/J8LHVmXftK9M5ohur+uVzXLG9ugdHe4BEVLwL6kbOrk4/zFuZrusNuGX7seVE3HzA4556kYWv7qynQmbgrIoExAuNKGDsFXCuoK9a2IJSb4WbXf2gLBYTr/T9d1XOOcf0Rswt4H4bpCu40LdJagqOFuhNzWzVNnBADFtL+/gdyZmzep42TzLEPDf3Rv20vTsKB5ZCSE+KqRp49GR6TrZZ09zOQfN0HaJgm/cWixkjBqcQtdG9AqBne9gcYP96B6ZLfiJ4/EfQm+vJuJeBnVw06Hb05eivOVmU3+Oj+VZXdYdynCGGr7BH++43xNCewxCHq6RIE+qq2XrZkXwqbwBUWD+tXbz9e3ARFVBdG9QuUN02ut2o/hZ2708Xy9OozrqG7BezMjirp7jMsNA+yiUecbFvXoedj0w8zVhMcRViPrPyYaI6RFd2eNAvAZT5wNRlCyxFCmpBbctxm09YWXSqRvYEXdjI+XVORwLqfXwN0hlVduP8l8QXFia0nA8UbJtXlaYME9hEb4wzsXu1gR0vjbKFshIJx1IZcJzcsrdBedI/gXicGf6hlfr/5lB0mULx1L/6UVOS+P/LnuTGicJjtgoFeleXfypPMz06WTmyOvObPQLqQ7txYDDMo0+/GMENJzByBsj6Pb/JRhKirstMAApclxxXK2A8H72HJxuqn4GPpU+5lsZxHln2SOampfbKE1TK7AY4ThbbEmHRsoSPHSaaSJK4J30lD8Gw38wR2t0fB4ETWf9FjLxRBBDE/qrPUVLFyQU7LCQcTSVElRirY7OUlo9kzLFiod9Y4p+yYrD16ZLp/CBcxADQ5QjldOGbQ2MOiUP/QdcdN8rON","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1590,6 +1592,20 @@
       return true;
     });
   }
+  // Ask the server to push a fixed test notification straight to one person's phone. Needed because a real
+  // note only ever notifies the OTHER person — with one phone and a laptop there'd be no way to see one land.
+  // Authenticated with the publishable key we already hold; the function will only ever send the fixed test
+  // text for this call, so this can't be used to forge a note ping (that path needs the server-side secret).
+  function sendTestPing(who) {
+    return fetch(SUPABASE_URL + "/functions/v1/notify-note", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-mv-key": SUPABASE_KEY },
+      body: JSON.stringify({ test: true, who: who })
+    }).then(function (r) {
+      if (!r.ok) throw new Error("server said " + r.status);
+      return r.json();
+    });
+  }
   // Push services rotate endpoints (and iOS doesn't reliably fire pushsubscriptionchange), which would
   // silently strand the row in the database. Once per session, quietly re-register what we actually have.
   function resyncPush() {
@@ -1919,56 +1935,93 @@
     function openPushSheet(onChange) {
       var pick = pushWho || EM;
       var on = !!pushWho;               // synchronous: the sheet must open on the tap, always
+      var tpick = ANH;                  // which phone the desktop test ping goes to
       modal.innerHTML =
         '<div class="pn-card">' +
-            "<h3>notifications</h3>" +
-            "<p>a little ping on this phone whenever the other one pins a note ♡</p>" +
-            (on ? "" :
-              '<div class="pn-label">this phone belongs to</div>' +
-              '<div class="pn-who">' +
-                '<button data-who="' + escW(EM) + '">em yêu (M)</button>' +
-                '<button data-who="' + escW(ANH) + '">anh yêu (V)</button>' +
-              "</div>") +
-            '<button class="pn-go' + (on ? " off" : "") + '" id="pnGo">' +
-              (on ? "turn them off" : "turn them on") + "</button>" +
-            '<div class="pn-msg" id="pnMsg">' +
-              (pushSupported() ? "" : (pushInstalled()
-                ? "this iOS is too old for web notifications (needs 16.4+)"
-                : "add M+V to your Home Screen first — iOS only allows notifications for installed apps")) +
+          "<h3>notifications</h3>" +
+          "<p>a little ping on this phone whenever the other one pins a note ♡</p>" +
+          (on ? "" :
+            '<div class="pn-label">this phone belongs to</div>' +
+            '<div class="pn-who">' +
+              '<button data-who="' + escW(EM) + '">em yêu (M)</button>' +
+              '<button data-who="' + escW(ANH) + '">anh yêu (V)</button>' +
+            "</div>") +
+          '<button class="pn-go' + (on ? " off" : "") + '" id="pnGo">' +
+            (on ? "turn them off" : "turn them on") + "</button>" +
+          '<div class="pn-msg" id="pnMsg">' +
+            (pushSupported() ? "" : (pushInstalled()
+              ? "this iOS is too old for web notifications (needs 16.4+)"
+              : "add M+V to your Home Screen first — iOS only allows notifications for installed apps")) +
+          "</div>" +
+          // Desktop only: a note only ever notifies the OTHER person, so with one phone between us there's
+          // otherwise no way to watch a push arrive. This asks the server to ping a chosen phone directly.
+          (PHONE ? "" :
+            '<div class="pn-sep"></div>' +
+            '<div class="pn-label">only one phone? ping it from here</div>' +
+            '<div class="pn-who pn-twho">' +
+              '<button data-twho="' + escW(EM) + '">em yêu\'s phone</button>' +
+              '<button data-twho="' + escW(ANH) + '">anh yêu\'s phone</button>' +
             "</div>" +
-            '<button class="pn-close">close</button>' +
+            '<button class="pn-go off" id="pnTest">send a test ping</button>' +
+            '<div class="pn-msg" id="pnTestMsg"></div>') +
+          '<button class="pn-close">close</button>' +
         "</div>";
       modal.classList.add("open");
 
       var msg = document.getElementById("pnMsg");
       var go = document.getElementById("pnGo");
+      var test = document.getElementById("pnTest");
+      var testMsg = document.getElementById("pnTestMsg");
       function sel() {
-        [].forEach.call(modal.querySelectorAll(".pn-who button"), function (b) {
-            b.classList.toggle("sel", b.getAttribute("data-who") === pick);
+        [].forEach.call(modal.querySelectorAll(".pn-who:not(.pn-twho) button"), function (b) {
+          b.classList.toggle("sel", b.getAttribute("data-who") === pick);
+        });
+        [].forEach.call(modal.querySelectorAll(".pn-twho button"), function (b) {
+          b.classList.toggle("sel", b.getAttribute("data-twho") === tpick);
         });
       }
       sel();
       function say(text, bad) { msg.textContent = text; msg.classList.toggle("bad", !!bad); }
+      function sayTest(text, bad) { testMsg.textContent = text; testMsg.classList.toggle("bad", !!bad); }
 
       modal.onclick = function (e) {
         if (e.target === modal || e.target.classList.contains("pn-close")) { closeModal(); return; }
-        var w = e.target.closest(".pn-who button");
+        var t = e.target.closest(".pn-twho button");
+        if (t) { tpick = t.getAttribute("data-twho"); sel(); return; }
+        var w = e.target.closest(".pn-who:not(.pn-twho) button");
         if (w) { pick = w.getAttribute("data-who"); sel(); return; }
+
+        if (e.target === test) {
+          test.disabled = true;
+          sayTest("sending…");
+          sendTestPing(tpick)
+            .then(function (r) {
+              test.disabled = false;
+              sayTest(r.sent
+                ? "sent to " + r.sent + " device" + (r.sent === 1 ? "" : "s") + " — look at the phone ♡"
+                : "nothing to send to: " + tpick + "'s phone hasn't turned notifications on yet", !r.sent);
+            })
+            .catch(function (err) {
+              test.disabled = false;
+              sayTest((err && err.message) || "couldn't reach the server", true);
+            });
+          return;
+        }
         if (e.target !== go) return;
 
         go.disabled = true;
         say(on ? "turning off…" : "asking iOS…");
         (on ? disablePush() : enablePush(pick))
-            .then(function () {
-              if (onChange) onChange();
-              say(on ? "off — no more pings on this phone" : "done ♡ you'll get a ping when " +
-                (pick === EM ? ANH : EM) + " pins a note");
-              setTimeout(closeModal, on ? 900 : 1600);
-            })
-            .catch(function (err) {
-              go.disabled = false;
-              say((err && err.message) || "that didn't work", true);
-            });
+          .then(function () {
+            if (onChange) onChange();
+            say(on ? "off — no more pings on this phone" : "done ♡ you'll get a ping when " +
+              (pick === EM ? ANH : EM) + " pins a note");
+            setTimeout(closeModal, on ? 900 : 1600);
+          })
+          .catch(function (err) {
+            go.disabled = false;
+            say((err && err.message) || "that didn't work", true);
+          });
       };
     }
     function openNoteModal(idx) {

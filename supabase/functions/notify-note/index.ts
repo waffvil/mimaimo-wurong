@@ -1,8 +1,10 @@
 // M+V — "she left you a note" push.
 //
-// Called by the after-insert trigger on public.notes (see the push_notifications_setup migration).
-// verify_jwt is OFF because a Postgres trigger has no user JWT to send; the request is authenticated
-// instead by the x-mv-hook shared secret, which lives in public.app_secrets and never leaves the server.
+// Two callers:
+//   · the after-insert trigger on public.notes (see the push_notifications_setup migration) — a real note
+//   · the app's "send a test ping" button — {test:true, who}, fixed text, so one phone can be tested alone
+// verify_jwt is OFF because a Postgres trigger has no user JWT to send; each caller proves itself with its
+// own credential instead (x-mv-hook / x-mv-key), both checked below against public.app_secrets.
 //
 // No secrets in this file — everything sensitive is read from app_secrets with the service role.
 
@@ -31,29 +33,68 @@ function sameSecret(a: string, b: string) {
   return diff === 0;
 }
 
+/**
+ * The test ping is called straight from the browser, so it needs CORS — but only from where the app
+ * actually lives. Anything else gets no allow-origin header and the browser drops the response.
+ */
+function corsFor(req: Request): Record<string, string> {
+  const origin = req.headers.get("Origin") || "";
+  let ok = false;
+  try {
+    const h = new URL(origin).hostname;
+    ok = h === "waffvil.github.io" || h === "localhost" || h === "127.0.0.1";
+  } catch { ok = false; }
+  return ok
+    ? {
+      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Headers": "content-type, x-mv-key",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Max-Age": "3600",
+    }
+    : {};
+}
+
 Deno.serve(async (req) => {
-  if (req.method !== "POST") return new Response("POST only", { status: 405 });
+  const cors = corsFor(req);
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method !== "POST") return new Response("POST only", { status: 405, headers: cors });
 
   const secrets: Record<string, string> = {};
   for (const row of await rest("app_secrets?select=key,value")) secrets[row.key] = row.value;
 
-  const given = req.headers.get("x-mv-hook") || "";
-  if (!secrets.notify_hook_secret || !sameSecret(given, secrets.notify_hook_secret)) {
-    return new Response("nope", { status: 401 });
+  const payloadIn = await req.json().catch(() => ({}));
+  const isTest = payloadIn.test === true;
+
+  // Two callers, two credentials. The note hook is the database, which holds the hook secret. The test
+  // ping is the app itself, which holds only the publishable key — the same key that can already read
+  // and write the notes table, so authenticating with it grants nothing new. The hook secret stays
+  // server-side, and a test ping can only ever send the fixed text below.
+  if (isTest) {
+    const key = req.headers.get("x-mv-key") || "";
+    if (!secrets.publishable_key || !sameSecret(key, secrets.publishable_key)) {
+      return new Response("nope", { status: 401, headers: cors });
+    }
+  } else {
+    const given = req.headers.get("x-mv-hook") || "";
+    if (!secrets.notify_hook_secret || !sameSecret(given, secrets.notify_hook_secret)) {
+      return new Response("nope", { status: 401, headers: cors });
+    }
   }
 
-  const payloadIn = await req.json().catch(() => ({}));
   const author: string | null = payloadIn.author ?? null;
   const noteBody: string = String(payloadIn.body ?? "");
 
-  // Notify the OTHER person. No author on the row (shouldn't happen) => tell both, better than silence.
-  const target = author === "em yêu" ? "anh yêu" : author === "anh yêu" ? "em yêu" : null;
+  // A real note notifies the OTHER person; a test ping goes to whoever asked for it. (No author on the
+  // row shouldn't happen — tell both in that case, which is better than silence.)
+  const target = isTest
+    ? (payloadIn.who === "em yêu" || payloadIn.who === "anh yêu" ? payloadIn.who : null)
+    : author === "em yêu" ? "anh yêu" : author === "anh yêu" ? "em yêu" : null;
   const q = "push_subs?select=endpoint,p256dh,auth,who" + (target ? "&who=eq." + encodeURIComponent(target) : "");
   const subs: (Sub & { who: string })[] = await rest(q);
 
   if (!subs.length) {
     return new Response(JSON.stringify({ sent: 0, note: "no subscriptions for " + (target ?? "anyone") }),
-      { headers: { "Content-Type": "application/json" } });
+      { headers: { ...cors, "Content-Type": "application/json" } });
   }
 
   const vapid: Vapid = {
@@ -61,12 +102,19 @@ Deno.serve(async (req) => {
     privateKey: secrets.vapid_private,
     subject: secrets.vapid_subject,
   };
-  const notification = JSON.stringify({
-    title: (author ? author + " left you a note" : "a new note") + " ♡",
-    body: noteBody.length > 140 ? noteBody.slice(0, 139) + "…" : noteBody,
-    tag: "mv-note",           // collapses a burst of notes into one line rather than a stack
-    url: "./",
-  });
+  const notification = JSON.stringify(isTest
+    ? {
+      title: "test ping ♡",
+      body: "if you can see this, notifications work",
+      tag: "mv-test",
+      url: "./",
+    }
+    : {
+      title: (author ? author + " left you a note" : "a new note") + " ♡",
+      body: noteBody.length > 140 ? noteBody.slice(0, 139) + "…" : noteBody,
+      tag: "mv-note",         // collapses a burst of notes into one line rather than a stack
+      url: "./",
+    });
 
   const nowSec = Math.floor(Date.now() / 1000);
   const results = await Promise.all(subs.map(async (s) => {
@@ -90,7 +138,7 @@ Deno.serve(async (req) => {
     }
   }));
 
-  console.log("notify-note", JSON.stringify({ author, target, results }));
+  console.log("notify-note", JSON.stringify({ test: isTest, author, target, results }));
   return new Response(JSON.stringify({ sent: results.filter((r) => r.status < 300 && r.status > 0).length, results }),
-    { headers: { "Content-Type": "application/json" } });
+    { headers: { ...cors, "Content-Type": "application/json" } });
 });
