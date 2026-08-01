@@ -489,39 +489,28 @@
 
     /* cat-ears flanking the Dynamic Island */
     .wall .wall-ears { display: block; }
-    /* Ears — three knobs, all on .wall-ear, so nudging them never means re-deriving four margins:
-         --ear-x  how far each ear's base sits from the screen centre (smaller = further in)
-         --ear-s  size. Scaled by TRANSFORM, not a smaller box: the clip-path uses absolute px
-                  coordinates, so shrinking width/height would crop the ear instead of scaling it.
-         --ear-y  vertical nudge; negative tucks the tips above the top edge so they only peek.
-       transform-origin is bottom centre, so each ear scales toward its own base and the pink inner stays
-       seated in the black outer. The margins below just convert --ear-x (a centre) into a box offset by
-       taking off half the box width. */
-    .wall .wall-ear { position: absolute; z-index: 7; transform-origin: bottom center;
+    /* Ears — three knobs on .wall-ear:
+         --ear-x  distance of each ear's base from the screen centre (smaller = further in)
+         --ear-s  size (scaled by TRANSFORM: the artwork is an SVG, so this never distorts it)
+         --ear-y  vertical nudge; negative tucks the tips above the top edge so they only peek
+       Each ear is ONE svg holding both the black outline and the pink inner, and BOTH ears use the
+       identical markup — the right one is simply mirrored with scaleX(-1). Previously each ear had its
+       own hand-drawn outer path AND its own hand-drawn pink path, four independent shapes that were
+       never true mirrors: the two ears leaned differently and the pink sat at a different height and
+       size on each side. One shape + a mirror makes them even by construction.
+       The pink is the SAME path as the black, scaled to 0.55 about the ear's base — so it is exactly
+       concentric with the outline, which is what makes it read as the inside of the ear rather than a
+       blob laid on top. */
+    .wall .wall-ears { display: block; }
+    .wall .wall-ear { position: absolute; top: var(--ear-y); left: 50%; z-index: 7;
+      width: 34px; height: 36px; transform-origin: bottom center;
       --ear-x: 49px; --ear-s: 0.8; --ear-y: -12px; }
-    .wall .ear-lo { top: var(--ear-y); left: 50%; margin-left: calc(-1 * var(--ear-x) - 17px);
-      width: 34px; height: 36px; background: #111;
-      transform: rotate(-12deg) scale(var(--ear-s));
-      clip-path: path('M18,1 C25,9 30,20 31,27 C31,31 27,32 22,31 C16,30 10,30 5,31 C1,32 0,30 1,27 C3,19 10,8 18,1 Z'); }
-    .wall .ear-li { top: calc(var(--ear-y) + 10px); left: 50%; margin-left: calc(-1 * var(--ear-x) - 8.5px);
-      width: 17px; height: 16px;
-      transform: rotate(-12deg) scale(var(--ear-s));
-      background: linear-gradient(165deg,#ffc8db,#ef94b3);
-      clip-path: path('M8,1 C11,5 14,10 14,12 C14,14 11,14 7,13 C4,13 2,14 1,12 C1,10 4,5 8,1 Z'); }
-    .wall .ear-ro { top: var(--ear-y); left: 50%; margin-left: calc(var(--ear-x) - 17px);
-      width: 34px; height: 36px; background: #111;
-      transform: rotate(12deg) scale(var(--ear-s));
-      clip-path: path('M14,1 C21,8 29,19 31,27 C32,30 31,32 27,31 C22,30 16,30 10,31 C5,32 1,31 1,27 C2,20 7,9 14,1 Z'); }
-    .wall .ear-ri { top: calc(var(--ear-y) + 10px); left: 50%; margin-left: calc(var(--ear-x) - 8.5px);
-      width: 17px; height: 16px;
-      transform: rotate(12deg) scale(var(--ear-s));
-      background: linear-gradient(195deg,#ffc8db,#ef94b3);
-      clip-path: path('M8,1 C12,5 14,10 15,12 C15,14 12,13 9,13 C5,13 2,14 2,12 C2,10 5,5 8,1 Z'); }
+    .wall .ear-l { margin-left: calc(-1 * var(--ear-x) - 17px);
+      transform: rotate(-12deg) scale(var(--ear-s)); }
+    .wall .ear-r { margin-left: calc(var(--ear-x) - 17px);
+      transform: scaleX(-1) rotate(-12deg) scale(var(--ear-s)); }   /* mirror of the left, same artwork */
+    .wall .wall-ear svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
-    /* the scroller runs from under the curtain to the TRUE screen bottom (bottom:0). It must NOT stop
-       short of the safe-area — an inset there reads as a blank cream bar under the notes, with the
-       cards clipped mid-card and the dotted frame stopping early. Notes simply scroll off the bottom edge
-       (under the home indicator) like any native list, so the board reads continuous to the edge. */
     /* The scroller ends exactly at the frame's inner edge (--sbot + the 2px border), so notes are clipped
        BY the frame instead of sliding across it — the frame is a window, and nothing is ever drawn on the
        far side of its closing edge.
@@ -916,7 +905,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"0OP/eisjtnO+9OWoCgnp5w==","iv":"vCYdF6ZDvVb7Pz6J","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"fPVQ7vNdyLA2quDNq3X6UQ==","iv":"XpTEpWNqPxu3/ZDi","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1513,6 +1502,26 @@
       + '</svg>';
   }
 
+  // One cat ear, black outline + pink inner, in a single 34x36 svg. BOTH ears use this exact markup —
+  // .ear-r just mirrors it in CSS — so the pair can never drift out of symmetry.
+  // The pink is the SAME path scaled to 0.55 about the ear's base (16,32), which keeps it perfectly
+  // concentric with the outline and seats it in the lower half, the way a real ear's inner sits.
+  // `side` only varies the gradient id, since two elements may not share one id.
+  var EAR_PATH = "M18,1 C25,9 30,20 31,27 C31,31 27,32 22,31 C16,30 10,30 5,31 C1,32 0,30 1,27 C3,19 10,8 18,1 Z";
+  function earSVG(side) {
+    var gid = "earPink-" + side;
+    return '<span class="wall-ear ear-' + side + '">' +
+      '<svg viewBox="0 0 34 36" aria-hidden="true" focusable="false">' +
+        '<defs><linearGradient id="' + gid + '" x1="0.15" y1="0" x2="0.75" y2="1">' +
+          '<stop offset="0" stop-color="#ffd9e6"/><stop offset="0.55" stop-color="#ffb6d0"/>' +
+          '<stop offset="1" stop-color="#ee8fb0"/>' +
+        '</linearGradient></defs>' +
+        '<path d="' + EAR_PATH + '" fill="#111"/>' +
+        '<path d="' + EAR_PATH + '" fill="url(#' + gid + ')"' +
+          ' transform="translate(16,30.4) scale(0.55) translate(-16,-32)"/>' +
+      '</svg></span>';
+  }
+
   function renderWall() {
     var NOTES = WALL_NOTES;
     var floaters = "";
@@ -1535,19 +1544,15 @@
       '<span class="wall-corner" style="bottom:22px;left:24px;">♡</span>' +
       '<span class="wall-corner" style="bottom:22px;right:24px;">♡</span>';
 
-    // phone-only cute chrome (scalloped pink banner + ears round the island + scalloped dashed frame).
+    // phone-only cute chrome (scalloped pink banner + ears round the island + the pinned dotted frame).
     // Hidden on desktop via CSS; the desktop keeps the plain .wall-frame.
-    // phone-only cute chrome: the pink "curtain" (banner) stays pinned at the top; the dotted
-    // frame is a border on the SCROLLING sheet, so its bottom sits after the last note.
     var phoneChrome =
       '<div class="wall-safebot"></div>' +
       '<div class="wall-banner"></div>' +
       '<div class="wall-banner-scallop"></div>' +
       '<div class="wall-pinframe"><span class="ws-heart ws-hl">♡</span><span class="ws-heart ws-hr">♡</span></div>' +
       '<div class="wall-curtain-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
-      '<div class="wall-ears">' +
-        '<span class="wall-ear ear-lo"></span><span class="wall-ear ear-li"></span>' +
-        '<span class="wall-ear ear-ro"></span><span class="wall-ear ear-ri"></span>' +
+      '<div class="wall-ears">' + earSVG("l") + earSVG("r") +
       '</div>';
     wallEl.innerHTML =
       '<div class="wall-floaters">' + floaters + "</div>" +
