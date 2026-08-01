@@ -429,7 +429,7 @@
   .wall.show { display: flex; flex-direction: column; }
   .wall-frame { position: absolute; inset: 18px; z-index: 0; pointer-events: none; border-radius: 20px; border: 2px solid rgba(214,150,178,0.6); box-shadow: inset 0 0 0 5px rgba(255,255,255,0.4), 0 6px 20px rgba(204,100,136,0.06); }
   /* phone-only cute chrome — hidden on desktop (desktop keeps the plain .wall-frame) */
-  .wall-banner, .wall-banner-scallop, .wall-banner-hearts, .wall-ears, .wall-curtain-deco, .ws-heart, .wall-safebot, .wall-pinframe { display: none; }
+  .wall-banner, .wall-banner-hearts, .wall-ears, .wall-curtain-deco, .ws-heart, .wall-safebot, .wall-pinframe { display: none; }
   .wall-sheet { display: contents; }   /* desktop: transparent to layout; phone turns it into the framed sheet */
 
   /* PHONE VIEW (exclusive): scalloped pink banner + ears round the Dynamic Island + a scalloped,
@@ -474,16 +474,29 @@
     .wall .ws-hl { left: 20px; } .wall .ws-hr { right: 20px; }
 
     /* pink scalloped banner across the very top */
-    .wall .wall-banner { display: block; position: absolute; top: 0; left: 0; right: 0; height: var(--bh); z-index: 6;
-      /* a MINOR gradient for a little depth: a soft light falling from the top-left over a three-stop
-         vertical base. The bottom stop stays exactly #ffd8e6 because the scallop below draws its circles
-         in that colour — change it here and a seam appears along the scallop line. */
+    /* THE CURTAIN, scalloped edge included — ONE element, so the bumps are cut out of the very same
+       gradient as the curtain above them and therefore match it everywhere, including across the
+       top-left sheen. (They used to be a separate element filled with flat #ffd8e6: fine while the
+       curtain was flat, but the moment it gained a gradient the bumps stopped matching it.)
+       The box is --bh + 16px tall and the mask has two layers, composited by union:
+         1. an opaque block over the top --bh — the curtain proper;
+         2. the scallop semicircles tiled across the last 16px — the bumps.
+       A minor gradient for depth: soft light from the top-left over a three-stop vertical base. */
+    .wall .wall-banner { display: block; position: absolute; top: 0; left: 0; right: 0;
+      height: calc(var(--bh) + 16px); z-index: 6;
       background-image:
         linear-gradient(107deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.08) 34%, rgba(255,255,255,0) 62%),
-        linear-gradient(180deg, #ffeaf2 0%, #ffe3ed 52%, #ffd8e6 100%); }
-    .wall .wall-banner-scallop { display: block; position: absolute; top: var(--bh); left: 0; right: 0; height: 16px; z-index: 6;
-      background-image: radial-gradient(circle 11px at 11px 0, #ffd8e6 10.4px, rgba(255,255,255,0) 10.9px);
-      background-size: 22px 16px; background-repeat: repeat-x; }
+        linear-gradient(180deg, #ffeaf2 0%, #ffe3ed 52%, #ffd8e6 100%);
+      -webkit-mask-image: linear-gradient(#000, #000),
+        radial-gradient(circle 11px at 11px 0, #000 10.4px, rgba(0,0,0,0) 10.9px);
+      -webkit-mask-size: 100% var(--bh), 22px 16px;
+      -webkit-mask-position: 0 0, 0 var(--bh);
+      -webkit-mask-repeat: no-repeat, repeat-x;
+      mask-image: linear-gradient(#000, #000),
+        radial-gradient(circle 11px at 11px 0, #000 10.4px, rgba(0,0,0,0) 10.9px);
+      mask-size: 100% var(--bh), 22px 16px;
+      mask-position: 0 0, 0 var(--bh);
+      mask-repeat: no-repeat, repeat-x; }
     /* HAND-DRAWN hearts on the curtain — an open stroked path with a sweeping tail, never a glyph or
        emoji. Three sizes and leans per tile so it reads as scattered doodles rather than wallpaper; the
        stroke widths are pre-divided by each group's scale so all three keep the same ~2.3px line weight.
@@ -926,7 +939,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"qq+V8IhitWIeIwoP8gSwKQ==","iv":"RXSh4XMWsAEB4eRb","ct":"eZFpNNxeCPhlvVT/MpARsbWz3cO/rxkkdKUeEaa+Ajs9ito96H5HCUMb8zfXvMm9i2lcAF4uSvWqwibL7SBbE/DHQ+CtuCUFtfKB3bq6olUkrAS9IcDVOjiNn9BHDUBNqeTphG/8uYiKTRYShy8h9seIrIo+wJf5bgJ7BBS+CUnIBNQXHYt4kXiL7bFlxam1NaVqsqJjQaogLFaQ9haZFNNDX5cDWkm3NqOPzd+a/x5VT+FIFp4d5SPRjrqnIiNr14+l5braV+ZGUDJ6Y1fIkLC4bjG/hpl70Ap5UJXO/N1lvqiZK/9NInYQGZN78c4XjnvNDP7vNv5+4+qXrCoBvQiuW531MhEikSCp4o1o8e6R0YYvRHSEHWDw67la0DK8C/i408pxJivSCQxRiLwR16aSg0P9YjCqJnQ9n/nawkFeseCIRWTAXW/X7zKC4playH3q8poON/1gaYEesXq8T9iJ1hgg2dohiWAMEbjD6eHz3LLeil1ClRrcaFsmAt49+UORiEBf846bh5B7+tWBoUVBor3a0MXDGp4IJicqpeuzL9/o1bM1OlBXhvc777LKcepVeAV0DK1JOPewsWMyX62fhru2tHVWbEkR0aI78AfE4fqI+cHdZlxKFY05t7FvMhIKdfHFDcmSxthF00dslooaQEtZVYdJdPC0NpPGXtdzqrhbdWflxq2ZfGA63b8o1OqHXc9Fr0mLrZRSPxD0Mps6p2DYR+AU2ltKzywb4weGxapGZLtfxPsCjGTZp8nBvmpZjHkfAxtTbzy+LQhut6yB8WnxHpWta8wxiywiHOmZ8ApZMF4/3ObnsXqW5c/nnUwySTwaSv4TB5pazvJ0cn9D7ozbvg7f+YVpk2IzVQfuqmvMipWpoqbUWsAGvl2jxXEeeylcb+Vf/Jk5DypTMlxR/NfR8GrK59av4PvGwc8mukIkHQloRrudateIZ2LXJwRxpbYPMtG8+Dc3kwfA1XxhTbFPmg5e29y4aoGW8hml6DGU3qos01t0uO7rPhwYuDxi6en/sGrsW4TXRNdNYP7ole8RkXayv+1UAfkdF0tS5HK642Eyoc1PZ+5dqEVut4JE9MxwoXJYzip+hUpVDd2xI+hP3Vl8Pu4ZgsDYfimARpbZCJwry6WzR+jj5GqCEObBYq+WxKuhLNeFhUVyh9Dq1wpetXy5miYo8wKVx11Kyoqu4y9/Ln7FmPx2jYRdzu/onNNFZ45H8jPk+Ct+TiujNIQrUaH5VD/PIbi+Vb3Q+HpCD7xd4OMod9ahFN9w+tf1MnwXjBgy4FZkiDadT4w4F14m2i/qxqQfhFMNpN+NFWE/MKOoviRlyOmCaIigmmgENiSD4bLV14e7DkxFFFsuAXTbY6VJ7iGlcI0/vOkiAPvFRmqNiLrbEf2nFuAGXF4dhiH8HMzaaSZnwPiC/9TiiGaHCscZp9lYUFrfByEJnbOzyr00w9ISanaUOpGsHg6SyMDa0xp6zdn7mk4hu74tMuWnHr4E9zqetdeVeR8SwmifS+nWEKE9KHjDP8RiUqP/npwg4UBcf4vuyto1rvwJiqRaeWU51aRSgxMqIEUcHb1NR8OlWG7OfkwHMUXFohOdqk1gWKlYp36fs9VC+WhJezzOr0lGipu0aeax8CamBUmUMrBdpIU1shTGKbE9WgIXtWTaJs4Nk50ouOEw6OvXBeLjyhMXXe2PkIXVrmFX3wxdfFcCZQ4yRp+Jx3AdUXAo7/RHjIt1N4BZqq48THk+bIBMgFblV6iy6+at5fi7yokSlcgyXtEmOddwHbG5c0Vf1quvHL2ZY1jafSCWpzh2ldUbQqxuI3zjkXOoXPsjmZ6htK2yWxtMErov75VEGlC+oE3ZpuXmw5g/6V/6QeAy+IrSOab55XcIPLyv5E5E54NbpCcWDS7thXfMCCRwC/pewGyLBMMUBUJWC3Nh3UPq7A/FOlilMNAOT3FAhUJ9FzAcBGhqNj9q3pKJ4cyXstJdks4vQVXZvvslWmlkDdjYH4yf0f2hEdRsrqk3AUlBbixIuphWM7R1SJQ+bT1+yQfwHrDoSK0wn1Z2pxAPtREcODcbCdElF98vZpfzcAPnOR4La2XTrS31O6G/IwKbXuS1zWIa3vwgEScZgI7uTORhogGIuAKXEG7w2135deVyd2PwX42uEO1Hm0pSZv2guGiX0P47AF6wcJ6WHZ4t6gRSk8hI0l2dZT+9lXwO/2VtiXLedJyzKtwdOgYTjJrODWWvwzh3rt8k5qo3HDrICQqcDWP+skENgHlDZmekx1LuEqfmMcfiXQI77W38Cm1xtH4TEqkPMYULaBVeluIdzP+1uZX9bGpU7LSmIkqjAJPgnwgeG8dcjrw/Hqeqn6VdbUDgK7TfLSFTPwK85DVmXEAcrXLzNMScYY1DJOnMNrSPDEYu5YPT9iDBXqeLG6Np5iat2QsDFCAcTGI8uwlD+VoFZTrJ7lFKz4DT1xqovBofR+MYKHJ4N1le+lXqsZzw9GFHkpzsRgpYmQvbIsbBlBXMxAu9qASSHeWlN88L9LkaKmQiM07P6wMslknOqJe5NjRr3TBrkjeFHAc5ZdIq9/3CVwGfbVJqmka2RkHL5ThMX/VedjN8W8lMhwvghNhHPeAVqQH155hnFzlCjVsUbrd4M1NTUvT89ilDPSdPVH8hecvFzeZjDcDSoqgUBuU4Vm/h+naij3CRWqEZcyPQ+PmpugkB0+trFU7GTyNug2ntk9jCp8QpoI2qr9irpXZH0o7D30pZtAkftq22OYUJjT5RX3lpXEPezr4SsXPqjZNmh6//kpUstH2exVhaNRU5TjtxvM7WfwuBAS/mAIG5VC8NHqTSu1TCWhWqwjI59hiRNq6UX7hddSRWw9uelDBpZD/e1txsbTDE3FKaG6Mcz59Lwjom36e+QUbdNZKv8T+Hyq3TqOULq59j2jLN45ReFC7VsT0DxYwFBrmiDfxXDx6Tv1Ibb9RAWxu1z49IGe5bFmosO2m4tsx7Nny48kG/oZlTdGOBZfFU7P7yfFFH5fkXHcMt+2Dw2Eb6uTyrKwA/PJCJhBOrfiPzmkguMKUEOOjujXkHn9xWNv2n3eRTaeYHHwbNm/QOOiynlHyVX1mCE6QhLbDQ0PA4RGrsfgxhSYAk7LzF1g/cTKU5lrBbZYvbUMJVZEDyrYq9T7E4g+zWRk5Tgviv1ojg0Or+ijWXI+y1OzUbjqdHaXRK6X/8rdvFrbXC8hw6xVNOoX8JaJ5p8kPWUixqywXrCkPMB9bGkbOSqpdiL9V5nJitu8noK5OPl+HZf1IqP/fdxXeOnsAaLH76qNwMw+o3iA1+Dn63w+Cn64Gzryu9A4swkuiwq0B2bKlrREzN8jzE","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"o11/jrBZCef8rycomhnkjw==","iv":"9l5/Od1IT3STgv71","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1570,7 +1583,6 @@
     var phoneChrome =
       '<div class="wall-safebot"></div>' +
       '<div class="wall-banner"><div class="wall-banner-hearts"></div></div>' +
-      '<div class="wall-banner-scallop"></div>' +
       '<div class="wall-pinframe"><span class="ws-heart ws-hl">♡</span><span class="ws-heart ws-hr">♡</span></div>' +
       '<div class="wall-curtain-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
       '<div class="wall-ears">' + earSVG("l") + earSVG("r") +
