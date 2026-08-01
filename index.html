@@ -429,7 +429,7 @@
   .wall.show { display: flex; flex-direction: column; }
   .wall-frame { position: absolute; inset: 18px; z-index: 0; pointer-events: none; border-radius: 20px; border: 2px solid rgba(214,150,178,0.6); box-shadow: inset 0 0 0 5px rgba(255,255,255,0.4), 0 6px 20px rgba(204,100,136,0.06); }
   /* phone-only cute chrome — hidden on desktop (desktop keeps the plain .wall-frame) */
-  .wall-banner, .wall-banner-scallop, .wall-banner-hearts, .wall-ears, .wall-curtain-deco, .ws-heart, .wall-safebot, .wall-uprights { display: none; }
+  .wall-banner, .wall-banner-scallop, .wall-banner-hearts, .wall-ears, .wall-curtain-deco, .ws-heart, .wall-safebot, .wall-pinframe { display: none; }
   .wall-sheet { display: contents; }   /* desktop: transparent to layout; phone turns it into the framed sheet */
 
   /* PHONE VIEW (exclusive): scalloped pink banner + ears round the Dynamic Island + a scalloped,
@@ -453,18 +453,25 @@
     .wall .wall-frame { display: none; }
     .wall .wall-safebot { display: none; }   /* the document reaches the bottom edge now; nothing to patch */
 
-    /* THE FRAME'S SIDE LINES — pinned, full height, and BEHIND everything that matters.
-       They used to be borders on the scrolling sheet, which had two faults: the lines moved with the
-       content, so an overscroll/rubber-band slid them away and opened a gap under the curtain; and the
-       piece that continued them upward was drawn ON TOP of the pink curtain. Pinning them fixes both —
-       z:3 puts them under the notes (z:4) and under the curtain (z:6), so they vanish behind the curtain
-       at the top and can never drift out of place no matter how hard the board is scrolled. They stop at
-       --sbot, exactly where the sheet's closing edge lands, so the corners join. */
-    .wall .wall-uprights { display: block; position: absolute; top: 0; left: 0; right: 0;
-      bottom: var(--sbot); z-index: 3; pointer-events: none; }
-    .wall .wu { position: absolute; top: 0; bottom: 0; width: 0; }
-    .wall .wu-l { left: 8px; border-left: 2px dotted rgba(222,150,180,0.6); }
-    .wall .wu-r { right: 8px; border-right: 2px dotted rgba(222,150,180,0.6); }
+    /* THE FRAME — ONE pinned element drawing the sides AND the closing edge as a single border, so the
+       corners are genuinely joined and the dash pattern runs continuously round it. Two separate pieces
+       (scrolling side borders + a scrolling bottom border) never lined up: different dash phases, a seam
+       at each corner, and both slid about as the board scrolled.
+       z:5 sits ABOVE the notes (z:4) so the closing edge stays fully visible as notes scroll past it —
+       otherwise the line vanishes behind a card, which is the inconsistency being fixed — and BELOW the
+       curtain (z:6) so the sides slip behind it at the top rather than crossing it.
+       Pinned, so nothing here can move however hard the board is scrolled or overscrolled. */
+    .wall .wall-pinframe {
+      display: block; position: absolute; z-index: 5; pointer-events: none;
+      top: 0; left: 8px; right: 8px; bottom: var(--sbot);
+      border: 2px dotted rgba(222,150,180,0.6); border-top: none;
+      /* iPhone screen corners are ~55px; less the 8px side inset, ~44px sits concentric with them, so the
+         corner curves parallel to the glass instead of cutting across it. */
+      border-radius: 0 0 44px 44px;
+    }
+    /* ♡ corners ride on the frame itself, so they stay with the closing edge */
+    .wall .ws-heart { display: block; position: absolute; bottom: 13px; font-size: 14px; color: rgba(226,150,180,0.75); }
+    .wall .ws-hl { left: 20px; } .wall .ws-hr { right: 20px; }
 
     /* pink scalloped banner across the very top */
     .wall .wall-banner { display: block; position: absolute; top: 0; left: 0; right: 0; height: var(--bh); z-index: 6;
@@ -511,20 +518,13 @@
        safe now that the chin gap is fixed — while the document was 100% tall it stacked on top of the
        webview's white and read as one big pale bar. Keep it tight for the same reason. */
     .wall .wall-sheet {
-      display: block; position: relative;
-      min-height: calc(100% - var(--sbot));
-      margin: 0 8px var(--sbot);
-      padding: 10px 14px 34px;
-      /* ONLY the closing edge lives here, so it still appears when you reach the last note. The sides are
-         the pinned .wall-uprights above — a scrolling border cannot stay put during a rubber-band.
-         iPhone screen corners are ~55px; less the 8px side inset, a ~44px radius sits concentric with
-         them, so the dotted corner curves parallel to the glass instead of cutting across it. */
-      border: none; border-bottom: 2px dotted rgba(222,150,180,0.6);
-      border-radius: 0 0 44px 44px;
+      /* the sheet draws NO frame at all now — .wall-pinframe owns the whole thing. It is purely the
+         scrolling content column, running to the bottom edge so notes scroll under the frame's closing
+         edge instead of stopping short of it (trailing space here is what used to read as a pale bar). */
+      display: block; position: relative; min-height: 100%;
+      margin: 0 8px; padding: 10px 14px 0;
+      border: none; border-radius: 0;
     }
-    /* ♡ corners on the closing edge — pulled in from the corners so they sit inside the bigger curve */
-    .wall .ws-heart { display: block; position: absolute; bottom: 13px; font-size: 14px; color: rgba(226,150,180,0.75); }
-    .wall .ws-hl { left: 28px; } .wall .ws-hr { right: 28px; }
     .wall .wall-head { margin-bottom: 14px; }
     .wall .wall-notes { flex: none; }
     .wall .wall-floaters, .wall .wall-corner { display: none; }
@@ -898,7 +898,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"QenN/9OPPh4+53+eir3ikw==","iv":"ANgV9tubsSwG9lJl","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"1QsY6CJp/qGR1rqRepoycQ==","iv":"2tIc1Ls1DiTLSUQV","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1525,7 +1525,7 @@
       '<div class="wall-safebot"></div>' +
       '<div class="wall-banner"></div>' +
       '<div class="wall-banner-scallop"></div>' +
-      '<div class="wall-uprights"><span class="wu wu-l"></span><span class="wu wu-r"></span></div>' +
+      '<div class="wall-pinframe"><span class="ws-heart ws-hl">♡</span><span class="ws-heart ws-hr">♡</span></div>' +
       '<div class="wall-curtain-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
       '<div class="wall-ears">' +
         '<span class="wall-ear ear-lo"></span><span class="wall-ear ear-li"></span>' +
@@ -1544,7 +1544,6 @@
             '<div class="wall-count">✧ ' + NOTES.length + ' little notes so far ✧</div>' +
           "</div>" +
           '<div class="wall-notes" id="wallNotes"></div>' +
-          '<span class="ws-heart ws-hl">♡</span><span class="ws-heart ws-hr">♡</span>' +
         "</div>" +
       "</div>" +
       '<div class="wall-modal" id="wallModal"></div>';
