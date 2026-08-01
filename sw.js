@@ -1,6 +1,6 @@
 // M+V service worker — makes the site installable & instant, without ever serving stale content
 // or touching Supabase. Bump CACHE when you ship a new build to retire the old shell.
-const CACHE = "mv-v15";
+const CACHE = "mv-v16";
 const SHELL = [
   "./",
   "./index.html",
@@ -20,6 +20,38 @@ self.addEventListener("activate", (e) => {
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
+  );
+});
+
+// ---------- push notifications ----------
+// iOS subscribes with userVisibleOnly:true, which is a promise: EVERY push must show a notification.
+// So there is no silent path here — even a malformed payload gets a fallback card, because staying quiet
+// is what makes iOS revoke the subscription.
+self.addEventListener("push", (e) => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : "" }; }
+  e.waitUntil(
+    self.registration.showNotification(d.title || "a new note ♡", {
+      body: d.body || "",
+      tag: d.tag || "mv-note",     // a burst of notes collapses into one line instead of a stack
+      icon: "./icon-192.png",      // (iOS uses the installed app's own icon and ignores this)
+      badge: "./icon-192.png",
+      data: { url: d.url || "./" }
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const target = new URL((e.notification.data && e.notification.data.url) || "./", self.location.href).href;
+  e.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      // already open (the usual case on a phone) — just bring it forward rather than reloading it
+      for (const c of list) {
+        if (c.url.startsWith(self.registration.scope) && "focus" in c) return c.focus();
+      }
+      return self.clients.openWindow(target);
+    })
   );
 });
 

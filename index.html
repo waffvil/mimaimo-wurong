@@ -613,6 +613,40 @@
   .wall-deco { font-size: 12px; letter-spacing: 3px; color: #d3a3b6; }
   .wall-title { font-family: "Snell Roundhand","Segoe Script","Brush Script MT",cursive; font-size: 34px; color: #cc6488; line-height: 1.25; }
   .wall-count { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #ab7c8f; }
+  /* notifications: a quiet line under the count, not a chrome button — it should read as part of the paper */
+  .wall-bell {
+    margin-top: 6px; border: none; background: none; cursor: pointer; padding: 3px 8px;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; color: #c08fa2;
+    border-bottom: 1px dotted rgba(200,140,165,0.55); border-radius: 0;
+  }
+  .wall-bell.on { color: #cc6488; }
+  .wall-bell:active { opacity: 0.6; }
+  /* the little settings sheet (lives in .wall-modal, so it gets the same backdrop and tap-to-close) */
+  .pn-card {
+    width: min(88vw, 360px); background: #fffdf8; border-radius: 20px; padding: 22px 20px 18px;
+    box-shadow: 0 26px 60px rgba(80,50,60,0.36); cursor: default; text-align: center;
+    animation: notePopBig 0.34s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .pn-card h3 { margin: 0 0 6px; font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 27px; color: #cc6488; font-weight: 400; }
+  .pn-card p { margin: 0 0 14px; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px; line-height: 1.45; color: #8d6a76; }
+  .pn-label { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; color: #ab7c8f; margin-bottom: 6px; }
+  .pn-who { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+  .pn-who button {
+    flex: 1 1 0; padding: 9px 4px; border-radius: 12px; cursor: pointer;
+    border: 1.5px solid rgba(214,150,175,0.5); background: #fff;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px; color: #a05a72;
+  }
+  .pn-who button.sel { background: linear-gradient(135deg, #ffd9e6, #ffc2d6); border-color: #e290ad; color: #8c3f5c; }
+  .pn-go {
+    width: 100%; padding: 12px; border: none; border-radius: 14px; cursor: pointer; color: #fff;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 16px;
+    background: linear-gradient(135deg, #ffa6c9, #d8698a); box-shadow: 0 8px 18px rgba(216,105,138,0.36);
+  }
+  .pn-go.off { background: #fff; color: #a05a72; border: 1.5px solid rgba(214,150,175,0.55); box-shadow: none; }
+  .pn-go[disabled] { opacity: 0.55; }
+  .pn-msg { min-height: 16px; margin-top: 10px; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; line-height: 1.4; color: #a5808d; }
+  .pn-msg.bad { color: #c2566f; }
+  .pn-close { margin-top: 8px; border: none; background: none; cursor: pointer; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; color: #b892a1; }
   .wall-notes { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; }
   /* phone: the whole board scrolls (see the max-width media query); let a touch over a note scroll it too */
   .wall-notes.stack .wnote { touch-action: pan-y; }
@@ -968,7 +1002,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"oUFtAE1fcGCchj5JNGSFHQ==","iv":"9XFrGW6RLz5K1AJL","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"zmHDuoA1wQdZC3hUNqQ5CA==","iv":"pdimqBmyg00aLMuZ","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1440,6 +1474,130 @@
       .catch(function (e) { console.error("[wall] delete failed", e); });
   }
 
+  // ---------- push notifications ("she left you a note ♡") ----------
+  // The chain: this phone registers its push subscription in public.push_subs, tagged with WHICH of the
+  // two of us it belongs to. An after-insert trigger on public.notes calls the notify-note Edge Function,
+  // which pushes to every subscription belonging to the OTHER person. Nothing here can send a push — the
+  // VAPID *private* key lives server-side only, in public.app_secrets (unreadable with this public key).
+  //
+  // iOS rules that shape all of this (16.4+):
+  //   · window.Notification only exists in an INSTALLED web app. In a Safari tab there is no API at all,
+  //     so "add to Home Screen" is the only possible answer there — not a bug to work around.
+  //   · requestPermission() must happen inside the user's tap. Awaiting anything first loses the gesture,
+  //     so the permission call is the first thing enablePush() does.
+  var VAPID_PUBLIC = "BORflTgOfobBVGeNsKOnY9N9u5aLKG9DT_VV8Vap0v_gPw7GUeHHr0776AjqmPljF8piHQTR8i00iomtvxkI3WI";
+  var PUSH_WHO_KEY = "mv_push_who";
+  var pushWho = null;
+  try { pushWho = localStorage.getItem(PUSH_WHO_KEY); } catch (e) { /* private mode */ }
+
+  function subsEndpoint() { return SUPABASE_URL + "/rest/v1/push_subs"; }
+  function pushInstalled() {
+    return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  }
+  function pushSupported() {
+    return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  }
+  function b64uToU8(s) {
+    var b64 = (s + "=".repeat((4 - (s.length % 4)) % 4)).replace(/-/g, "+").replace(/_/g, "/");
+    var raw = atob(b64), out = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+  function u8ToB64u(buf) {
+    var b = new Uint8Array(buf), s = "";
+    for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  // navigator.serviceWorker.ready NEVER settles if the worker doesn't reach activated — so anything that
+  // awaits it must have a way out, or the UI that waits on it silently never appears. Hence the race.
+  // The two failure modes are deliberately NOT the same value: `null` means the worker answered and there
+  // genuinely is no subscription, `undefined` means we never got an answer. Only `null` may be trusted to
+  // conclude "not subscribed" — treating a timeout as null would switch the label off on a slow launch.
+  function currentPushSub() {
+    if (!pushSupported()) return Promise.resolve(null);
+    return Promise.race([
+      navigator.serviceWorker.ready.then(function (reg) { return reg.pushManager.getSubscription(); }),
+      new Promise(function (res) { setTimeout(function () { res(undefined); }, 4000); })
+    ]).catch(function () { return undefined; });
+  }
+  // Register (or re-register) this device's row. DELETE-then-INSERT rather than a PostgREST upsert:
+  // merge-duplicates needs to READ the conflicting row, and push_subs deliberately has no select policy
+  // for the public key, so an upsert comes back as an RLS violation. Two calls, no read needed.
+  function savePushSub(sub, who) {
+    var j = sub.toJSON ? sub.toJSON() : sub;
+    var keys = j.keys || {};
+    if (!keys.p256dh && sub.getKey) {                       // older WebKit: no toJSON keys
+      keys = { p256dh: u8ToB64u(sub.getKey("p256dh")), auth: u8ToB64u(sub.getKey("auth")) };
+    }
+    var row = {
+      endpoint: j.endpoint || sub.endpoint,
+      p256dh: keys.p256dh, auth: keys.auth, who: who,
+      label: (pushInstalled() ? "home screen" : "browser") + " · " + (navigator.platform || "")
+    };
+    var q = "?endpoint=eq." + encodeURIComponent(row.endpoint);
+    return fetch(subsEndpoint() + q, { method: "DELETE", headers: wallHeaders(false) })
+      .then(function () {
+        return fetch(subsEndpoint(), {
+          method: "POST",
+          headers: (function () { var h = wallHeaders(true); h.Prefer = "return=minimal"; return h; })(),
+          body: JSON.stringify(row)
+        });
+      })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return true; });
+  }
+  function forgetPushSub(endpoint) {
+    return fetch(subsEndpoint() + "?endpoint=eq." + encodeURIComponent(endpoint),
+      { method: "DELETE", headers: wallHeaders(false) }).catch(function () { });
+  }
+
+  function enablePush(who) {
+    if (!pushSupported()) {
+      return Promise.reject(new Error(pushInstalled()
+        ? "this iOS version is too old for notifications (needs 16.4+)"
+        : "add M+V to your Home Screen first — iOS only allows notifications for installed apps"));
+    }
+    // straight into the gesture: no await before this line
+    return Notification.requestPermission().then(function (perm) {
+      if (perm !== "granted") {
+        throw new Error(perm === "denied"
+          ? "notifications are blocked for M+V — turn them back on in Settings › Notifications"
+          : "no answer given, so nothing changed");
+      }
+      return navigator.serviceWorker.ready;
+    }).then(function (reg) {
+      return reg.pushManager.getSubscription().then(function (existing) {
+        return existing || reg.pushManager.subscribe({
+          userVisibleOnly: true,                        // iOS *requires* true: every push must be visible
+          applicationServerKey: b64uToU8(VAPID_PUBLIC)
+        });
+      });
+    }).then(function (sub) {
+      return savePushSub(sub, who).then(function () {
+        try { localStorage.setItem(PUSH_WHO_KEY, who); } catch (e) { }
+        pushWho = who;
+        return true;
+      });
+    });
+  }
+  function disablePush() {
+    return currentPushSub().then(function (sub) {
+      if (!sub) return true;
+      var endpoint = sub.endpoint;
+      return sub.unsubscribe().catch(function () { }).then(function () { return forgetPushSub(endpoint); });
+    }).then(function () {
+      try { localStorage.removeItem(PUSH_WHO_KEY); } catch (e) { }
+      pushWho = null;
+      return true;
+    });
+  }
+  // Push services rotate endpoints (and iOS doesn't reliably fire pushsubscriptionchange), which would
+  // silently strand the row in the database. Once per session, quietly re-register what we actually have.
+  function resyncPush() {
+    if (resyncPush._done || !pushWho || !pushSupported()) return;
+    resyncPush._done = true;
+    currentPushSub().then(function (sub) { if (sub) savePushSub(sub, pushWho).catch(function () { }); });
+  }
+
   function stW(o) { var s = ""; for (var k in o) { if (o[k] == null) continue; var kk = k.charAt(0) === "-" ? k : k.replace(/[A-Z]/g, function (m) { return "-" + m.toLowerCase(); }); s += kk + ":" + o[k] + ";"; } return s; }
   function escW(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function hshW(s) { var x = 0; s = s || ""; for (var i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) | 0; return Math.abs(x); }
@@ -1628,6 +1786,7 @@
             '<div class="wall-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
             '<div class="wall-title">our note wall</div>' +
             '<div class="wall-count">✧ ' + NOTES.length + ' little notes so far ✧</div>' +
+            '<button class="wall-bell" id="wallBell">♡ notifications</button>' +
           "</div>" +
           '<div class="wall-notes" id="wallNotes"></div>' +
         "</div>" +
@@ -1731,9 +1890,87 @@
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
 
+    // ----- notifications toggle -----
+    var bell = document.getElementById("wallBell");
+    // Painted from localStorage, which is synchronous and always available; the subscription object is only
+    // consulted afterwards, to catch the stale case (app reinstalled / permission reset elsewhere).
+    function paintBell() {
+      var on = !!pushWho;
+      bell.classList.toggle("on", on);
+      bell.textContent = on ? "♡ notifications on · " + pushWho : "♡ notifications";
+      if (!on) return;
+      currentPushSub().then(function (sub) {
+        if (sub !== null || !pushWho) return;   // null ONLY — see currentPushSub()
+        try { localStorage.removeItem(PUSH_WHO_KEY); } catch (e) { }
+        pushWho = null;
+        paintBell();
+      });
+    }
+    paintBell();
+    resyncPush();
+    bell.addEventListener("click", function () { openPushSheet(paintBell); });
+
     // ----- drag to place · tap to open -----
     var modal = document.getElementById("wallModal");
     function closeModal() { modal.classList.remove("open"); modal.innerHTML = ""; }
+
+    // The notifications sheet. Kept here (rather than beside the push helpers) because it needs `modal`,
+    // and it repaints the bell through the callback so the label never disagrees with reality.
+    function openPushSheet(onChange) {
+      var pick = pushWho || EM;
+      var on = !!pushWho;               // synchronous: the sheet must open on the tap, always
+      modal.innerHTML =
+        '<div class="pn-card">' +
+            "<h3>notifications</h3>" +
+            "<p>a little ping on this phone whenever the other one pins a note ♡</p>" +
+            (on ? "" :
+              '<div class="pn-label">this phone belongs to</div>' +
+              '<div class="pn-who">' +
+                '<button data-who="' + escW(EM) + '">em yêu (M)</button>' +
+                '<button data-who="' + escW(ANH) + '">anh yêu (V)</button>' +
+              "</div>") +
+            '<button class="pn-go' + (on ? " off" : "") + '" id="pnGo">' +
+              (on ? "turn them off" : "turn them on") + "</button>" +
+            '<div class="pn-msg" id="pnMsg">' +
+              (pushSupported() ? "" : (pushInstalled()
+                ? "this iOS is too old for web notifications (needs 16.4+)"
+                : "add M+V to your Home Screen first — iOS only allows notifications for installed apps")) +
+            "</div>" +
+            '<button class="pn-close">close</button>' +
+        "</div>";
+      modal.classList.add("open");
+
+      var msg = document.getElementById("pnMsg");
+      var go = document.getElementById("pnGo");
+      function sel() {
+        [].forEach.call(modal.querySelectorAll(".pn-who button"), function (b) {
+            b.classList.toggle("sel", b.getAttribute("data-who") === pick);
+        });
+      }
+      sel();
+      function say(text, bad) { msg.textContent = text; msg.classList.toggle("bad", !!bad); }
+
+      modal.onclick = function (e) {
+        if (e.target === modal || e.target.classList.contains("pn-close")) { closeModal(); return; }
+        var w = e.target.closest(".pn-who button");
+        if (w) { pick = w.getAttribute("data-who"); sel(); return; }
+        if (e.target !== go) return;
+
+        go.disabled = true;
+        say(on ? "turning off…" : "asking iOS…");
+        (on ? disablePush() : enablePush(pick))
+            .then(function () {
+              if (onChange) onChange();
+              say(on ? "off — no more pings on this phone" : "done ♡ you'll get a ping when " +
+                (pick === EM ? ANH : EM) + " pins a note");
+              setTimeout(closeModal, on ? 900 : 1600);
+            })
+            .catch(function (err) {
+              go.disabled = false;
+              say((err && err.message) || "that didn't work", true);
+            });
+      };
+    }
     function openNoteModal(idx) {
       var n = NOTES[idx], s = resolveNoteStyle(n);
       var size = Math.round(Math.min(window.innerWidth * 0.82, 380));
