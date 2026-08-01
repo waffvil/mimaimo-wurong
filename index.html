@@ -792,14 +792,6 @@
   }
   .add-back:hover { background: #ffe1ec; color: #b8446a; }
   .add-title { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 32px; color: #cc6488; text-align: center; margin: 2px 0 16px; }
-  .add-cols { display: flex; flex-wrap: wrap; gap: 26px; align-items: flex-start; }
-  .add-col { flex: 1 1 280px; min-width: 260px; }
-  .add-col-left { position: sticky; top: 20px; }
-  @media (max-width: 620px) { .add-col-left { position: static; } }
-  .add-col-right .add-label { text-align: center; }
-  .add-col-right .add-opts { justify-content: center; }
-  .add-preview { display: flex; align-items: center; justify-content: center; min-height: 340px; padding-top: 24px; margin-bottom: 4px; }
-  .add-preview .pv { position: relative; display: inline-block; transition: transform 0.2s ease; }
   .add-hint { text-align: center; font: 13px "Bradley Hand","Segoe Print",cursive; color: #b98aa0; margin-bottom: 16px; }
 
   /* ---------- the little pinned preview ----------
@@ -811,7 +803,7 @@
   .add-mini {
     position: fixed; z-index: 12; cursor: pointer;
     top: calc(12px + max(env(safe-area-inset-top), var(--sat, 0px))); right: 13px;
-    width: 110px; padding: 9px 9px 5px; border-radius: 15px;
+    width: 138px; padding: 10px 10px 6px; border-radius: 17px;
     background: rgba(255,253,250,0.97);
     border: 1.5px dashed rgba(228,168,190,0.8);
     box-shadow: 0 12px 26px rgba(200,120,150,0.28);
@@ -830,13 +822,11 @@
   }
   /* the window is a few px taller than the note is wide, because the tape/pin decoration sits ABOVE the
      card (top:-9k in noteDecoHTML) — without the headroom the miniature's own tape would be clipped off. */
-  .am-window { position: relative; width: 92px; height: 99px; overflow: hidden; margin: 0 auto; }
-  .am-shrink { position: absolute; top: 7px; left: 0; width: 300px; height: 300px; transform-origin: top left; }
+  .am-window { position: relative; width: 118px; height: 127px; overflow: hidden; margin: 0 auto; }
+  .am-shrink { position: absolute; top: 9px; left: 0; width: 300px; height: 300px; transform-origin: top left; }
   .am-cap { display: block; text-align: center; margin-top: 3px; letter-spacing: 0.6px;
     font: 10px "Bradley Hand","Segoe Print",cursive; color: #c08fa2; }
-  @media (max-width: 620px) { .add-mini { width: 98px; } .am-window { width: 80px; height: 87px; } }
-  .note-edit { outline: none; }
-  .note-edit:empty:before { content: attr(data-ph); opacity: 0.45; }
+  @media (max-width: 620px) { .add-mini { width: 122px; } .am-window { width: 102px; height: 110px; } }
   .add-row { margin: 13px 0; }
   .add-label { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 15px; color: #b07890; margin-bottom: 7px; letter-spacing: 0.4px; }
   .add-opts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -855,10 +845,40 @@
   .opt-swatch.sel { box-shadow: 0 0 0 3px #d8698a; }
   .add-msg {
     width: 100%; box-sizing: border-box; border: 1.5px solid rgba(216,105,138,0.28); border-radius: 14px;
-    padding: 13px 15px; font: 17px "Bradley Hand","Segoe Print",cursive; color: #6a4a54;
-    min-height: 150px; resize: vertical; background: #fffdfc; outline: none;
+    padding: 11px 13px; font: 16px "Bradley Hand","Segoe Print",cursive; color: #6a4a54;
+    min-height: 74px; resize: vertical; background: #fffdfc; outline: none; display: block;
   }
   .add-msg:focus { border-color: #ff9dc2; }
+  /* ---------- customisation ----------
+     A two-column grid (label · choices) rather than a label ABOVE each set of choices: that alone saves a
+     line per setting, and it lines every set of choices up on one left edge so the eye runs straight down.
+     Related pairs share a row separated by a .cgap — paper+edge, pin+its colour, from+size — which halves
+     the row count again. Chips and swatches are a size down from the ones on the board editor. */
+  .cust { display: grid; grid-template-columns: max-content 1fr; column-gap: 10px; row-gap: 9px; align-items: center; margin: 14px 0 4px; }
+  .cust .cl { font: 12.5px "Bradley Hand","Segoe Print",cursive; color: #b07890; text-align: right; white-space: nowrap; letter-spacing: 0.3px; }
+  .cust .cv { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+  .cust .opt { padding: 3px 8px; font-size: 12.5px; border-radius: 9px; line-height: 1.3; }
+  /* the glyph pickers are square, exactly swatch-sized: it lines every row up on the same 22px rhythm, and
+     it is what makes the pin row fit on ONE line at 393px (as words + swatches it was 20px too wide) */
+  .cust .opt[data-g="doodle"], .cust .opt[data-g="pin"], .cust .opt[data-g="tapePat"] {
+    width: 22px; height: 22px; padding: 0; font-size: 13px; border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .cust .opt-swatch { width: 22px; height: 22px; border-radius: 6px; }
+  /* the fastening that isn't in use: readable and still tappable, just clearly not the current one */
+  .cust .dim { opacity: 0.45; }
+  .cust .dim .opt.sel, .cust .dim .opt-swatch.sel { border-color: rgba(216,105,138,0.28); background-color: #fff; box-shadow: 0 0 0 1.5px rgba(216,105,138,0.3); }
+  .cust .corner-chip { box-shadow: 0 0 0 1.5px rgba(216,105,138,0.3), inset 0 -6px 9px rgba(0,0,0,0.04); }
+  .cust .cgrp { display: flex; align-items: center; gap: 5px; flex-wrap: nowrap; }
+  .cust .cgap { flex: 0 0 9px; height: 1px; }   /* a breath between two related groups sharing a row */
+
+  /* The miniature is pinned over the scrolling card, so the full-width things underneath it keep clear of
+     its corner. The grid rows are short and left-aligned, so they simply pass under the empty part of it. */
+  @media (max-width: 620px) {
+    .add-inner { padding-top: 16px; }
+    .add-title { text-align: left; margin-left: 44px; padding-right: 116px; font-size: 26px; }
+    .add-msg { padding-right: 118px; }
+  }
   .add-actions { display: flex; gap: 10px; margin-top: 24px; }
   .add-btn { flex: 1; border: none; border-radius: 14px; padding: 14px; font: 600 15px -apple-system, system-ui, sans-serif; cursor: pointer; transition: transform 0.12s ease; }
   .add-btn:active { transform: scale(0.97); }
@@ -1038,7 +1058,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"wkuISzNa7MK6D6wUbqB9TA==","iv":"qlDBe1rLczELLU8M","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"cw5NmzfNZWtdveqblH/Fzw==","iv":"DxwnJUbKGi9xvXjA","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2179,49 +2199,95 @@
     addEl.classList.add("show");
     // Only now can anything be measured: the miniature's scale and its show/hide test both need real
     // rects, and renderAdd() ran while this screen was still display:none.
-    renderMini();
-    if (bindMini._check) bindMini._check();
+    showMini();
     document.body.style.overflow = "auto";
     markDebug("add");
   }
 
-  function renderAdd() {
-    function curVal(g) { if (g === "folded") return addDraft.folded ? "folded" : "flat"; return addDraft[g]; }
-    function group(g, items) {
-      return items.map(function (it) {
-        var sel = String(curVal(g)) === String(it.v) ? " sel" : "";
-        if (it.swatch) return '<span class="opt-swatch' + sel + '" data-g="' + g + '" data-v="' + it.v + '" style="background:' + it.swatch + '"></span>';
-        return '<button class="opt' + sel + '" data-g="' + g + '" data-v="' + it.v + '">' + it.label + "</button>";
+  /* ---------- the customisation grid ----------
+     One two-column grid (label · choices) instead of a stack of label-above-choices blocks: that alone
+     removes a whole line per setting. Choices are shown as the thing they DO wherever possible — paper
+     patterns are real paper, edges are real corners, pins are the pin — which is both smaller than a word
+     and easier to read at a glance. It re-renders wholesale on every change, which keeps three things that
+     used to be hand-synced honest: the selected ring, which sub-row is showing, and the paper chips (they
+     are drawn in the note's CURRENT colour, so they have to follow the colour picker). */
+  function custHTML() {
+    function swatches(g, list, style) {
+      return list.map(function (c, ix) {
+        var sel = +addDraft[g] === ix ? " sel" : "";
+        return '<span class="opt-swatch' + sel + '" data-g="' + g + '" data-v="' + ix + '" style="' + style(c) + '"></span>';
       }).join("");
     }
-    var row = function (label, opts, id) { return '<div class="add-row"' + (id ? ' id="' + id + '"' : "") + '><div class="add-label">' + label + '</div><div class="add-opts">' + opts + "</div></div>"; };
+    function chips(g, items) {
+      return items.map(function (it) {
+        var sel = String(addDraft[g]) === String(it.v) ? " sel" : "";
+        return '<button class="opt' + sel + '" data-g="' + g + '" data-v="' + it.v + '"' +
+          (it.title ? ' title="' + it.title + '"' : "") + ">" + it.label + "</button>";
+      }).join("");
+    }
+    // `dim` marks the fastening that isn't in use — still fully tappable, just visibly not the current one
+    function cell(label, inner, dim) {
+      dim = dim || "";
+      return '<div class="cl' + dim + '">' + label + "</div>" +
+             '<div class="cv' + dim + '">' + inner + "</div>";
+    }
 
+    // paper: each chip is the actual paper, in the note's current colour
+    var paper = ["plain", "lined", "check", "hearts"].map(function (p) {
+      var sel = addDraft.paper === p ? " sel" : "";
+      return '<span class="opt-swatch' + sel + '" data-g="paper" data-v="' + p + '" title="' + p + '" style="' +
+        "background-image:" + noteCardBg({ color: addDraft.color, paper: p }) + '"></span>';
+    }).join("");
+    // edge: a real corner rather than the words "curved"/"sharp"
+    var edge = ["curved", "sharp"].map(function (e) {
+      var sel = addDraft.edge === e ? " sel" : "";
+      return '<span class="opt-swatch corner-chip' + sel + '" data-g="edge" data-v="' + e + '" title="' + e + '" style="' +
+        "background-image:" + WPADS[addDraft.color].bg + ";border-radius:" + (e === "curved" ? "11px" : "2px") + '"></span>';
+    }).join("");
+
+    // Each group is one no-wrap flex box, so when a row is too narrow it breaks BETWEEN groups — the pin
+    // shapes never end up split across two lines with their colours.
+    function grp(inner) { return '<span class="cgrp">' + inner + "</span>"; }
+    // No "held by pin / tape" toggle any more: picking a pin IS choosing a pin, and picking tape is
+    // choosing tape. One fewer control, one fewer row, one fewer tap — and the two rows say which is in
+    // use by dimming the one that isn't, which the old toggle needed a whole extra row to express.
+    function grp(inner) { return '<span class="cgrp">' + inner + "</span>"; }
+    var pinRow =
+      grp(chips("pin", [{ v: "heart", label: "♥" }, { v: "star", label: "★" }, { v: "circle", label: "●" }, { v: "flower", label: "❀" }])) +
+      '<span class="cgap"></span>' +
+      grp(swatches("pinColor", WPIN_HUES, function (c) { return "background:" + c; }));
+    var tapeRow =
+      grp(swatches("tape", WTAPE_HUES, function (c) { return "background:" + c; })) +
+      '<span class="cgap"></span>' +
+      grp(chips("tapePat", [{ v: "stripe", label: "▨" }, { v: "plain", label: "▬" }, { v: "check", label: "▦" }]));
+
+    return '<div class="cust">' +
+      cell("paper", grp(paper) + '<span class="cgap"></span>' + grp(edge)) +
+      cell("colour", swatches("color", WPADS, function (p) { return "background-image:" + p.bg; })) +
+      cell("ink", swatches("inkColor", WINK, function (c) { return "background:" + c; })) +
+      cell("doodle", chips("doodle", WDOODLE_CHOICES.map(function (d) { return { v: d, label: d }; }))) +
+      cell("pin", pinRow, addDraft.fasten === "pin" ? "" : " dim") +
+      cell("tape", tapeRow, addDraft.fasten === "tape" ? "" : " dim") +
+      cell("from", grp(chips("author", [{ v: EM, label: "em yêu" }, { v: ANH, label: "anh yêu" }])) +
+        '<span class="cgap"></span>' +
+        grp(chips("size", [{ v: "s", label: "small", title: "small on the board" }, { v: "l", label: "large", title: "large on the board" }]))) +
+    "</div>";
+  }
+
+  function renderAdd() {
     addEl.innerHTML =
       '<div class="add-inner">' +
         '<button class="add-back" id="addCancel" title="back">←</button>' +
         '<div class="add-title">✎ leave a note</div>' +
-        '<div class="add-cols">' +
-          '<div class="add-col add-col-left">' +
-            '<div class="add-preview"><div class="pv" id="addPvInner"></div></div>' +
-            '<button class="draw-open" id="drawOpen">✎ ' + (addDraft.strokes && addDraft.strokes.length ? "edit drawing" : "add a drawing") + "</button>" +
-            row("from", group("author", [{ v: EM, label: "em yêu (M)" }, { v: ANH, label: "anh yêu (V)" }])) +
-            row("size", group("size", [{ v: "s", label: "small" }, { v: "l", label: "large" }])) +
-          "</div>" +
-          '<div class="add-col add-col-right">' +
-            row("colour", group("color", WPADS.map(function (p, ix) { return { v: ix, swatch: p.bg }; }))) +
-            row("ink", group("inkColor", WINK.map(function (c, ix) { return { v: ix, swatch: c }; }))) +
-            row("paper", group("paper", [{ v: "plain", label: "plain" }, { v: "lined", label: "lined" }, { v: "check", label: "check" }, { v: "hearts", label: "hearts" }])) +
-            row("edge", group("edge", [{ v: "curved", label: "curved" }, { v: "sharp", label: "sharp" }])) +
-            row("corner doodle", group("doodle", WDOODLE_CHOICES.map(function (d) { return { v: d, label: d }; }))) +
-            row("held up by", group("fasten", [{ v: "pin", label: "pin" }, { v: "tape", label: "tape" }])) +
-            row("pin", group("pin", [{ v: "heart", label: "♥" }, { v: "star", label: "★" }, { v: "circle", label: "●" }, { v: "flower", label: "❀" }]) + '</div><div class="add-opts" style="margin-top:8px">' + group("pinColor", WPIN_HUES.map(function (c, ix) { return { v: ix, swatch: c }; })), "addPinSub") +
-            row("tape", group("tape", WTAPE_HUES.map(function (c, ix) { return { v: ix, swatch: c }; })) + '</div><div class="add-opts" style="margin-top:8px">' + group("tapePat", [{ v: "stripe", label: "striped" }, { v: "plain", label: "plain" }, { v: "check", label: "checkered" }]), "addTapeSub") +
-          "</div>" +
-        "</div>" +
+        // Text and drawing are left exactly as they were on purpose — they become their own expanding
+        // sections next. The words live here now rather than inside the (removed) big note preview.
+        '<textarea class="add-msg" id="addBody" placeholder="write something sweet…" spellcheck="false"></textarea>' +
+        '<button class="draw-open" id="drawOpen">✎ ' + (addDraft.strokes && addDraft.strokes.length ? "edit drawing" : "add a drawing") + "</button>" +
+        '<div id="custHost">' + custHTML() + "</div>" +
         '<div class="add-actions"><button class="add-btn primary" id="addSave">pin it to the wall 💗</button></div>' +
       "</div>" +
       // pinned miniature — deliberately OUTSIDE .add-inner (see the .add-mini comment in the stylesheet)
-      '<div class="add-mini" id="addMini" title="back to the big one">' +
+      '<div class="add-mini" id="addMini" title="your note">' +
         '<span class="am-tape"></span>' +
         '<div class="am-window"><div class="am-shrink" id="addMiniInner"></div></div>' +
         '<span class="am-cap">your note</span>' +
@@ -2236,19 +2302,26 @@
         if (g === "color" || g === "pinColor" || g === "tape" || g === "inkColor") addDraft[g] = +v;
         else if (g === "folded") addDraft.folded = v === "folded";
         else addDraft[g] = v;
-        var sibs = addEl.querySelectorAll('[data-g="' + g + '"]');
-        for (var k = 0; k < sibs.length; k++) sibs[k].classList.remove("sel");
-        o.classList.add("sel");
-        if (g === "fasten") toggleSub();
-        updatePreview();
+        // choosing from either fastening row selects that fastening — see the note in custHTML()
+        if (g === "pin" || g === "pinColor") addDraft.fasten = "pin";
+        if (g === "tape" || g === "tapePat") addDraft.fasten = "tape";
+        var host = document.getElementById("custHost");
+        if (host) host.innerHTML = custHTML();   // redraw the lot: nothing left to keep in sync by hand
+        renderMini();
       });
     }
+    var body = document.getElementById("addBody");
+    body.value = addDraft.body || "";
+    body.addEventListener("input", function () {
+      addDraft.body = body.value;
+      // at most one miniature redraw a frame — a note per keystroke is wasted work
+      if (renderAdd._pend) return;
+      renderAdd._pend = true;
+      requestAnimationFrame(function () { renderAdd._pend = false; renderMini(); });
+    });
     document.getElementById("addCancel").addEventListener("click", showWall);
     document.getElementById("addSave").addEventListener("click", submitNote);
     document.getElementById("drawOpen").addEventListener("click", showDraw);
-    bindMini();
-    toggleSub();
-    updatePreview();
   }
 
   // The miniature is the SAME note markup as the big preview, rendered at a fixed 300px and scaled down to
@@ -2270,75 +2343,21 @@
   }
   // Bound once on the persistent .add element — renderAdd() replaces its innerHTML on every open, so the
   // handler looks its elements up each time it runs rather than closing over ones that get thrown away.
-  function bindMini() {
-    function check() {
-      var mini = document.getElementById("addMini");
-      var anchor = addEl.querySelector(".add-preview");
-      if (!mini || !anchor) return;
-      var r = anchor.getBoundingClientRect();
-      // A hidden screen measures as a zero-height box at the origin, which reads as "scrolled past" and
-      // popped the miniature up the instant the creator opened. No height means don't decide anything yet.
-      if (!r.height) { mini.classList.remove("show"); return; }
-      // "the big one is gone" = its bottom has passed above the top strip of the screen. On desktop the left
-      // column is sticky, so this never becomes true and the miniature simply never appears — which is right,
-      // because up there the real preview is always on screen already.
-      mini.classList.toggle("show", r.bottom < 96);
-    }
-    bindMini._check = check;
-    
-    if (!bindMini._bound) {
-      bindMini._bound = true;
-      var pending = false;
-      addEl.addEventListener("scroll", function () {
-        if (pending) return;
-        pending = true;
-        requestAnimationFrame(function () { pending = false; check(); });
-      }, { passive: true });
-      window.addEventListener("resize", check);
-      // tap it to go back up to the full-size note
-      addEl.addEventListener("click", function (e) {
-        if (!e.target.closest("#addMini")) return;
-        if (addEl.scrollTo) addEl.scrollTo({ top: 0, behavior: "smooth" });
-        else addEl.scrollTop = 0;
-      });
-    }
-    check();
-  }
-
-  function toggleSub() {
-    var p = document.getElementById("addPinSub"), t = document.getElementById("addTapeSub");
-    if (p) p.style.display = addDraft.fasten === "pin" ? "" : "none";
-    if (t) t.style.display = addDraft.fasten === "tape" ? "" : "none";
-  }
-  function updatePreview() {
-    var pv = document.getElementById("addPvInner");
-    if (!pv) return;
-    pv.style.transform = "rotate(" + addDraft.tilt + "deg)";
-    // the editor note is ALWAYS this fixed size — small/large only affects the board, never here,
-    // so the white note never moves or resizes as you change options.
-    var size = Math.min(340, window.innerWidth - 56);
-    pv.innerHTML = noteInner(resolveNoteStyle(addDraft), addDraft.body, addDraft.author, size); // square post-it
-    var p = pv.querySelector(".wnote-card > p");
-    if (p) {
-      p.className = "note-edit";
-      p.setAttribute("contenteditable", "true");
-      p.setAttribute("spellcheck", "false");
-      p.setAttribute("data-ph", "write something sweet…");
-      p.addEventListener("input", function () {
-        addDraft.body = p.innerText;
-        // keep the miniature in step with the typing, but at most once a frame — re-rendering a note on
-        // every keystroke is wasted work, and this one is off screen half the time anyway
-        if (!updatePreview._pend) {
-          updatePreview._pend = true;
-          requestAnimationFrame(function () { updatePreview._pend = false; renderMini(); });
-        }
-      });
-    }
+  // With the big preview gone the miniature IS the preview, so it is simply always on. (It used to appear
+  // only once the big note scrolled away, which is why it had a scroll listener and a visibility test.)
+  function showMini() {
+    var mini = document.getElementById("addMini");
+    if (mini) mini.classList.add("show");
     renderMini();
   }
+  window.addEventListener("resize", function () {
+    // the phone/desktop breakpoint changes the miniature's window size, so its scale has to be recomputed
+    if (addEl.classList.contains("show")) renderMini();
+  });
+
   function submitNote() {
     var body = (addDraft.body || "").trim();
-    if (!body) { var p = document.querySelector("#addPvInner .wnote-card p"); if (p) p.focus(); return; }
+    if (!body) { var t = document.getElementById("addBody"); if (t) t.focus(); return; }
     if (editingNote) {
       // update the existing note in place (keeps its position on the board)
       var n = editingNote;
