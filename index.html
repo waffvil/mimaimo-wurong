@@ -613,14 +613,6 @@
   .wall-deco { font-size: 12px; letter-spacing: 3px; color: #d3a3b6; }
   .wall-title { font-family: "Snell Roundhand","Segoe Script","Brush Script MT",cursive; font-size: 34px; color: #cc6488; line-height: 1.25; }
   .wall-count { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #ab7c8f; }
-  /* notifications: a quiet line under the count, not a chrome button — it should read as part of the paper */
-  .wall-bell {
-    margin-top: 6px; border: none; background: none; cursor: pointer; padding: 3px 8px;
-    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; color: #c08fa2;
-    border-bottom: 1px dotted rgba(200,140,165,0.55); border-radius: 0;
-  }
-  .wall-bell.on { color: #cc6488; }
-  .wall-bell:active { opacity: 0.6; }
   /* the little settings sheet (lives in .wall-modal, so it gets the same backdrop and tap-to-close) */
   .pn-card {
     width: min(88vw, 360px); background: #fffdf8; border-radius: 20px; padding: 22px 20px 18px;
@@ -1073,7 +1065,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"noiA3IPLSi3MqGb2G33mdw==","iv":"0wEZ3XBlBjEE7+Nd","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"Pp459lH71EgLo7g8Wyq51w==","iv":"5fAnfUm0wy2bSoV/","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1875,7 +1867,6 @@
             '<div class="wall-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
             '<div class="wall-title">our note wall</div>' +
             '<div class="wall-count">✧ ' + NOTES.length + ' little notes so far ✧</div>' +
-            '<button class="wall-bell" id="wallBell">♡ notifications</button>' +
           "</div>" +
           '<div class="wall-notes" id="wallNotes"></div>' +
         "</div>" +
@@ -1941,12 +1932,23 @@
     // mobile layout is in pixels (the page scrolls, so it can't lean on a fixed board height):
     // two edge-hugging columns, rows stepping down and overlapping a little.
     var pW = [], pRowTop = [], pMargin = Math.round(bw * 0.05);   // side gap so notes don't hug the frame
-    // How far to pull each column back out of the sheet's padding so its outer edge lands 12px from the
-    // screen — measured rather than assumed, so changing the sheet's padding can't quietly break it.
-    var pEdge = -10;
+    // Where the outer edge of a column may sit, measured from the screen. The container itself starts 22px
+    // in (the sheet's 8px margin + 14px padding), measured rather than assumed so changing that padding
+    // can't quietly break this.
+    var pHostLeft = 22;
     if (PHONE) {
-      var hostLeft = wallNotes.getBoundingClientRect().left - wallEl.getBoundingClientRect().left;
-      if (hostLeft > 0) pEdge = Math.round(12 - hostLeft);
+      var hl = wallNotes.getBoundingClientRect().left - wallEl.getBoundingClientRect().left;
+      if (hl > 0) pHostLeft = hl;
+    }
+    // A note is TILTED, so its corners stick out sideways past its own width — by w*(cos+sin-1)/2, which
+    // is ~5px for a 3° lean and ~11px for a 6.7° one (6° of tilt plus the sway's extra 0.7°). Pulling every
+    // note out by the same amount therefore left the leaniest ones touching the border while the straight
+    // ones had room to spare. Each note now gets exactly the room its own lean needs, so all of them clear
+    // the frame by the same 4px and none of them is further in than it has to be.
+    var FRAME_INNER = 10, FRAME_CLEAR = 4;
+    function tiltPad(w, tiltDeg) {
+      var t = (Math.abs(tiltDeg) + 0.7) * Math.PI / 180;
+      return w * (Math.cos(t) + Math.sin(t) - 1) / 2;
     }
     if (PHONE) {
       pW = order.map(function (idx) { var z = { s: 1, m: 1, l: 1.26 }[resolveNoteStyle(NOTES[idx]).size] || 1; return Math.round(noteW * z); });
@@ -1970,12 +1972,11 @@
         var c = oi % 2, r = Math.floor(oi / 2);
         // anchor left column by its LEFT edge, right column by its RIGHT edge — the browser fixes
         // each margin against the real container, so the right edge can never overshoot the frame.
-        // Both columns are pulled out to the frame's inner edge: the sheet's 8px margin + 14px padding
-        // sit this container 22px in from the screen, and the frame's inside is at 8+2=10px, so a
-        // negative offset takes the notes back out to 12px — as far as they can go without sliding under
-        // the frame. It is also what opens up the middle: measured on a 393px screen the two columns
-        // overlapped by 51px, and this drops it to 17.
-        if (c === 0) wrap.left = pEdge + "px"; else wrap.right = pEdge + "px";
+        // Both columns sit as far out as their lean allows (see tiltPad) — a negative offset, because the
+        // container starts further in than the frame does. This is also what opens up the middle: the two
+        // columns used to overlap by 51px on a 393px screen.
+        var pOut = Math.round(FRAME_INNER + FRAME_CLEAR + tiltPad(nW, s.tilt) - pHostLeft);
+        if (c === 0) wrap.left = pOut + "px"; else wrap.right = pOut + "px";
         wrap.top = pRowTop[r] + "px";
         pBottom = Math.max(pBottom, pRowTop[r] + noteH);
       } else {
@@ -1993,32 +1994,17 @@
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
 
-    // ----- notifications toggle -----
-    var bell = document.getElementById("wallBell");
-    // Painted from localStorage, which is synchronous and always available; the subscription object is only
-    // consulted afterwards, to catch the stale case (app reinstalled / permission reset elsewhere).
-    function paintBell() {
-      var on = !!pushWho;
-      bell.classList.toggle("on", on);
-      bell.textContent = on ? "♡ notifications on · " + pushWho : "♡ notifications";
-      if (!on) return;
-      currentPushSub().then(function (sub) {
-        if (sub !== null || !pushWho) return;   // null ONLY — see currentPushSub()
-        try { localStorage.removeItem(PUSH_WHO_KEY); } catch (e) { }
-        pushWho = null;
-        paintBell();
-      });
-    }
-    paintBell();
+    // Notifications have no button on the board any more — they move to the settings screen. The sheet
+    // itself is kept and still works: openPushSheet() is what that screen will call, and #notif on the URL
+    // opens it in the meantime. This keeps this phone's registration fresh either way.
     resyncPush();
-    bell.addEventListener("click", function () { openPushSheet(paintBell); });
+    if (/[?&#]notif\b/.test(location.search + location.hash)) setTimeout(openPushSheet, 0);
 
     // ----- drag to place · tap to open -----
     var modal = document.getElementById("wallModal");
     function closeModal() { modal.classList.remove("open"); modal.innerHTML = ""; }
 
-    // The notifications sheet. Kept here (rather than beside the push helpers) because it needs `modal`,
-    // and it repaints the bell through the callback so the label never disagrees with reality.
+    // The notifications sheet. Lives here (rather than beside the push helpers) because it needs `modal`.
     function openPushSheet(onChange) {
       var pick = pushWho || EM;
       var on = !!pushWho;               // synchronous: the sheet must open on the tap, always
