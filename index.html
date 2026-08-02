@@ -189,6 +189,24 @@
   /* 0.42em keeps the heart the same fraction of the letters it always was (it was 20px against 48px);
      at 0.36 it read small and lonely between letters this size. */
   .mono .h { font-size: 0.42em; color: #e58aa4; margin: 0 0.36em; transform: translateY(-0.03em); }
+  /* The heart on the lock screen is a switch: tap it, it fills and glows, and the next correct passcode
+     opens the settings instead of the board. Unlabelled on purpose — it's meant to be ours, not signposted.
+     The tap target is an invisible skirt rather than padding, because padding on a flex item would shift
+     the M and V apart. */
+  #monoHeart { cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; user-select: none;
+    transition: color 0.25s ease, text-shadow 0.25s ease; }
+  #monoHeart::after { content: ""; position: absolute; inset: -14px; }
+  #monoHeart.armed {
+    color: #e0356b;
+    text-shadow: 0 0 12px rgba(255,120,170,0.95), 0 0 28px rgba(255,90,150,0.55);
+    animation: heartArm 1.7s ease-in-out infinite;
+  }
+  @keyframes heartArm {
+    0%, 100% { transform: translateY(-0.03em) scale(1); }
+    50%      { transform: translateY(-0.03em) scale(1.13); }
+  }
+  /* once the M and V draw together the heart has its own swell to do — the pulse would fight it */
+  .mono.together .h { animation: none; }
   /* on unlock, the M and V draw together and the heart swells —
      0.75s ease-in-out to match the passcode "checking" pulse timing */
   .mono .letter, .mono .h { transition: transform 0.75s ease-in-out; }
@@ -977,6 +995,27 @@
   /* currentColor = the note's ink, which styleWriteField() sets */
   .add-msg::placeholder { color: currentColor; opacity: 0.42; }
   .add-msg::-webkit-input-placeholder { color: currentColor; opacity: 0.42; }
+  /* ---------- the secret settings ---------- */
+  .settings .add-inner { max-width: 460px; }
+  .set-sec { margin: 18px 0 0; padding: 14px 15px 15px; border-radius: 16px;
+    background: rgba(255,255,255,0.55); border: 1.5px solid rgba(228,168,190,0.4); }
+  .set-h { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 23px; color: #cc6488; margin-bottom: 2px; }
+  .set-p { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13.5px; line-height: 1.5; color: #8d6a76; margin: 0 0 10px; }
+  .set-state { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13.5px; color: #a05a72; margin-bottom: 10px; }
+  .set-state b { color: #cc6488; font-weight: 400; }
+  .set-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .set-btn {
+    padding: 10px 14px; border-radius: 13px; cursor: pointer; border: 1.5px solid rgba(216,105,138,0.32);
+    background: #fff; color: #a05a72; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px;
+  }
+  .set-btn:hover { background: #fff3f7; }
+  .set-btn.sel { background: linear-gradient(135deg, #ffd9e6, #ffc2d6); border-color: #e290ad; color: #8c3f5c; }
+  .set-btn.go { border: none; color: #fff; background: linear-gradient(135deg, #ffa6c9, #d8698a); box-shadow: 0 7px 16px rgba(216,105,138,0.32); }
+  .set-btn[disabled] { opacity: 0.55; }
+  .set-msg { min-height: 17px; margin-top: 9px; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12.5px; line-height: 1.45; color: #a5808d; }
+  .set-msg.bad { color: #c2566f; }
+  .set-note { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12.5px; line-height: 1.55; color: #a5808d; }
+
   /* ---------- customisation ----------
      A two-column grid (label · choices) rather than a label ABOVE each set of choices: that alone saves a
      line per setting, and it lines every set of choices up on one left edge so the eye runs straight down.
@@ -1145,7 +1184,7 @@
     <div class="panel">
       <div class="mono">
         <span class="letter">M</span>
-        <span class="h">♡</span>
+        <span class="h" id="monoHeart" role="button" tabindex="0" aria-label="settings"></span>
         <span class="letter">V</span>
       </div>
       <div class="dots" id="dots">
@@ -1191,6 +1230,8 @@
 
   <!-- ✎ Add-a-note creator screen -->
   <div class="add" id="add"></div>
+  <!-- ⚙ the secret settings, reached by arming the heart on the lock screen -->
+  <div class="add settings" id="settings"></div>
 
   <!-- ✎ Drawing screen -->
   <div class="draw" id="draw"></div>
@@ -1200,7 +1241,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"6TMjAPTh+VOX3Edq1WNlDQ==","iv":"ozNgQS1InnuoRFtt","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"o5kP26oqWJft/RNwHZM3Kg==","iv":"7A4DgMBw0Z2KgkWl","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1250,6 +1291,27 @@
     renderDots();
   }
 
+  // The heart on the lock screen is a switch. Armed + a correct passcode = the settings, instead of the
+  // blossom and the board. The passcode is still required, so this is exactly as protected as the app is.
+  var secretArmed = false;
+  var heartEl = document.getElementById("monoHeart");
+  function paintHeart() {
+    if (!heartEl) return;
+    heartEl.textContent = secretArmed ? "♥" : "♡";
+    heartEl.classList.toggle("armed", secretArmed);
+  }
+  if (heartEl) {
+    paintHeart();
+    heartEl.addEventListener("click", function () {
+      if (locked()) return;                 // mid-check or already unlocking: leave it alone
+      secretArmed = !secretArmed;
+      paintHeart();
+    });
+    heartEl.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); heartEl.click(); }
+    });
+  }
+
   function onUnlockSuccess() {
     status = "success";
     renderDots();
@@ -1258,7 +1320,9 @@
     if (monoEl) monoEl.classList.add("together");
     setTimeout(function () {
       if (panelEl) panelEl.classList.add("fade");
-      setTimeout(showBloom, 650);
+      // armed heart: straight into the settings, no blossom — you came here to change something, not to
+      // watch a flower open
+      setTimeout(secretArmed ? showSettings : showBloom, 650);
     }, 750);
   }
 
@@ -1419,7 +1483,7 @@
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
     lockEl.style.display = "";
     lockEl.classList.remove("dismiss");
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
     if (panelEl) panelEl.classList.remove("fade");
     if (monoEl) monoEl.classList.remove("together");
     entered = ""; status = "idle"; renderDots();
@@ -1434,7 +1498,7 @@
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
     lockEl.style.display = "";
     lockEl.classList.remove("dismiss");
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
     entered = CORRECT_CODE; status = "success"; renderDots();
     celebrate();
     successEl.classList.add("show");
@@ -1447,7 +1511,7 @@
     backdropEl.style.display = "";
     successEl.classList.remove("show");
     siteEl.classList.remove("show");
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
     lockEl.style.display = "none";
     renderBloom();                 // rebuild markup so the animation restarts
     bloomEl.classList.add("show");
@@ -1526,7 +1590,7 @@
     clearBloomTimers();
     successEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
     siteEl.classList.remove("heart-reveal");
     siteEl.style.transition = "";
     siteEl.style.webkitMaskImage = siteEl.style.maskImage = "";
@@ -1549,7 +1613,7 @@
     editingNote = null;
     successEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
     siteEl.classList.remove("show");
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
@@ -2474,12 +2538,128 @@
   var DRAW_SIZES = [{ label: "fine", w: 1.1 }, { label: "medium", w: 2 }, { label: "bold", w: 3.4 }];
   var editingNote = null; // set when the creator is editing an existing note
 
+  // ⚙ The secret settings. Reached only by arming the heart on the lock screen and then unlocking, so it
+  // needs no password of its own. Everything here used to be unreachable or hidden behind a URL flag.
+  var settingsEl = document.getElementById("settings");
+  function showSettings() {
+    rootSkin("rt-board");
+    clearBloomTimers();
+    successEl.classList.remove("show");
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    wallEl.classList.remove("show"); wallEl.innerHTML = "";
+    addEl.classList.remove("show"); addEl.innerHTML = "";
+    drawEl.classList.remove("show"); drawEl.innerHTML = "";
+    homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    siteEl.classList.remove("show");
+    lockEl.style.display = "none";
+    backdropEl.style.display = "none";
+    renderSettings();
+    settingsEl.classList.add("show");
+    secretArmed = false;      // used up: the next unlock goes to the board as usual
+    paintHeart();
+    document.body.style.overflow = "auto";
+    markDebug("settings");
+  }
+
+  function renderSettings() {
+    var t = togetherText();
+    var on = !!pushWho;
+    var pick = pushWho || EM;          // who this phone is, when turning notifications on
+    var tpick = pushWho === EM ? EM : ANH;   // which phone to aim a test ping at
+
+    function whoRow(g, sel) {
+      return '<button class="set-btn' + (sel === EM ? " sel" : "") + '" data-' + g + '="' + escW(EM) + '">em yêu (M)</button>' +
+             '<button class="set-btn' + (sel === ANH ? " sel" : "") + '" data-' + g + '="' + escW(ANH) + '">anh yêu (V)</button>';
+    }
+
+    settingsEl.innerHTML =
+      '<div class="add-inner">' +
+        '<button class="add-back" id="setBack" title="to the board">←</button>' +
+        '<div class="add-title">♥ our settings</div>' +
+
+        '<div class="set-sec">' +
+          '<div class="set-h">notifications</div>' +
+          '<p class="set-p">a ping on this phone whenever the other one pins a note.</p>' +
+          '<div class="set-state" id="setState">' + (on
+            ? "on — this phone is <b>" + escW(pushWho) + "</b>"
+            : "off on this phone") + "</div>" +
+          (on ? '<div class="set-row"><button class="set-btn" id="setOff">turn them off</button></div>'
+              : '<div class="set-row" id="setWho">' + whoRow("who", pick) + "</div>" +
+                '<div class="set-row" style="margin-top:8px"><button class="set-btn go" id="setOn">turn them on</button></div>') +
+          '<div class="set-msg" id="setMsg">' + (pushSupported() ? "" : (pushInstalled()
+            ? "this iOS is too old for web notifications (needs 16.4+)"
+            : "add M+V to your Home Screen first — iOS only allows notifications for installed apps")) + "</div>" +
+        "</div>" +
+
+        '<div class="set-sec">' +
+          '<div class="set-h">test a ping</div>' +
+          '<p class="set-p">sends a real notification to one phone, so you can check it arrives without waiting for a note.</p>' +
+          '<div class="set-row" id="setT">' + whoRow("t", tpick) + "</div>" +
+          '<div class="set-row" style="margin-top:8px"><button class="set-btn" id="setTest">send it</button></div>' +
+          '<div class="set-msg" id="setTestMsg"></div>' +
+        "</div>" +
+
+        '<div class="set-sec">' +
+          '<div class="set-h">us</div>' +
+          '<p class="set-note">together since 16 october 2025 — ' + escW(t.text.replace(/^♡ /, "").replace(/ together$/, "")) + ".<br>" +
+            "the blossom grows a petal on the 16th of every month: <b>" + monthsTogether() + "</b> so far.</p>" +
+        "</div>" +
+
+        '<div class="add-actions"><button class="add-btn primary" id="setDone">to the board 💗</button></div>' +
+      "</div>";
+
+    function msg(id, text, bad) {
+      var el = document.getElementById(id);
+      el.textContent = text; el.classList.toggle("bad", !!bad);
+    }
+    function selectIn(rowId, attr, value) {
+      var row = document.getElementById(rowId);
+      if (!row) return;
+      [].forEach.call(row.querySelectorAll("[data-" + attr + "]"), function (b) {
+        b.classList.toggle("sel", b.getAttribute("data-" + attr) === value);
+      });
+    }
+
+    settingsEl.onclick = function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      if (b.id === "setBack" || b.id === "setDone") { showWall(); return; }
+
+      if (b.hasAttribute("data-who")) { pick = b.getAttribute("data-who"); selectIn("setWho", "who", pick); return; }
+      if (b.hasAttribute("data-t")) { tpick = b.getAttribute("data-t"); selectIn("setT", "t", tpick); return; }
+
+      if (b.id === "setOn") {
+        b.disabled = true; msg("setMsg", "asking iOS…");
+        enablePush(pick).then(function () { renderSettings(); })
+          .catch(function (err) { b.disabled = false; msg("setMsg", (err && err.message) || "that didn't work", true); });
+        return;
+      }
+      if (b.id === "setOff") {
+        b.disabled = true; msg("setMsg", "turning off…");
+        disablePush().then(function () { renderSettings(); })
+          .catch(function (err) { b.disabled = false; msg("setMsg", (err && err.message) || "that didn't work", true); });
+        return;
+      }
+      if (b.id === "setTest") {
+        b.disabled = true; msg("setTestMsg", "sending…");
+        sendTestPing(tpick).then(function (r) {
+          b.disabled = false;
+          msg("setTestMsg", r.sent
+            ? "sent to " + r.sent + " device" + (r.sent === 1 ? "" : "s") + " — look at the phone ♡"
+            : tpick + "'s phone hasn't turned notifications on yet", !r.sent);
+        }).catch(function (err) {
+          b.disabled = false; msg("setTestMsg", (err && err.message) || "couldn't reach the server", true);
+        });
+      }
+    };
+  }
+
   function showAdd() {
     rootSkin("rt-board");
     clearBloomTimers();
     successEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
     siteEl.classList.remove("show");
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
@@ -2726,7 +2906,7 @@
     successEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
     wallEl.classList.remove("show"); wallEl.innerHTML = "";
-    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
     siteEl.classList.remove("show");
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
@@ -2812,7 +2992,7 @@
     clearBloomTimers();
     successEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = "";
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
     siteEl.classList.remove("show");
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
