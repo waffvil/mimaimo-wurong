@@ -169,7 +169,9 @@
   .mono {
     display: flex; align-items: center; justify-content: center;
     width: 100%; margin-bottom: 34px;
-    font-size: 48px;   /* reference size for the em-based nudges below */
+    /* ONE knob for the whole lockup: the letters, the heart and every gap are em-based off this, so the
+       celebration card just restates it smaller and nothing else has to be kept in step. */
+    font-size: 84px;
     /* No optical nudge any more. It existed to counter the cursive V's ink spilling right of its advance
        box; Gochi is an upright marker whose ink sits inside its box, so the same shift would just push the
        monogram visibly off-centre. */
@@ -177,19 +179,26 @@
   .mono .letter {
     font-family: "Gochi Hand", "Bradley Hand", "Marker Felt", cursive;
     /* Gochi has one weight — asking for 600 only invites a browser to fake a bold */
-    font-size: 48px; font-weight: 400; color: #d8698a; line-height: 1;
+    font-size: 1em; font-weight: 400; color: #d8698a; line-height: 1;
   }
   /* Margins are em-based so they scale with the monogram (big on the lock, small on the celebration card),
      and now SYMMETRIC: the old 0.8em/0.5em split was correcting for the cursive M and V, whose ink sat
      differently in their boxes. With Gochi the letters are upright and even, so an uneven split just pushed
      the heart 6px right of centre — measured, then equalised. It also makes the unlock pose symmetric,
      since both letters travel the same 1.28em inward. */
-  .mono .h { font-size: 20px; color: #e58aa4; margin: 0 0.65em; transform: translateY(-2px); }
+  /* 0.42em keeps the heart the same fraction of the letters it always was (it was 20px against 48px);
+     at 0.36 it read small and lonely between letters this size. */
+  .mono .h { font-size: 0.42em; color: #e58aa4; margin: 0 0.36em; transform: translateY(-0.03em); }
   /* on unlock, the M and V draw together and the heart swells —
      0.75s ease-in-out to match the passcode "checking" pulse timing */
   .mono .letter, .mono .h { transition: transform 0.75s ease-in-out; }
-  .mono.together > .letter:first-child { transform: translateX(1.28em); }
-  .mono.together > .letter:last-child  { transform: translateX(-1.28em); }
+  /* Travel just far enough to tuck each letter against the heart: the gap at rest is 0.42em of margin plus
+     side bearings (~0.42em all in), so ~0.58em closes it and leaves a little overlap for the heart — which
+     swells to 1.5x and sits on top — to hide the join. This is em-based off .mono, so it holds at both the
+     lock's 84px and the celebration card's 40px. It was 1.28em, tuned when the letters were 48px; left
+     alone at 84px it hurled them 107px inward and they ended up overlapping each other by 79px. */
+  .mono.together > .letter:first-child { transform: translateX(0.58em); }
+  .mono.together > .letter:last-child  { transform: translateX(-0.58em); }
   .mono.together .h { transform: translateY(-2px) scale(1.5); position: relative; z-index: 3; }
 
 
@@ -260,9 +269,7 @@
   .confetti span { position: absolute; top: -8vh; }
   .success .card { position: relative; text-align: center; animation: cardIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both; }
   .success .big { font-size: 64px; animation: heartBeat 1.4s ease-in-out infinite; margin-bottom: 10px; }
-  .success .mono { font-size: 32px; } /* the em-based together-nudges scale from this */
-  .success .mono .letter { font-size: 32px; }
-  .success .mono .h { font-size: 15px; }
+  .success .mono { font-size: 40px; }   /* everything inside scales from this one value */
   .success .msg { font-family: Georgia, serif; font-style: italic; font-size: 24px; color: #935767; margin: 0; }
 
   /* ---------- lock fade-out + revealed site ---------- */
@@ -1193,7 +1200,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"dd/tvVm6P6YmEvTd2otUkQ==","iv":"qph3w9yneXtfX/bs","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"6TMjAPTh+VOX3Edq1WNlDQ==","iv":"ozNgQS1InnuoRFtt","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
