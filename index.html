@@ -169,15 +169,22 @@
   .mono {
     display: flex; align-items: center; justify-content: center;
     width: 100%; margin-bottom: 34px;
-    font-size: 44px; /* reference size for the optical nudge below */
-    transform: translateX(-0.22em); /* counter the cursive V's rightward ink overflow */
+    font-size: 48px;   /* reference size for the em-based nudges below */
+    /* No optical nudge any more. It existed to counter the cursive V's ink spilling right of its advance
+       box; Gochi is an upright marker whose ink sits inside its box, so the same shift would just push the
+       monogram visibly off-centre. */
   }
   .mono .letter {
-    font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
-    font-size: 44px; font-weight: 600; color: #d8698a; line-height: 1;
+    font-family: "Gochi Hand", "Bradley Hand", "Marker Felt", cursive;
+    /* Gochi has one weight — asking for 600 only invites a browser to fake a bold */
+    font-size: 48px; font-weight: 400; color: #d8698a; line-height: 1;
   }
-  /* em-based margins scale with the monogram size (big lock vs small celebration) */
-  .mono .h { font-size: 20px; color: #e58aa4; margin: 0 0.5em 0 0.8em; transform: translateY(-2px); }
+  /* Margins are em-based so they scale with the monogram (big on the lock, small on the celebration card),
+     and now SYMMETRIC: the old 0.8em/0.5em split was correcting for the cursive M and V, whose ink sat
+     differently in their boxes. With Gochi the letters are upright and even, so an uneven split just pushed
+     the heart 6px right of centre — measured, then equalised. It also makes the unlock pose symmetric,
+     since both letters travel the same 1.28em inward. */
+  .mono .h { font-size: 20px; color: #e58aa4; margin: 0 0.65em; transform: translateY(-2px); }
   /* on unlock, the M and V draw together and the heart swells —
      0.75s ease-in-out to match the passcode "checking" pulse timing */
   .mono .letter, .mono .h { transition: transform 0.75s ease-in-out; }
@@ -253,8 +260,8 @@
   .confetti span { position: absolute; top: -8vh; }
   .success .card { position: relative; text-align: center; animation: cardIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both; }
   .success .big { font-size: 64px; animation: heartBeat 1.4s ease-in-out infinite; margin-bottom: 10px; }
-  .success .mono { font-size: 30px; } /* scales the translateX nudge to this size */
-  .success .mono .letter { font-size: 30px; }
+  .success .mono { font-size: 32px; } /* the em-based together-nudges scale from this */
+  .success .mono .letter { font-size: 32px; }
   .success .mono .h { font-size: 15px; }
   .success .msg { font-family: Georgia, serif; font-style: italic; font-size: 24px; color: #935767; margin: 0; }
 
@@ -280,13 +287,13 @@
   }
   .site .hero-mono {
     display: flex; align-items: center; margin-bottom: 12px;
-    font-size: 56px; transform: translateX(-0.22em); /* same optical nudge, scaled */
+    font-size: 56px;   /* nudge dropped for the same reason as .mono */
   }
   .site .hero-mono .letter {
-    font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
-    font-size: 56px; font-weight: 600; color: #d8698a; line-height: 1;
+    font-family: "Gochi Hand", "Bradley Hand", "Marker Felt", cursive;
+    font-size: 56px; font-weight: 400; color: #d8698a; line-height: 1;
   }
-  .site .hero-mono .h { font-size: 26px; color: #e58aa4; margin: 0 0.5em 0 0.8em; transform: translateY(-2px); }
+  .site .hero-mono .h { font-size: 26px; color: #e58aa4; margin: 0 0.65em; transform: translateY(-2px); }
   .site .hero h1 {
     font-family: Georgia, "Times New Roman", serif; font-style: italic;
     font-weight: 500; font-size: clamp(28px, 8vw, 40px); color: #935767; margin: 0;
@@ -1186,7 +1193,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"go3iUh1jqASLgA/Gbm5YcQ==","iv":"KmNUwt7dRFYW8SL6","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"dd/tvVm6P6YmEvTd2otUkQ==","iv":"qph3w9yneXtfX/bs","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
