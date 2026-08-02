@@ -613,6 +613,14 @@
   .wall-deco { font-size: 12px; letter-spacing: 3px; color: #d3a3b6; }
   .wall-title { font-family: "Snell Roundhand","Segoe Script","Brush Script MT",cursive; font-size: 34px; color: #cc6488; line-height: 1.25; }
   .wall-count { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #ab7c8f; }
+  /* how long we've been us. On the 16th it says "today" instead of counting, and glows a little. */
+  .wall-since { margin-top: 3px; font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 17px; color: #c0879b; }
+  .wall-since.today {
+    color: #d1567f; font-size: 20px;
+    text-shadow: 0 0 10px rgba(255,190,215,0.9), 0 0 22px rgba(255,170,200,0.55);
+    animation: sinceGlow 2.6s ease-in-out infinite;
+  }
+  @keyframes sinceGlow { 0%,100% { opacity: 0.86; transform: scale(1); } 50% { opacity: 1; transform: scale(1.035); } }
   /* the little settings sheet (lives in .wall-modal, so it gets the same backdrop and tap-to-close) */
   .pn-card {
     width: min(88vw, 360px); background: #fffdf8; border-radius: 20px; padding: 22px 20px 18px;
@@ -911,7 +919,10 @@
   .blossom {
     position: absolute; left: 50%; top: 50%;
     width: 180px; height: 180px;
-    transform: translate(-50%, -50%) scale(1.9); /* overall blossom size — bump this to grow it */
+    /* --bs is the overall blossom size. It MUST be a variable rather than an inline transform: the
+       transform also carries the centring translate, and .blossom.shrink overrides the whole property
+       to collapse the flower — an inline transform would have beaten that class and killed the shrink. */
+    transform: translate(-50%, -50%) scale(var(--bs, 1.9));
     transition: transform 0.7s cubic-bezier(0.6, 0, 0.85, 0.2), opacity 0.7s ease;
   }
   .blossom.shrink { transform: translate(-50%, -50%) scale(0); opacity: 0; }
@@ -1065,7 +1076,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"ARC0NHXpzYYD8XgQ7QWktA==","iv":"0aY5W+HuejzSIo7n","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"uhwYK3QkUWF0Sl0VlE7NFQ==","iv":"fUungLCAt6flC0hR","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1488,7 +1499,7 @@
   }
   var STYLE_KEYS = ["color","inkColor","paper","edge","folded","doodle","fasten","pin","pinColor","tape","tapePat","tilt","size","strokes"];
   function noteRowToObj(r) {
-    var s = r.style || {}, o = { id: r.id, body: r.body, author: r.author, x: r.x, y: r.y, locked: true };
+    var s = r.style || {}, o = { id: r.id, body: r.body, author: r.author, x: r.x, y: r.y, locked: true, created_at: r.created_at };
     STYLE_KEYS.forEach(function (k) { o[k] = s[k]; });
     o.strokes = s.strokes || [];
     return o;
@@ -1739,7 +1750,14 @@
   // the deco + card markup (positioning is provided by the parent wrapper)
   // sizePx = the square side; everything scales off a 210px reference so the note
   // looks identical (just bigger/smaller) on the wall, preview, expanded view and draw page.
-  function noteInner(s, body, author, sizePx) {
+  // "2 aug" — small and lowercase, the way you'd scribble it in a corner. Undated notes just get nothing.
+  function noteDate(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d)) return "";
+    return d.getDate() + " " + ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"][d.getMonth()];
+  }
+  function noteInner(s, body, author, sizePx, dateStr) {
     var pad = WPADS[s.color];
     var ink = s.inkColor >= 0 ? WINK[s.inkColor] : pad.ink;
     var dood = s.doodle === "none" ? "" : s.doodle;
@@ -1754,6 +1772,11 @@
           '<span style="' + stW({ fontSize: (12 * k) + "px", color: ink, opacity: 0.55 }) + '">' + dood + "</span>" +
         "</div>" +
         '<span style="' + stW(foldStyle) + '"></span>' +
+        // top-right, above the writing and clear of the pin/tape in the middle. Same ink as the note,
+        // faint, so it reads as part of the handwriting rather than a label stuck on.
+        (dateStr ? '<span style="' + stW({ position: "absolute", top: (7 * k) + "px", right: (10 * k) + "px",
+          fontFamily: WFONT, fontSize: (10 * k) + "px", lineHeight: (10 * k) + "px", color: ink, opacity: 0.45 }) +
+          '">' + escW(dateStr) + "</span>" : "") +
         strokesSVG(s.strokes) +
       "</div>";
   }
@@ -1867,6 +1890,10 @@
             '<div class="wall-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
             '<div class="wall-title">our note wall</div>' +
             '<div class="wall-count">✧ ' + NOTES.length + ' little notes so far ✧</div>' +
+            (function () {
+              var t = togetherText();
+              return '<div class="wall-since' + (t.special ? " today" : "") + '">' + escW(t.text) + "</div>";
+            })() +
           "</div>" +
           '<div class="wall-notes" id="wallNotes"></div>' +
         "</div>" +
@@ -2015,7 +2042,7 @@
       }
 
       renderWall._meta.push({ body: n.body, author: n.author, bg: noteCardBg(s), ink: WPADS[s.color].ink, curved: s.curved });
-      html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH) + "</div>";
+      html += '<div class="wnote' + (n.locked === false ? " movable" : "") + '" data-i="' + i + '" style="' + stW(wrap) + '">' + noteInner(s, n.body, n.author, noteH, noteDate(n.created_at)) + "</div>";
     }
     // spacer sets the scroll height. It ends EXACTLY at the last note's bottom edge — any trailing room
     // here shows up as a blank pale strip under the last note when scrolled to the end (the "white bar").
@@ -2134,7 +2161,7 @@
       modal.innerHTML =
         '<div class="wm-stage">' +
           '<div class="wm-note-box" style="position:relative;width:' + size + 'px;height:' + size + 'px">' +
-            noteInner(s, n.body, n.author, size) +
+            noteInner(s, n.body, n.author, size, noteDate(n.created_at)) +
           "</div>" +
           '<div class="wm-tools">' +
             '<button class="wm-tool" data-act="close" title="close">✕</button>' +
@@ -2392,7 +2419,8 @@
     // this window, so the guess was wrong by 15%). showAdd() calls again once the screen is up.
     var win = inner.parentNode.clientWidth;
     if (!win) return;
-    inner.innerHTML = noteInner(resolveNoteStyle(addDraft), addDraft.body, addDraft.author, MINI_BASE);
+    inner.innerHTML = noteInner(resolveNoteStyle(addDraft), addDraft.body, addDraft.author, MINI_BASE,
+      noteDate(editingNote && editingNote.created_at ? editingNote.created_at : new Date().toISOString()));
     // No tilt here: the whole card is already tilted by CSS, and rotating inside a clipped window would
     // slice the note's corners off.
     inner.style.transform = "scale(" + (win / MINI_BASE) + ")";
@@ -2465,6 +2493,7 @@
         paper: addDraft.paper, edge: addDraft.edge, folded: addDraft.folded, doodle: addDraft.doodle,
         fasten: addDraft.fasten, pin: addDraft.pin, pinColor: addDraft.pinColor, tape: addDraft.tape,
         tapePat: addDraft.tapePat, tilt: addDraft.tilt, size: addDraft.size, strokes: addDraft.strokes, locked: false,
+        created_at: new Date().toISOString(),   // so it reads right away, without waiting for a reload
         x: 50, y: 10    // % of board — lands centre-top; drag it anywhere, which saves the spot
       };
       WALL_NOTES.push(note);   // …the new one is the single movable note
@@ -2506,7 +2535,8 @@
         '<div class="add-title">✎ doodle on it</div>' +
         '<div class="draw-stage">' +
           '<div class="draw-card" style="position:relative;width:' + size + 'px;height:' + size + 'px">' +
-            noteInner(sBg, addDraft.body, addDraft.author, size) +
+            noteInner(sBg, addDraft.body, addDraft.author, size,
+              noteDate(editingNote && editingNote.created_at ? editingNote.created_at : new Date().toISOString())) +
             '<canvas id="drawCanvas" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;z-index:6;border-radius:' + (s.curved ? "16px" : "3px") + '"></canvas>' +
           "</div>" +
         "</div>" +
@@ -2749,13 +2779,56 @@
     });
   }
 
+  // ---------- how long we've been us ----------
+  // 16 October 2025. Everything anniversary-ish counts from this one date: the blossom grows a petal on
+  // the 16th of every month, and the board header says how long it's been. The 16th is <= 28, so there is
+  // no short-February edge case to worry about — every month really does have one.
+  var MV_START = new Date(2025, 9, 16);        // month is 0-based: 9 = October
+  function monthsTogether(now) {
+    now = now || new Date();
+    var m = (now.getFullYear() - MV_START.getFullYear()) * 12 + (now.getMonth() - MV_START.getMonth());
+    if (now.getDate() < MV_START.getDate()) m -= 1;      // this month's 16th hasn't come round yet
+    return Math.max(0, m);
+  }
+  // days since the most recent 16th (0 ON the 16th, which is what makes the day feel like the day)
+  function daysSinceTheSixteenth(now) {
+    now = now || new Date();
+    var last = new Date(now.getFullYear(), now.getMonth() - (now.getDate() < MV_START.getDate() ? 1 : 0), MV_START.getDate());
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.round((today - last) / 86400000);
+  }
+  
+  function plural(n, word) { return n + " " + word + (n === 1 ? "" : "s"); }
+  function togetherText(now) {
+    now = now || new Date();
+    var m = monthsTogether(now), d = daysSinceTheSixteenth(now);
+    var yrs = Math.floor(m / 12), mo = m % 12;
+    var span = [];
+    if (yrs) span.push(plural(yrs, "year"));
+    if (mo) span.push(plural(mo, "month"));
+    if (!span.length || (d && span.length < 2)) span.push(plural(d, "day"));
+    if (d === 0 && m > 0) {
+      // the 16th itself: today is the whole message
+      return { text: "♡ " + (yrs && !mo ? plural(yrs, "year") : plural(m, "month")) + " today ♡",
+               special: true, anniversary: yrs > 0 && mo === 0 };
+    }
+    return { text: "♡ " + span.join(", ") + " together", special: false, anniversary: false };
+  }
+
   // a pretty layered cherry-blossom, drawn in SVG.
   // Each layer is its own stacked SVG so it can bloom in on its own delay.
   function renderBloom() {
     // one petal, pointing up, base at the center (100,100), notched tip at the top
     var petal = "M100 100 C70 92 58 56 78 30 C83 22 91 22 100 35 C109 22 117 22 122 30 C142 56 130 92 100 100 Z";
 
-    var N = 9; // 💐 nine layers — one for each month together
+    // 💐 one petal for every month together — a new one opens on the 16th of each month.
+    var N = Math.max(5, monthsTogether());        // a flower needs at least a flower's worth
+    var RING = 5;                                 // petals per ring
+    var rings = Math.ceil(N / RING);
+    // Fill from the front: full rings of five, and the BACKMOST ring takes the remainder — so at nine
+    // months this is 5 + 4, exactly the blossom it has always been.
+    var ringCount = [];
+    for (var rg = 0; rg < rings; rg++) ringCount.push(rg < rings - 1 ? RING : N - RING * (rings - 1));
 
     // blend two hex colors, t = 0 (a) → 1 (b)
     function hx(c) { return [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]; }
@@ -2769,14 +2842,18 @@
 
     // each layer's petal gradient is interpolated between a light (front)
     // and a deep (back) palette, so layer N is always a step darker than N-1.
+    // light (front) → deep (back) → deeper still, so a ring is always a step darker than the one in
+    // front of it however many rings there are. t runs 0..1 through the first pair and 1..2 through the
+    // second; without that third colour every ring past the fourth came out the same shade.
     var stopDefs = [
-      [0,   "#fffdfe", "#ffe6f0"],  // near-center: stays bright
-      [0.5, "#ffe8f1", "#ff9dc0"],  // middle
-      [1,   "#ffccde", "#df5d89"]   // tip: deepens the most
+      [0,   "#fffdfe", "#ffe6f0", "#f2c8db"],  // near-center: stays bright
+      [0.5, "#ffe8f1", "#ff9dc0", "#c1648b"],  // middle
+      [1,   "#ffccde", "#df5d89", "#8b3153"]   // tip: deepens the most
     ];
     function petalGrad(i, t, radius) {
       var stops = stopDefs.map(function (s) {
-        return '<stop offset="' + s[0] + '" stop-color="' + mix(s[1], s[2], t) + '"/>';
+        var c = t <= 1 ? mix(s[1], s[2], t) : mix(s[2], s[3], Math.min(1, t - 1));
+        return '<stop offset="' + s[0] + '" stop-color="' + c + '"/>';
       }).join("");
       return '<radialGradient id="petalFill' + i + '" cx="100" cy="100" r="' + radius +
              '" gradientUnits="userSpaceOnUse">' + stops + '</radialGradient>';
@@ -2812,8 +2889,17 @@
     }
     core += '<circle cx="100" cy="100" r="11" fill="url(#coreFill)"/>';
 
-    var lightGrad = petalGrad(0, 0.32, 96);   // id petalFill0 — soft front petals
-    var deepGrad  = petalGrad(1, 0.72, 122);  // id petalFill1 — deeper back petals (a tad darker)
+    // Each ring is a step darker and a step bigger than the one in front of it, so depth reads correctly
+    // however many rings there are. Rings 0 and 1 keep their original values to the decimal, so the
+    // nine-month blossom is untouched; anything further back continues the same progression.
+    function ringTint(r) { return r === 0 ? 0.32 : Math.min(1.9, 0.72 + 0.12 * (r - 1)); }
+    function ringScale(r) { return 1 + 0.28 * r; }
+    function ringStroke(r) { return r === 0 ? "#ff97bd" : mix("#f97ba4", "#a83459", Math.min(1, (r - 1) / 3)); }
+    // Half-step offsets so each ring peeks through the gaps of the one in front instead of hiding behind
+    // it — that is what keeps the flower looking full rather than like petals stacked on petals.
+    var RING_OFFSET = [0, 36, 18, 54, 27, 63];
+    var ringGrads = "";
+    for (var rg2 = 0; rg2 < rings; rg2++) ringGrads += petalGrad(rg2, ringTint(rg2), 96 + 26 * rg2);
 
     // a little white twinkle at the petal tip, flashing as the petal pops
     function spark(begin) {
@@ -2833,17 +2919,32 @@
              svgWrap(gradDef, petalUnit(angle, scale, fillId, stroke, delay + 0.05)) + '</div>';
     }
 
-    var STEP = 0.15;
-    var OFF = 0.4; // petals wait for the centre to appear first
+    var OFF = 0.4;   // petals wait for the centre to appear first
+    // Every petal must be open before the blossom starts shrinking at 2900ms, so the step between them
+    // closes up as there are more to get through. At nine months this still works out at the original 0.15.
+    var STEP = Math.min(0.15, (2.2 - 0.1 * rings) / N);
 
-    // the golden centre appears first (the heart of the flower), then a 5-petal
-    // blossom opens around it, then 4 more grow in behind (5 → 9) — one per month.
-    var h = '<div class="blossom">';
-    var backAngles = [36, 108, 180, 252];          // 4 back petals filling the gaps of the 5
-    for (var b = 0; b < 4; b++)                     // DOM-first so they paint behind…
-      h += petalDiv(deepGrad, backAngles[b], 1.28, "petalFill1", "#f97ba4", OFF + (5 + b) * STEP + 0.1); // …but appear after the 5
-    for (var i = 0; i < 5; i++)
-      h += petalDiv(lightGrad, i * 72, 1, "petalFill0", "#ff97bd", OFF + i * STEP);
+    // The golden centre appears first (the heart of the flower), then the front ring opens around it, then
+    // each ring behind it grows in — front to back, one petal per month.
+    // DOM order is paint order, so the backmost ring is emitted FIRST and the centre last.
+    // Size the whole blossom so the outermost ring still fits the actual screen. A petal's tip sits 78
+    // units up in a 200-unit viewBox drawn at 180px, i.e. 70.2px from the centre before any scaling; the
+    // outer ring multiplies that, and --bs multiplies it again. Anything wider than half the viewport gets
+    // cut off by .bloom's overflow:hidden. At nine months this leaves 1.9 exactly as it was — it only
+    // starts easing down once the flower would genuinely be clipped, which is around fifteen months.
+    var outerScale = ringScale(rings - 1);
+    var tipPx = 78 * (180 / 200) * outerScale;
+    var bs = Math.min(1.9, (Math.min(window.innerWidth, window.innerHeight) / 2 - 14) / tipPx);
+    var h = '<div class="blossom" style="--bs:' + bs.toFixed(3) + '">';
+    for (var r = rings - 1; r >= 0; r--) {
+      var off = RING_OFFSET[r % RING_OFFSET.length];
+      for (var p = 0; p < ringCount[r]; p++) {
+        // petals opened so far in the rings IN FRONT of this one, so the timing runs front → back
+        var before = RING * r + p;
+        h += petalDiv(ringGrads, off + p * (360 / RING), ringScale(r), "petalFill" + r,
+                      ringStroke(r), OFF + before * STEP + 0.1 * r);
+      }
+    }
     // centre first (delay 0), and last in the DOM so it stays on top
     h += '<div class="bloom-petal" style="animation-delay:0s">' + svgWrap(CORE_GRAD, core) + '</div>';
     h += '</div>';
