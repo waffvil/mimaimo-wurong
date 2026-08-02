@@ -1,8 +1,9 @@
 // M+V — "she left you a note" push.
 //
-// Two callers:
+// Three callers:
 //   · the after-insert trigger on public.notes (see the push_notifications_setup migration) — a real note
 //   · the app's "send a test ping" button — {test:true, who}, fixed text, so one phone can be tested alone
+//   · the app's little-message sender — {say:true, who, text}, a preset line or a typed one
 // verify_jwt is OFF because a Postgres trigger has no user JWT to send; each caller proves itself with its
 // own credential instead (x-mv-hook / x-mv-key), both checked below against public.app_secrets.
 //
@@ -34,8 +35,8 @@ function sameSecret(a: string, b: string) {
 }
 
 /**
- * The test ping is called straight from the browser, so it needs CORS — but only from where the app
- * actually lives. Anything else gets no allow-origin header and the browser drops the response.
+ * The browser-called modes need CORS — but only from where the app actually lives. Anything else gets no
+ * allow-origin header and the browser drops the response.
  */
 function corsFor(req: Request): Record<string, string> {
   const origin = req.headers.get("Origin") || "";
@@ -64,12 +65,13 @@ Deno.serve(async (req) => {
 
   const payloadIn = await req.json().catch(() => ({}));
   const isTest = payloadIn.test === true;
+  const isSay = payloadIn.say === true;
 
-  // Two callers, two credentials. The note hook is the database, which holds the hook secret. The test
-  // ping is the app itself, which holds only the publishable key — the same key that can already read
-  // and write the notes table, so authenticating with it grants nothing new. The hook secret stays
-  // server-side, and a test ping can only ever send the fixed text below.
-  if (isTest) {
+  // Two credentials for three callers. The note hook is the database, which holds the hook secret. The
+  // browser-side modes hold only the publishable key — and that grants nothing new: the same key can
+  // already insert a note, and the note hook pushes the note's body, so arbitrary text was always
+  // sendable. This just doesn't make a note out of it. The hook secret never reaches the browser.
+  if (isTest || isSay) {
     const key = req.headers.get("x-mv-key") || "";
     if (!secrets.publishable_key || !sameSecret(key, secrets.publishable_key)) {
       return new Response("nope", { status: 401, headers: cors });
@@ -84,11 +86,16 @@ Deno.serve(async (req) => {
   const author: string | null = payloadIn.author ?? null;
   const noteBody: string = String(payloadIn.body ?? "");
 
-  // A real note notifies the OTHER person; a test ping goes to whoever asked for it. (No author on the
-  // row shouldn't happen — tell both in that case, which is better than silence.)
-  const target = isTest
-    ? (payloadIn.who === "em yêu" || payloadIn.who === "anh yêu" ? payloadIn.who : null)
-    : author === "em yêu" ? "anh yêu" : author === "anh yêu" ? "em yêu" : null;
+  const known = (w: unknown) => w === "em yêu" || w === "anh yêu";
+  const other = (w: string) => (w === "em yêu" ? "anh yêu" : "em yêu");
+  // A test ping goes to whoever asked for it (you're testing your OWN phone). A message and a note both
+  // go to the other person. No author on a note row shouldn't happen — tell both, better than silence.
+  const target = isTest ? (known(payloadIn.who) ? payloadIn.who : null)
+    : isSay ? (known(payloadIn.who) ? other(payloadIn.who) : null)
+    : known(author) ? other(author as string) : null;
+  if ((isTest || isSay) && !target) {
+    return new Response(JSON.stringify({ sent: 0, note: "who?" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
+  }
   const q = "push_subs?select=endpoint,p256dh,auth,who" + (target ? "&who=eq." + encodeURIComponent(target) : "");
   const subs: (Sub & { who: string })[] = await rest(q);
 
@@ -102,11 +109,22 @@ Deno.serve(async (req) => {
     privateKey: secrets.vapid_private,
     subject: secrets.vapid_subject,
   };
+  // one line, no newlines, and short enough that iOS shows all of it
+  const said = String(payloadIn.text ?? "").replace(/\s+/g, " ").trim().slice(0, 140) || "♡";
   const notification = JSON.stringify(isTest
     ? {
       title: "test ping ♡",
       body: "if you can see this, notifications work",
       tag: "mv-test",
+      url: "./",
+    }
+    : isSay
+    ? {
+      title: payloadIn.who + " ♡",
+      body: said,
+      // no shared tag: two different things said an hour apart should both be readable, unlike a burst
+      // of notes where collapsing is the kindness
+      tag: "mv-say-" + Date.now(),
       url: "./",
     }
     : {
@@ -138,7 +156,7 @@ Deno.serve(async (req) => {
     }
   }));
 
-  console.log("notify-note", JSON.stringify({ test: isTest, author, target, results }));
+  console.log("notify-note", JSON.stringify({ test: isTest, say: isSay, author, target, results }));
   return new Response(JSON.stringify({ sent: results.filter((r) => r.status < 300 && r.status > 0).length, results }),
     { headers: { ...cors, "Content-Type": "application/json" } });
 });

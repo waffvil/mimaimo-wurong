@@ -689,6 +689,29 @@
     font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px;
   }
   .cal-all.sel { background: linear-gradient(135deg, #ffd9e6, #ffc2d6); border-color: #e290ad; color: #8c3f5c; }
+  /* ---------- little messages ---------- */
+  .say-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 12px; }
+  .say-chip {
+    padding: 9px 6px; border-radius: 13px; cursor: pointer;
+    border: 1.5px solid rgba(216,105,138,0.3); background: #fff;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #a05a72; line-height: 1.25;
+  }
+  .say-chip:hover { background: #fff3f7; }
+  .say-chip:active { transform: scale(0.97); }
+  .say-chip[disabled] { opacity: 0.5; }
+  .say-row { display: flex; gap: 7px; }
+  .say-input {
+    flex: 1; min-width: 0; box-sizing: border-box; padding: 10px 12px; border-radius: 13px;
+    border: 1.5px solid rgba(216,105,138,0.3); background: #fffdfc; outline: none;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px; color: #6a4a54;
+  }
+  .say-input:focus { border-color: #ff9dc2; }
+  .say-send {
+    flex: 0 0 auto; padding: 10px 15px; border: none; border-radius: 13px; cursor: pointer; color: #fff;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px;
+    background: linear-gradient(135deg, #ffa6c9, #d8698a); box-shadow: 0 6px 14px rgba(216,105,138,0.32);
+  }
+  .say-send[disabled] { opacity: 0.55; }
   .cal-close { margin-top: 8px; border: none; background: none; cursor: pointer; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; color: #b892a1; }
   /* nothing in this month yet */
   .wall-empty {
@@ -1168,7 +1191,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"rIUNFK85yhka0OPY121HOA==","iv":"Zl4Gl8syr8rVmgCK","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"13i9cgDEMy30nshq7vtVGg==","iv":"x6gYBRvdaBmps+1U","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1655,6 +1678,7 @@
   var PUSH_WHO_KEY = "mv_push_who";
   var pushWho = null;
   try { pushWho = localStorage.getItem(PUSH_WHO_KEY); } catch (e) { /* private mode */ }
+  
 
   function subsEndpoint() { return SUPABASE_URL + "/rest/v1/push_subs"; }
   function pushInstalled() {
@@ -1770,6 +1794,30 @@
       return r.json();
     });
   }
+  // A little message straight to the other phone — a preset line or a typed one. No note is made; this is
+  // just a notification. It needs to know which of us is sending, which is exactly what the notifications
+  // registration already stores, so it can't be used until that's on.
+  var SAY_PRESETS = [
+    "thinking of you ♡", "miss you", "i love you",
+    "goodnight ♡", "come home safe", "you're my favourite"
+  ];
+  var saySentAt = 0;
+  function sayCooldownLeft() { return Math.max(0, 12000 - (Date.now() - saySentAt)); }
+  function sendSay(text) {
+    if (!pushWho) return Promise.reject(new Error("turn notifications on first, so we know which phone this is"));
+    if (sayCooldownLeft()) return Promise.reject(new Error("just a moment — one at a time ♡"));
+    return fetch(SUPABASE_URL + "/functions/v1/notify-note", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-mv-key": SUPABASE_KEY },
+      body: JSON.stringify({ say: true, who: pushWho, text: text })
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status === 400 ? "who is this phone? turn notifications on again" : "server said " + r.status);
+      saySentAt = Date.now();
+      return r.json();
+    });
+  }
+  function theOther() { return pushWho === EM ? ANH : pushWho === ANH ? EM : "the other one"; }
+
   // Push services rotate endpoints (and iOS doesn't reliably fire pushsubscriptionchange), which would
   // silently strand the row in the database. Once per session, quietly re-register what we actually have.
   function resyncPush() {
@@ -1954,6 +2002,20 @@
       "</svg>";
   }
 
+  // A drawn face, not an emoji: eyes, a smile, and a little heart drifting off it.
+  function faceIcon() {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<circle cx="11.2" cy="12.6" r="8.1"/>' +
+      '<circle cx="8.4" cy="10.9" r="1.15" fill="currentColor" stroke="none"/>' +
+      '<circle cx="14" cy="10.9" r="1.15" fill="currentColor" stroke="none"/>' +
+      '<path d="M8.1 15.1c0.9 1.5 2.0 2.2 3.1 2.2s2.2-0.7 3.1-2.2"/>' +
+      // the heart: two little arcs into a point, the same shape the curtain hearts use
+      '<path d="M19.4 2.6c0.55-0.75 1.75-0.55 1.85 0.4 0.1 0.95-0.9 1.95-1.85 2.6-0.95-0.65-1.95-1.65-1.85-2.6 0.1-0.95 1.3-1.15 1.85-0.4z" ' +
+        'fill="currentColor" stroke="none" opacity="0.9"/>' +
+      "</svg>";
+  }
+
   function renderWall() {
     var NOTES = notesInView(WALL_NOTES);
     var floaters = "";
@@ -1996,6 +2058,8 @@
       '<div class="wall-rail">' +
         '<button class="wall-icon' + (monthView.all || !isThisMonth ? " on" : "") + '" id="wallCal" ' +
           'title="pick a month" aria-label="pick a month">' + calendarIcon() + "</button>" +
+        '<button class="wall-icon" id="wallSay" title="send a little something" ' +
+          'aria-label="send a little something">' + faceIcon() + "</button>" +
       "</div>" +
       '<button class="wall-add" id="wallAdd" title="add a note"><span>+</span></button>' +
       '<button class="wall-place" id="wallPlace">place it here ♡</button>' +
@@ -2170,6 +2234,7 @@
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
     document.getElementById("wallCal").addEventListener("click", function () { openCalendar(); });
+    document.getElementById("wallSay").addEventListener("click", function () { openSayer(); });
 
     // Notifications have no button on the board any more — they move to the settings screen. The sheet
     // itself is kept and still works: openPushSheet() is what that screen will call, and #notif on the URL
@@ -2180,6 +2245,78 @@
     // ----- drag to place · tap to open -----
     var modal = document.getElementById("wallModal");
     function closeModal() { modal.classList.remove("open"); modal.innerHTML = ""; }
+
+    // Send a little something: a preset line, or type your own. Both are just notifications — nothing is
+    // pinned to the board, which is the whole point of it.
+    function openSayer() {
+      // It has to know who is sending to know who to send to, and that is what the notifications
+      // registration stores. Without it, the honest move is to offer that instead of failing later.
+      if (!pushWho) {
+        modal.innerHTML =
+          '<div class="pn-card">' +
+            "<h3>little messages</h3>" +
+            "<p>these land straight on the other phone as a notification ♡ first, this phone needs to say " +
+            "which of you it belongs to.</p>" +
+            '<button class="pn-go" id="sayFix">set that up</button>' +
+            '<button class="pn-close">close</button>' +
+          "</div>";
+        modal.classList.add("open");
+        modal.onclick = function (e) {
+          if (e.target === modal || e.target.classList.contains("pn-close")) { closeModal(); return; }
+          if (e.target.id === "sayFix") { closeModal(); openPushSheet(); }
+        };
+        return;
+      }
+
+      modal.innerHTML =
+        '<div class="pn-card">' +
+          "<h3>send a little something</h3>" +
+          "<p>it lands on " + escW(theOther()) + "'s phone as a notification ♡</p>" +
+          '<div class="say-grid">' +
+            SAY_PRESETS.map(function (t) {
+              return '<button class="say-chip" data-say="' + escW(t) + '">' + escW(t) + "</button>";
+            }).join("") +
+          "</div>" +
+          '<div class="say-row">' +
+            '<input class="say-input" id="sayText" maxlength="140" placeholder="or say your own…" ' +
+              'autocomplete="off" spellcheck="false">' +
+            '<button class="say-send" id="saySend">send</button>' +
+          "</div>" +
+          '<div class="pn-msg" id="sayMsg"></div>' +
+          '<button class="pn-close">close</button>' +
+        "</div>";
+      modal.classList.add("open");
+
+      var msg = document.getElementById("sayMsg");
+      var input = document.getElementById("sayText");
+      function say(t, bad) { msg.textContent = t; msg.classList.toggle("bad", !!bad); }
+      function fire(text, btn) {
+        text = (text || "").trim();
+        if (!text) { input.focus(); return; }
+        if (btn) btn.disabled = true;
+        say("sending…");
+        sendSay(text)
+          .then(function (r) {
+            if (btn) btn.disabled = false;
+            if (r.sent) { say("sent ♡"); setTimeout(closeModal, 900); }
+            else say(theOther() + " hasn't turned notifications on yet", true);
+          })
+          .catch(function (e) {
+            if (btn) btn.disabled = false;
+            say((e && e.message) || "that didn't send", true);
+          });
+      }
+
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); fire(input.value, document.getElementById("saySend")); }
+      });
+      modal.onclick = function (e) {
+        if (e.target === modal || e.target.classList.contains("pn-close")) { closeModal(); return; }
+        var chip = e.target.closest(".say-chip");
+        if (chip) { fire(chip.getAttribute("data-say"), chip); return; }
+        if (e.target.id === "saySend") fire(input.value, e.target);
+      };
+    }
 
     // The month picker. Months only — no day grid — because notes belong to a month here, and picking a
     // single day would hide almost everything almost always.
