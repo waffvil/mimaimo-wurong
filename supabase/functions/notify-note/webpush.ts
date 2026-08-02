@@ -33,10 +33,13 @@ function concat(...parts: Uint8Array[]): Uint8Array {
 }
 
 const utf8 = (s: string) => new TextEncoder().encode(s);
+// TS 5.7 made typed arrays generic over their backing buffer, so a plain Uint8Array no longer satisfies
+// BufferSource / BodyInit. This is a types-only shim — the bytes handed to WebCrypto are untouched.
+const buf = (u: Uint8Array) => u as unknown as BufferSource;
 
 async function hkdf(salt: Uint8Array, ikm: Uint8Array, info: Uint8Array, len: number): Promise<Uint8Array> {
-  const key = await crypto.subtle.importKey("raw", ikm as BufferSource, "HKDF", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt, info } as any, key, len * 8);
+  const key = await crypto.subtle.importKey("raw", buf(ikm), "HKDF", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt: buf(salt), info: buf(info) } as any, key, len * 8);
   return new Uint8Array(bits);
 }
 
@@ -53,7 +56,7 @@ export async function encryptPayload(
   const uaPublic = b64uToBytes(p256dh);
   const uaAuth = b64uToBytes(authSecret);
 
-  const uaKey = await crypto.subtle.importKey("raw", uaPublic as BufferSource, { name: "ECDH", namedCurve: "P-256" }, false, []);
+  const uaKey = await crypto.subtle.importKey("raw", buf(uaPublic), { name: "ECDH", namedCurve: "P-256" }, false, []);
   const kp = test?.keys ?? (await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveBits"]));
   const asPublic = new Uint8Array(await crypto.subtle.exportKey("raw", kp.publicKey));
   const shared = new Uint8Array(await crypto.subtle.deriveBits({ name: "ECDH", public: uaKey } as any, kp.privateKey, 256));
@@ -65,9 +68,9 @@ export async function encryptPayload(
   const cek = await hkdf(salt, ikm, utf8("Content-Encoding: aes128gcm\0"), 16);
   const nonce = await hkdf(salt, ikm, utf8("Content-Encoding: nonce\0"), 12);
 
-  const aes = await crypto.subtle.importKey("raw", cek as BufferSource, "AES-GCM", false, ["encrypt"]);
+  const aes = await crypto.subtle.importKey("raw", buf(cek), "AES-GCM", false, ["encrypt"]);
   const plaintext = concat(utf8(payload), new Uint8Array([2]));
-  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce, tagLength: 128 }, aes, plaintext as BufferSource));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: buf(nonce), tagLength: 128 }, aes, buf(plaintext)));
 
   const rs = new Uint8Array(4);
   new DataView(rs.buffer).setUint32(0, 4096);
@@ -93,7 +96,7 @@ export async function vapidAuth(endpoint: string, vapid: Vapid, nowSec: number):
     sub: vapid.subject,
   })));
   const signed = header + "." + claims;
-  const sig = new Uint8Array(await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, utf8(signed) as BufferSource));
+  const sig = new Uint8Array(await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, buf(utf8(signed))));
   return "vapid t=" + signed + "." + bytesToB64u(sig) + ", k=" + vapid.publicKey;
 }
 
@@ -112,7 +115,7 @@ export async function sendPush(sub: Sub, payload: string, vapid: Vapid, nowSec: 
       TTL: String(ttl),
       Urgency: "normal",
     },
-    body,
+    body: body as unknown as BodyInit,
   });
   return { status: res.status, text: res.ok ? "" : await res.text().catch(() => "") };
 }
