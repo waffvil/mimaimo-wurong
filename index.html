@@ -492,6 +492,15 @@
   .wall .wcd-h { position: absolute; left: 50%; width: 16px; margin-left: -8px; text-align: center; }
   .wall .wcd-l { position: absolute; right: 50%; margin-right: 5px; white-space: nowrap; letter-spacing: 3px; }
   .wall .wcd-r { position: absolute; left: 50%; margin-left: 8px; white-space: nowrap; letter-spacing: 3px; }
+  /* how long we've been us, tucked into the end of the curtain's line — a whisper, not a headline.
+     Right-aligned rather than centred so it can never fight the ♡ for the middle of the curtain. */
+  .wall .wcd-since {
+    position: absolute; right: 21px; top: 4px; white-space: nowrap;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 8px; letter-spacing: 0.2px;
+    color: rgba(176,104,134,0.6);
+  }
+  /* on the 16th it is allowed to be noticed — but only just */
+  .wall .wcd-since.today { color: rgba(198,74,116,0.92); font-size: 9px; animation: sinceGlow 2.6s ease-in-out infinite; }
 
   /* PHONE VIEW (exclusive): scalloped pink banner + ears round the Dynamic Island + a scalloped,
      dashed frame. The banner/ears/frame are pinned; the header + notes scroll underneath them.
@@ -515,6 +524,7 @@
     /* the curtain is phone-only (desktop stays the plain framed board) */
     .wall .wall-banner, .wall .wall-banner-hearts, .wall .wall-curtain-deco { display: block; }
     .wall .wall-head .wall-deco { display: none; }   /* the curtain carries it here; don't repeat it */
+    .wall .wall-head .wall-since { display: none; }  /* likewise — it rides on the curtain on a phone */
     .wall .wall-safebot { display: none; }   /* the document reaches the bottom edge now; nothing to patch */
 
     /* THE FRAME — ONE pinned element drawing the sides AND the closing edge as a single border, so the
@@ -1076,7 +1086,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"uhwYK3QkUWF0Sl0VlE7NFQ==","iv":"fUungLCAt6flC0hR","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"I1POd74Bn4/LEWNmjz27Rw==","iv":"mXhB5lLVfVBXNhLA","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1869,6 +1879,7 @@
       '<span class="wall-corner" style="bottom:22px;left:24px;">♡</span>' +
       '<span class="wall-corner" style="bottom:22px;right:24px;">♡</span>';
 
+    var SINCE = togetherText();
     // phone-only cute chrome (scalloped pink banner + ears round the island + the pinned dotted frame).
     // Hidden on desktop via CSS; the desktop keeps the plain .wall-frame.
     var phoneChrome =
@@ -1876,7 +1887,8 @@
       '<div class="wall-banner"><div class="wall-banner-hearts"></div></div>' +
       '<div class="wall-pinframe"><span class="ws-heart ws-hl">♡</span><span class="ws-heart ws-hr">♡</span></div>' +
       '<div class="wall-curtain-deco"><span class="wcd-l">⋆˚ ୨</span>' +
-        '<span class="wcd-h">♡</span><span class="wcd-r">୧ ˚⋆</span></div>' +
+        '<span class="wcd-h">♡</span><span class="wcd-r">୧ ˚⋆</span>' +
+        '<span class="wcd-since' + (SINCE.special ? " today" : "") + '">' + escW(SINCE.short) + "</span></div>" +
       '<div class="wall-ears">' + earSVG("l") + earSVG("r") +
       '</div>';
     wallEl.innerHTML =
@@ -1890,10 +1902,7 @@
             '<div class="wall-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
             '<div class="wall-title">our note wall</div>' +
             '<div class="wall-count">✧ ' + NOTES.length + ' little notes so far ✧</div>' +
-            (function () {
-              var t = togetherText();
-              return '<div class="wall-since' + (t.special ? " today" : "") + '">' + escW(t.text) + "</div>";
-            })() +
+            '<div class="wall-since' + (SINCE.special ? " today" : "") + '">' + escW(SINCE.text) + "</div>" +
           "</div>" +
           '<div class="wall-notes" id="wallNotes"></div>' +
         "</div>" +
@@ -2809,10 +2818,15 @@
     if (!span.length || (d && span.length < 2)) span.push(plural(d, "day"));
     if (d === 0 && m > 0) {
       // the 16th itself: today is the whole message
-      return { text: "♡ " + (yrs && !mo ? plural(yrs, "year") : plural(m, "month")) + " today ♡",
-               special: true, anniversary: yrs > 0 && mo === 0 };
+      var today = (yrs && !mo ? plural(yrs, "year") : plural(m, "month")) + " today";
+      return { text: "♡ " + today + " ♡", short: today + " ♡", special: true, anniversary: yrs > 0 && mo === 0 };
     }
-    return { text: "♡ " + span.join(", ") + " together", special: false, anniversary: false };
+    // the curtain gets an abbreviated stamp — at 8px, "9 months, 17 days" is a paragraph
+    var stamp = [];
+    if (yrs) stamp.push(yrs + "y");
+    if (mo) stamp.push(mo + "m");
+    if (d || !stamp.length) stamp.push(d + "d");
+    return { text: "♡ " + span.join(", ") + " together", short: stamp.join(" ") + " ♡", special: false, anniversary: false };
   }
 
   // a pretty layered cherry-blossom, drawn in SVG.
