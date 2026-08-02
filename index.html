@@ -611,6 +611,8 @@
     .wall .wall-notes { flex: none; }
     .wall .wall-floaters, .wall .wall-corner { display: none; }
     .wall .wall-place { position: fixed; }
+    /* pinned just under the curtain on the left, mirroring the counter stamp on its right */
+    .wall .wall-rail { left: 13px; top: calc(var(--bh) + 8px); z-index: 9; }
     .wall .wall-add {
       position: fixed; top: auto; left: auto;
       right: 26px; bottom: calc(40px + max(env(safe-area-inset-bottom), var(--sab, 0px)));
@@ -620,6 +622,76 @@
   .wall-floaters { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
   .wall-floaters span { position: absolute; }
   .wall-corner { position: absolute; z-index: 3; pointer-events: none; font-size: 14px; color: rgba(226,150,180,0.75); }
+
+  /* ---------- the little rail of drawn icons, top-left ----------
+     Hand-drawn SVG rather than emoji, so they sit in the same ink as everything else and can't change
+     shape under us when a platform updates its emoji font. Room for more than one: the calendar is first,
+     with the reaction face and the jar to come. */
+  .wall-rail { position: absolute; z-index: 9; display: flex; flex-direction: column; gap: 8px; }
+  .wall-icon {
+    width: 38px; height: 38px; border-radius: 12px; padding: 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,253,250,0.9); border: 1.5px solid rgba(222,150,180,0.5);
+    box-shadow: 0 4px 12px rgba(190,120,150,0.2);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    transition: transform 0.14s ease, background 0.14s ease;
+  }
+  .wall-icon:hover { background: #fff3f7; transform: scale(1.06); }
+  .wall-icon:active { transform: scale(0.94); }
+  .wall-icon svg { display: block; width: 21px; height: 21px; }
+  .wall-icon.on { background: linear-gradient(135deg, #ffd9e6, #ffc2d6); border-color: #e290ad; }
+
+  /* ---------- the month picker ---------- */
+  .cal-card {
+    width: min(88vw, 330px); background: #fffdf8; border-radius: 22px; padding: 20px 18px 16px;
+    border: 1.5px dashed rgba(228,168,190,0.6);
+    box-shadow: 0 26px 60px rgba(80,50,60,0.36); cursor: default; text-align: center;
+    animation: notePopBig 0.34s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .cal-title { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 27px; color: #cc6488; margin-bottom: 2px; }
+  .cal-sub { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; color: #b08b99; margin-bottom: 12px; }
+  .cal-year { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 12px; }
+  .cal-year span { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 17px; color: #a05a72; min-width: 54px; }
+  .cal-arrow {
+    width: 30px; height: 30px; border-radius: 50%; cursor: pointer; padding: 0;
+    border: 1.5px solid rgba(216,105,138,0.3); background: #fff; color: #c07d95; font: 15px/1 system-ui, sans-serif;
+  }
+  .cal-arrow[disabled] { opacity: 0.3; cursor: default; }
+  .cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .cal-m {
+    position: relative; padding: 9px 2px 7px; border-radius: 13px; cursor: pointer;
+    border: 1.5px solid rgba(216,105,138,0.26); background: #fff;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px; color: #8a5462;
+  }
+  .cal-m .n {   /* a little count bead */
+    display: block; margin-top: 2px; font-size: 10px; color: #c08fa2;
+  }
+  /* a month holding something gets a warmer edge, so which months exist reads at a glance rather than
+     having to read every count */
+  .cal-m:not(.empty) { border-color: rgba(216,105,138,0.48); background: #fff8fb; }
+  .cal-m.empty { opacity: 0.42; }
+  .cal-m.sel { background: linear-gradient(135deg, #ffd9e6, #ffc2d6); border-color: #e290ad; color: #8c3f5c; }
+  .cal-m.sel .n { color: #a84c6c; }
+  .cal-m.now::after {   /* a dot marking the month we are actually in */
+    content: ""; position: absolute; top: 5px; right: 6px; width: 5px; height: 5px; border-radius: 50%;
+    background: #e8709a;
+  }
+  .cal-all {
+    width: 100%; margin-top: 12px; padding: 10px; border-radius: 13px; cursor: pointer;
+    border: 1.5px solid rgba(216,105,138,0.3); background: #fff; color: #a05a72;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px;
+  }
+  .cal-all.sel { background: linear-gradient(135deg, #ffd9e6, #ffc2d6); border-color: #e290ad; color: #8c3f5c; }
+  .cal-close { margin-top: 8px; border: none; background: none; cursor: pointer; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; color: #b892a1; }
+  /* nothing in this month yet */
+  .wall-empty {
+    position: absolute; left: 0; right: 0; top: 34px; text-align: center; padding: 0 26px;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px; line-height: 1.6; color: #b08b99;
+  }
+  .wall-empty b { display: block; font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 25px; color: #cc6488; font-weight: 400; margin-bottom: 4px; }
+
+  /* desktop: the rail tucks under the top-left corner flower, inside the frame */
+  .wall-rail { left: 22px; top: 52px; }
   .wall-inner { position: relative; z-index: 1; width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 6px 6px 0; }
   .wall-head { text-align: center; margin-bottom: 12px; flex: 0 0 auto; }
   .wall-deco { font-size: 12px; letter-spacing: 3px; color: #d3a3b6; }
@@ -1088,7 +1160,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"KiEDja0VOpqSnDsCSvyBww==","iv":"pUVES3BuyjUhqbnx","ct":"SABRRSiSCTDLw3MYAAxtV8xp9qYx1By0HmDbJ5moyEtOXP5WrU6Nc/CLONFq6DJxPl28wxWEkvuMZ2wIbUFkxmBugtZmSDxoG4QzeEaV5c5Oa0z2uaRLRA2GKTyISWSpaBqkbul8Wtqye6s7+5FJQwNxYpSGqvbApYZEnXG0YyDDaXL7tSbf6wae2aU1AeTENE1Z30FYdEnL9bD6W81xp6uVQbiXHh8knuSCPMqauc3rRiLY/9nL0Jw0NDdIOjlg/z7B3X7J2IW86rGa60BkrRiKxdvMRK1vzhlscqORr1mQ+e3ej3wgBScjSisWd299pA/4Nhau6tmrV82y8oMJZ5QvuSMA2v5pEuKEeM7ufijQFMjq7n/HGJ8VfXnitm20kG9N2SZfI5wTQNqMjQCtgb5r8tc4OqwfEGd1Vpk1+MfrFeAOgUTbdAzUEqWwQmtZtsft+/8qouqihJBc5Lm+uiYcckS9STEIXjSZ3qzl9FEbwtgbiPWzCgs/ebGvWSMSrAhaVulWrLxNr5rMbXiccgw4QmpX5rafv48fQ5GQR/nxTeTbbvz2cZ5GEUHavGL+PKtcgZtxNcb5f+HFiOjdRKg8YWgkzt00J4bdtOP3iiySzGfDzpTP+zHjYALgslTKLKRyH7CrwKU/y4B66uttJKfEMbGFHoDBGCUQi26HhEfLYTlVt3B1vWYjZPnevusouY0dwYFAd5NLnPP5GD/f5UjgtlhDqcTwN0oYaEX4805GEz4La5Hk5V0XRKN7htyBAu3dBi2NjbSdMatgg9ydbuyYvx2Z5BmEN21Ax8ZsUcnhvjcn7uk1VSxulXvoGSfqXexh6+OmkuIvQsVclFg87lgYvhWHk0vH2ChmwMX0gPzDVlOyyaMXRkMNC/Ihtp22iAMzSLi+Mdfr+capqcVZ73MqOAzMYbCEn0+l7UazSN8+mAjw+jWtFjhVx78SXtTLcbDf5bu8tFrlfYyfgHXOh0k8H8XdL7QhmfkpzMaAFdeIk8UgLyKiNM+9NP1JtO/0x5zxE06Lawx+AJalfRsOP9J8QHrxbKLcFjPP23fK29Bi724yZ4ori3u3cQxMJUtw6TovjA/IN3TZRxi7N8YPe2ZPOSqXyzM+Mf4I07I3oyiBWPX/O53ieIDUx6buDENjQTiwkoDcIe7F64prX37cEdXFWMh9NwSLH/r/vZ92G62Ex6GgxA7n1lDic9Ic0FEtWRh8CcEWKUpHE6/pYba7gxT+rrUoQIlsguEd21VZIhQN4yrEcLXwt/hQcLRvlkTSWM3MmJNaayD8AuAWny/kfXCzC8SbMRNMc84OqziWHgxTH5YIFFxC08woGr/K99Y00HpEhp2XLPdOSqu8xaBzmSwe5P1xV3C04y/EpHfXlIOgZ1fQVllukQBmf8wPsc/ucC+GbJpZbh1cBFS0ZrZXjVdWDdyfb0dxiF/5Q/8bDApcCmyg+Ys1ulGlCg503dIbagLU+uaHzzsqgsz42cpSavUq0dvXayKtCZtFe07a2kNA6zYENpWIausS+xNuCiH2hDIaHUzrGkLl1JiAZaT9L9478klo4CSplZuoeych52jVQwATl4/M2vCtHc87qtK3RetsS1/1wgoiidqOzM1FAtLpllVOs7asJFteGyxbmIguAUWRu0wp3H1qU7ljsLf9IhQQnvKbg9bCeX/LrBHQfP7Ct8bN02vGue/S+E4HwyBcR9KhczJ4Ki6Y3YY7BPPe2yxWKmetA4ICR+yUO/eEWOoqifTQv1u2SrSvru8YpruPr0ZDp67BhpikRXgMUlmKH95LeZJHUjShIzqxu1YOKS8CI1tP9NdjbTutNNTuSCU6WxHmRj1XeAoYZmVHnHmdUWa1l9/GtN/kbQppF7w01O0IoChXD6VVlOysFQjzLkrIY9k3kKgRi6gRE68xXnkhItuyoqrYaQsqBcxOmX0F8uVmaY+ElJGAIs/qrZUtYiRa1LnIiazQWc6Zi1NJLN0/2YFW7A6opzpb3Cdvl7s1wPGmrJ30aDUWlsy9trbaS0Q5CljhACxSCPU6SjzmH1e5svJE2Fkqi4olzua47vOejaTy9BIylQ3k+bgNZkfP0pK7A2pIO/VT5s659RlpK9cMrsQzqdDUeBTMeSPBxS2Bo8yRx4wfn8Wh3N8oIKM+vciXaHA3rvJ2YKTpHa60dvRGwAAxy/EYFc8jfIYCaKWwcSr5R3G4rYFHAlLmfa2KOfkWaXJhWDglkMop2Rb2DIjxaqiidk1Bnfxavmw4hKnkQmqSXRC5mkZmZW9/YvFUwRkS0DTSshsnUxZA+1fgi1BQ/cqMOTEGxixTjnjbgQWVkuviaImZ5G0RRX8ebgK6GDsUwLdWMjoZs/ri8OnDpqB+duYZZBWVF1z8KrFCg73qgm84XeAptxAv8Y04oUyZ7c6u+69Ms1odBNrjiVbJDsLsQYD3H4U2Zk+KdcQ6hYUANcxE7lP9BavNsXcvNPb5clS6uY+yvn/piNANgpOoL0tsY28YBwQuAKWxQpi0Y7tHy8HBYUylSHb2/x38yrfAeFRz5vqLwbR6pnhxH3RWsXYh12t8fsRLaaeNMbQDykLJVJliwfm4FM1ziYYBh0Hsh76bUDA1VOwAqRiz5v3hjcWJikpFv4GCXZmmbX1dO2Py5AfpaLGUOKX2r4QYW8Tl2R4kIBoDl4M601hB6/1o1KnnO/2YZ/E8qFvA8xtqaffTeRLz/Nm9iuwBZaqgHPQNHUqRiV6R6CpwpC6HRQvjDdYaZm9+qmnM4VeX9yOfXZM8xhApLZHfnc9ZdkXeT0T2slZLHTurbkbGSGZsmZnS85lOeyMXF7s56Al+HEJXlMmqjl/JYFDJhKlElUoP9HItNsOR7qbWe+l1NuHprIgU/K86Rb4JlcTTV0uhwoEuwC2rQJEhoENmbjFrfGjo+gSvDNOGjZsaIdWl/UKp2NMu+QcAnYKc3MdLu45rlZeK3Iw72ojNwIlD49cjTLNQdbPqEfGJdmmtH8GxzOpALjaTylCXI2V8gG6fTW97ZCOkdN7pylS0wRkO4hsI/Zjr0X8xYYOCNn47K5N2fy6NGWyAT1ZQvlO3fGpGDj+VQiSbe6TmRnExPI3Pb4p2gXK1FEggZrLrr8CEHlAKa+Y9PEvvvd/ISqrH02p/H+LqJBeocrBUg5e4WL4lfciDThk3MCmvQWxDi5F9al8RdWie7N4U7v/bkkIgm/bzykv16pDGOsNR8W0l1unBe6oBaW3RHz2/LddiKK/tLvw0qDLMMlWRqp0SoOuI7JsL1Eg65PSmz1nxyEhD4lgGDPf4LjlWs2SwHpAZrJwW1fqGl/8g1Z49bkrfeHPHLZUMo49GY89GeRXaiz73f+FW3O0OorLz","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"Y2I5XMT9v1gtAIkQaawdeg==","iv":"frkuHqzK8xr+vJVD","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1859,8 +1931,23 @@
       '</svg></span>';
   }
 
+  // A drawn calendar: pad, two little rings, and three days ticked off. Stroked in currentColor so the
+  // button's own colour drives it (including the "a month is being filtered" state).
+  function calendarIcon() {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<rect x="3.2" y="5.4" width="17.6" height="15.4" rx="3.2"/>' +
+      '<path d="M3.2 10.2h17.6"/>' +
+      '<path d="M8 3.2v3.4M16 3.2v3.4"/>' +
+      '<circle cx="8.4" cy="14" r="1.15" fill="currentColor" stroke="none"/>' +
+      '<circle cx="12" cy="14" r="1.15" fill="currentColor" stroke="none"/>' +
+      '<circle cx="15.6" cy="14" r="1.15" fill="currentColor" stroke="none"/>' +
+      '<circle cx="8.4" cy="17.4" r="1.15" fill="currentColor" stroke="none"/>' +
+      "</svg>";
+  }
+
   function renderWall() {
-    var NOTES = WALL_NOTES;
+    var NOTES = notesInView(WALL_NOTES);
     var floaters = "";
     for (var fi = 0; fi < 14; fi++) {
       var sparkle = fi % 3 === 1;
@@ -1882,6 +1969,8 @@
       '<span class="wall-corner" style="bottom:22px;right:24px;">♡</span>';
 
     var SINCE = togetherText();
+    var nowV = thisMonthView();
+    var isThisMonth = !monthView.all && monthView.y === nowV.y && monthView.m === nowV.m;
     // phone-only cute chrome (scalloped pink banner + ears round the island + the pinned dotted frame).
     // Hidden on desktop via CSS; the desktop keeps the plain .wall-frame.
     var phoneChrome =
@@ -1896,6 +1985,10 @@
     wallEl.innerHTML =
       '<div class="wall-floaters">' + floaters + "</div>" +
       '<div class="wall-frame"></div>' + corners + phoneChrome +
+      '<div class="wall-rail">' +
+        '<button class="wall-icon' + (monthView.all || !isThisMonth ? " on" : "") + '" id="wallCal" ' +
+          'title="pick a month" aria-label="pick a month">' + calendarIcon() + "</button>" +
+      "</div>" +
       '<button class="wall-add" id="wallAdd" title="add a note"><span>+</span></button>' +
       '<button class="wall-place" id="wallPlace">place it here ♡</button>' +
       '<div class="wall-inner">' +
@@ -1903,7 +1996,7 @@
           '<div class="wall-head">' +
             '<div class="wall-deco">⋆˚ ୨♡୧ ˚⋆</div>' +
             '<div class="wall-title">our note wall</div>' +
-            '<div class="wall-count">✧ ' + NOTES.length + ' little notes so far ✧</div>' +
+            '<div class="wall-count">' + escW(viewLabel(NOTES.length)) + "</div>" +
             '<div class="wall-since' + (SINCE.special ? " today" : "") + '">' + escW(SINCE.text) + "</div>" +
           "</div>" +
           '<div class="wall-notes" id="wallNotes"></div>' +
@@ -2058,9 +2151,17 @@
     // spacer sets the scroll height. It ends EXACTLY at the last note's bottom edge — any trailing room
     // here shows up as a blank pale strip under the last note when scrolled to the end (the "white bar").
     if (PHONE) html += '<div style="position:relative;width:1px;height:' + pBottom + 'px;pointer-events:none"></div>';
+    // A month with nothing in it is the point of the reset, not a fault — say so, and say where the rest went.
+    if (!NOTES.length) {
+      html = '<div class="wall-empty"><b>' + (monthView.all ? "no notes yet" : "a fresh month ♡") + "</b>" +
+        (monthView.all ? "leave the first one with the ✚"
+          : "nothing pinned here yet — leave the first one with the ✚, or tap the calendar to look back") +
+        "</div>";
+    }
     wallNotes.innerHTML = html;
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
+    document.getElementById("wallCal").addEventListener("click", function () { openCalendar(); });
 
     // Notifications have no button on the board any more — they move to the settings screen. The sheet
     // itself is kept and still works: openPushSheet() is what that screen will call, and #notif on the URL
@@ -2071,6 +2172,65 @@
     // ----- drag to place · tap to open -----
     var modal = document.getElementById("wallModal");
     function closeModal() { modal.classList.remove("open"); modal.innerHTML = ""; }
+
+    // The month picker. Months only — no day grid — because notes belong to a month here, and picking a
+    // single day would hide almost everything almost always.
+    function openCalendar() {
+      var counts = monthCounts(WALL_NOTES);
+      // years worth offering: every year that holds a note, plus the one we are in
+      var years = {};
+      Object.keys(counts).forEach(function (k) { years[+k.split("-")[0]] = 1; });
+      years[nowV.y] = 1;
+      var yList = Object.keys(years).map(Number).sort(function (a, b) { return a - b; });
+      var shownYear = monthView.all ? nowV.y : monthView.y;
+
+      function draw() {
+        var cells = "";
+        for (var m = 0; m < 12; m++) {
+          var n = counts[shownYear + "-" + m] || 0;
+          var sel = !monthView.all && monthView.y === shownYear && monthView.m === m;
+          var isNow = shownYear === nowV.y && m === nowV.m;
+          cells += '<button class="cal-m' + (sel ? " sel" : "") + (n ? "" : " empty") + (isNow ? " now" : "") +
+            '" data-m="' + m + '"' + (n || isNow ? "" : " disabled") + ">" + MONTHS_SHORT[m] +
+            '<span class="n">' + (n ? n + (n === 1 ? " note" : " notes") : "—") + "</span></button>";
+        }
+        var yi = yList.indexOf(shownYear);
+        modal.innerHTML =
+          '<div class="cal-card">' +
+            '<div class="cal-title">our months</div>' +
+            '<div class="cal-sub">every note is still here — pick a month ♡</div>' +
+            '<div class="cal-year">' +
+              '<button class="cal-arrow" data-y="-1"' + (yi <= 0 ? " disabled" : "") + ">‹</button>" +
+              "<span>" + shownYear + "</span>" +
+              '<button class="cal-arrow" data-y="1"' + (yi >= yList.length - 1 ? " disabled" : "") + ">›</button>" +
+            "</div>" +
+            '<div class="cal-grid">' + cells + "</div>" +
+            '<button class="cal-all' + (monthView.all ? " sel" : "") + '" id="calAll">every note, all of it ♡</button>' +
+            '<button class="cal-close">close</button>' +
+          "</div>";
+        modal.classList.add("open");
+      }
+      draw();
+
+      modal.onclick = function (e) {
+        if (e.target === modal || e.target.classList.contains("cal-close")) { closeModal(); return; }
+        var ar = e.target.closest(".cal-arrow");
+        if (ar) {
+          var i = yList.indexOf(shownYear) + (+ar.getAttribute("data-y"));
+          if (i >= 0 && i < yList.length) { shownYear = yList[i]; draw(); }
+          return;
+        }
+        if (e.target.closest("#calAll")) {
+          monthView = { all: true, y: shownYear, m: nowV.m };
+          closeModal(); renderWall(); return;
+        }
+        var cell = e.target.closest(".cal-m");
+        if (cell && !cell.disabled) {
+          monthView = { all: false, y: shownYear, m: +cell.getAttribute("data-m") };
+          closeModal(); renderWall();
+        }
+      };
+    }
 
     // The notifications sheet. Lives here (rather than beside the push helpers) because it needs `modal`.
     function openPushSheet(onChange) {
@@ -2508,6 +2668,9 @@
         x: 50, y: 10    // % of board — lands centre-top; drag it anywhere, which saves the spot
       };
       WALL_NOTES.push(note);   // …the new one is the single movable note
+      // if the board was showing an older month, come back to now — otherwise the note you just wrote
+      // would be filtered straight out of sight
+      monthView = thisMonthView();
       saveNewNote(note);       // persist to Supabase + backfill its id
     }
     addDraft.body = "";
@@ -2788,6 +2951,41 @@
         .catch(function (e) { console.error("[notes] post failed", e); alert("Couldn't pin that note — try again in a sec 💗"); })
         .then(function () { btn.disabled = false; });
     });
+  }
+
+  // ---------- which month the board is showing ----------
+  // The board shows THIS month by default, so on the 1st it starts clean — but nothing is deleted or
+  // hidden away: the calendar reaches every month there has ever been a note in.
+  var MONTHS_SHORT = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+  var MONTHS_LONG = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+  var monthView = { all: false, y: new Date().getFullYear(), m: new Date().getMonth() };
+  function thisMonthView() { var n = new Date(); return { all: false, y: n.getFullYear(), m: n.getMonth() }; }
+  // A note with no date yet (just written, not saved) belongs to today — otherwise it would vanish the
+  // moment it was pinned.
+  function noteYM(n) {
+    var d = n.created_at ? new Date(n.created_at) : new Date();
+    if (isNaN(d)) d = new Date();
+    return { y: d.getFullYear(), m: d.getMonth() };
+  }
+  function notesInView(list) {
+    if (monthView.all) return list.slice();
+    return list.filter(function (n) {
+      var ym = noteYM(n);
+      return ym.y === monthView.y && ym.m === monthView.m;
+    });
+  }
+  // { "2026-7": 3, … } — how many notes each month holds, for the calendar
+  function monthCounts(list) {
+    var out = {};
+    list.forEach(function (n) { var ym = noteYM(n); var k = ym.y + "-" + ym.m; out[k] = (out[k] || 0) + 1; });
+    return out;
+  }
+  function viewLabel(count) {
+    if (monthView.all) return "✧ " + count + " little note" + (count === 1 ? "" : "s") + " in all ✧";
+    var now = new Date(), isNow = monthView.y === now.getFullYear() && monthView.m === now.getMonth();
+    var where = isNow ? "this month" : MONTHS_LONG[monthView.m] + (monthView.y === now.getFullYear() ? "" : " " + monthView.y);
+    if (!count) return "✧ nothing " + (isNow ? "yet this month" : "from " + where) + " ✧";
+    return "✧ " + count + " little note" + (count === 1 ? "" : "s") + " " + (isNow ? "this month" : "from " + where) + " ✧";
   }
 
   // ---------- how long we've been us ----------
