@@ -1118,6 +1118,20 @@
     letter-spacing: 2px; text-transform: uppercase; color: #c07d95;
   }
 
+  /* TEMPORARY — see the veil element in the markup */
+  .veil {
+    position: fixed; inset: 0; z-index: 100000;   /* above the app, the modals and the dev bar */
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    padding: 24px; text-align: center; cursor: default;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+    transition: opacity 0.5s ease;
+  }
+  .veil p {
+    margin: 0; color: #8a8a8a; font-size: 15px; line-height: 1.6;
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+  .veil.lifting { opacity: 0; pointer-events: none; }
+
   /* 🔧 DEBUG BAR — dev only */
   .debugbar {
     position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%);
@@ -1152,6 +1166,15 @@
 </style>
 </head>
 <body>
+  <!-- ======================= TEMPORARY: the "not ready" veil =======================
+       Hides the whole app from anyone who opens the link before it's a gift. Deliberately plain: a white
+       screen and one line, nothing to poke at, nothing that hints there is more behind it.
+       To get in: five taps anywhere (within 2.5s), or #letmein on the URL. Once opened it stays open on
+       that device, so it doesn't have to be done on every launch.
+       TO REMOVE LATER: delete this element, the .veil block in the stylesheet, and the veil script at the
+       very bottom of the page. Nothing else references it. -->
+  <div class="veil" id="veil"><p>your gift is not ready yet</p></div>
+
   <!-- persistent living backdrop (gradient base on <body>) — shows behind every screen -->
   <div class="backdrop" id="backdrop">
     <div class="shimmer"></div>
@@ -1219,7 +1242,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"2yXMGXFznP/W2XyXKYi29A==","iv":"rC2jOgsCYbEXq2dQ","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"//ysqDV/VJYCUHJBnHoDzg==","iv":"Rhb1+6B0fYnr3EIn","ct":"uWTIN2skz9+oIDSl4Yqg2GQVMSGslxxFCioCoM4yPk9aTTLGHlW6AyBY7GQym1eCtmbxwSoWNate4dxvwBwTFidJzeUjnTljXXb6+8TeXnnDEjyS4BdGdtshuPpYOITH7T0NYRPTY44CHqp94YB4X0y8LcXv0RbvhCV/wT7fXdFS5cw02K7Ag706reriq/L4d1bIOp3TPJG7OoolHc3GTtsZVHEOhEJTY6MbdafANu1spl+UVvNdfH6hVfYTWoz0gytk+Zbrvh4bqzrjHWqZOVoXr9uD5Tk5re4OHsnuSpYU6SFMVqUoat8ScteZ7PXbHFHVQQBhuugggPtCkFserUPukRRWywno/yxrauOYZxORZ+WNM1G3+G3ZJhwlGooPmRbmOHQwYXprXsziCv8MGTlJgJIe00b+imqyYFJScwEAG9PSzZujS4YeYexk/SQN/ABp44jRAorNt50RQ/clYrzhTPLxoucvbv3AHlaSennc3iCUa5/MuHn6saF3Nk8n22gPG3ii4rrNKw0s1OIa04runqvRbv08QzM02qLu7oV28IHmuhQRpJH8koQr30Hnao9gFirycRTs4mNSKpUtUGt0/OWRXMYhw9Smunbf5ViQ+Fmehdh3WmCSV0I+OzlOOmrX2n5c5ZkwhuDzPFBz4jYpl4haCYOzVEiyffmjm+Fd6JUDREx3xuUilmVYC8eNnHS5W7Er5wy3u4mS2SYgMQ5M0JkVgN4+TkP5F1WEScX6mWXOKDqMOeTshB8MOpgA2pw15cR/CH/D1poRzjCZNdKAotxVh1/8NWIh/HN2HU4GAhEY6YuIpkOrn+J2kHJ7/L+YZ/UAAcF/bbO7MCR8JSZZnZ3x5CI6egXu9TWESoMT45LpM3WGW52JH6gbjjqWRs6AKKvAaVlmXquDuHqv3MGxpDYbQDTLylBASC86FY9wWl0ElzO+XGsi3gJ/2g62AUFPaIbRMLd5oqkwxNoc807gduqZrBTr9TpkpL3NDyKb/XTwqNF3jz/da1xjnK4PBUZss2xrGtTt7nQq6h5rHkB6XSSvIF6d1vsWnlmK2xlFKJk9sZYGp3lvEtOT2t5lazss+MKGuXTBcoHWYPdYL9oiCb5xz4KI4QqcjOrwsNWQVqsgRUUnBMSHiRZeleY10aXEOlNll7gx6rOXqK5YvnzSktAvW/OonICZTqf/ukKF44RownsCGYzrLOnL10z3a6fn3ZXiiTdRxAbrSKIeWQzCiXCpVeXpZJ4oXquI1M8IF19X4IaZ/OXUmDULzBqiysijcfZ9YZom1mesneQxQ8IOjawVpgs2tHANoj9oDkcE3MsAOxKNxGiTfd2qyNgn2S3nmJuE8+12pcudsLPXfF5YUY3UFASpU11Nvqi0wvB7bz5x4foc+C6iJqXL6hFW7GEomQE07eL5H6kBnd+A2hjOLDsQVVYY9gSSwfe1h3193VZSVwN0ACmB+fkZjAGRTOiwbbkMVMcOSgde0JkvWZp+qiQEfNCOiV7NQFx5hZvylU3ZWvz7IU48Nd22BQwtCLDG9XhtcB00qiEFVDbwCPgp4AfP6v0iAHOi2Nk/lJP4Nk0u6BgZJQtRvnk+Nbi8ZVjZGRr3hh5x19M8oCTIza4BshpFyRIhxkHFOdZ2kauIQfbUcNfO+gfNDXs790cvu13UP0k7xG5tnXyq5lKhjSAc0/r11cg79yZ/VEAoCvVo5Z1f+7z7eCedSJRcnQnVD3KeMDra+vf6X2BbEgYN84ah3pFv9/2d+3E/pbVCCBNg5tA4/dykVXO5X1Bfz0XBh9xc32h+zZm6SS5bOdzVDBOdTlSZJhVVkE4j7CdgVpdXa35eGeTT5BKfmhWXp3vFHK1dnWIzAIVow+HrMLXLGhCIaZaF2PbcZXFDaPuLSqqJIn3Kq8YzOYYcitunkei1t3eZ8gZuVwprcG0sn7HANQxnMDNhiPI6XpH3FgZFYFU2jRHmyzyntE16R8XEYJLT3k5TLrqoWZQwVxg3VP3gmorjAcq6yhdBn3KdB+KLqrMbnfFspWi0sYg1j9U5CXnO9/08MF/Cl7ckAtjF1pesKR50zPWrhWkYWxVfOLbUQYdx/lezYxxI/wlDppDOym6CZtCUNwTCb5yIKy5z2u+/qDqUHb/IGWS1FbN2PwWb+CIPBw/oJ72pKsQU4ZJihzUVMjXpHM1eWGrMgRqjaHQPZefcwaDiK68eklJ3+JAZ2c5oNTOHYpXsvQtPXip1lIHrEEcEbvNU492kwkX3Ti7TgXdR5hAFBZ9/SVboh7HduUGidzKC3ov10Pvu3T8F3kYTCu2a9fth3P+5RVwrgrkn7phP8Di/r9RvHdKhMfDgWOTmUa4IjfUi7x7hwvUj3tXCd+RvFnLCtsKwpSHjgc5CK+t7WToH1dFWrBGdlsiCZQCb4A8tr5rtCzGPgY/tHV3M1tiXmF0qsMgeMlVnCOU2p7Ef1zG4GGtZt4Eo698XTHrBlbHl3GUrm/aaC7Zkg+Z3eRE5d7Yhp4aM/skyEfssUIWA1pfcSiiKZe3vzM6Hc7VZkludKDjnh3ZIedcDVhp8ezRHZO8WoIy4vR36DM7hKiPqWfsnVLN82xjCD4btAcknXmzHgh3t7ZFVLmoj72WH8LI1Q2jAeuD0G7pr/8bGJc8QA5uGGTX2xhRKtBVipFUKB/k20U3vUMhquvq8Zzfsrf0c3wJrlVHyevfBWCiOmITnjYdm3RgBjd/e9ZqaZ5rGngUoQrYishfeOHLAxRUDpef4uDRfU5KofwBKX59B2SMOfHlrW0MQ0k1b1k+Iqtrf7vcUv8Gv7D5/szZ+XWWjXa/aMotajGBOp1YfvVSLHXIMsZhOztHVIENMcZ7IgZFv0PwjGo+IYbc63u9v1dUYSh7pqdacmuzfX/ezSRXvWU6oOGf9sDPisr8oP5LfmOBHUgckOi/abE/Y7uE6sT4hMXPJwYDJvvZav/EDC8OcR1zfm70tx8Cdxj/rBNRi/03aX/4TIpy4OVjZtEAstFgiI43gvBNDwUXuefuUXnR91RrSkZUsCgt6GCHWnwtzPk29G77X8qpoPpijyPfwBIxS/dSA8ap2Hk9nAKEHlNsTAuy8yAQyi/B6faKpm1JvHipc4GhuFENd2qu+Xjm9Bh7bYsadLHBScqGgjKgXRDXj1t5BCDlqdnglwoN6kuPQSQBau1rgygjGvsb5bJ4g3pkkAKi3e5Nfpu3Z59+YDBIdjK05Gly8QVNWwt+eWfPfxbdYox/YVQ9dZpCcioJ/JL+kEo8mzGMkVQGjhvSdHjN07Wd9M0RtlL16bLUxqkr5qfnMFBV8pu1SmMHamlb3B9IgvFrcrybiIXU+5V2EdVzpLx+YBheb4K6MF3Yy","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -3293,5 +3316,32 @@ if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
   });
 }
 </script>
+  <!-- ======================= TEMPORARY: the veil's five-tap latch ======================= -->
+  <script>
+  (function () {
+    var veil = document.getElementById("veil");
+    if (!veil) return;
+    var KEY = "mv_veil_open";
+    // Already let in on this device, or arriving with the flag: don't even show it. Checked before the
+    // first paint, so there's no flash of white for us.
+    var open = false;
+    try { open = localStorage.getItem(KEY) === "1"; } catch (e) { }
+    if (open || /[?&#]letmein\b/.test(location.search + location.hash)) {
+      try { localStorage.setItem(KEY, "1"); } catch (e) { }
+      veil.parentNode.removeChild(veil);
+      return;
+    }
+    // five taps within 2.5s, anywhere on it
+    var taps = 0, first = 0;
+    veil.addEventListener("click", function () {
+      var now = Date.now();
+      if (now - first > 2500) { taps = 0; first = now; }
+      if (++taps < 5) return;
+      try { localStorage.setItem(KEY, "1"); } catch (e) { }
+      veil.classList.add("lifting");
+      setTimeout(function () { if (veil.parentNode) veil.parentNode.removeChild(veil); }, 520);
+    });
+  })();
+  </script>
 </body>
 </html>
