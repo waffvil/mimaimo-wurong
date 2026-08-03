@@ -1124,7 +1124,9 @@
     background: #fff; display: flex; align-items: center; justify-content: center;
     padding: 24px; text-align: center; cursor: default;
     -webkit-tap-highlight-color: transparent; user-select: none;
+    transition: opacity 0.5s ease;
   }
+  .veil.lifting { opacity: 0; pointer-events: none; }
   .veil p {
     margin: 0; color: #8a8a8a; font-size: 15px; line-height: 1.6;
     font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
@@ -1167,9 +1169,8 @@
   <!-- ======================= TEMPORARY: the "not ready" veil =======================
        Hides the whole app from anyone who opens the link before it's a gift. Deliberately plain: a white
        screen and one line, nothing to poke at, nothing that hints there is more behind it.
-       To get in: #letmein on the URL. Nothing on the page opens it — no gesture, no hidden tap — so there
-       is genuinely nothing to find. Once used it is remembered on that device, so it isn't needed on every
-       launch.
+       The only way in is ten taps in quick succession. No URL flag and nothing remembered, so every launch
+       starts here — including from the Home Screen icon.
        TO REMOVE LATER: delete this element, the .veil block in the stylesheet, and the veil script at the
        very bottom of the page. Nothing else references it. -->
   <div class="veil" id="veil"><p>your gift is not ready yet</p></div>
@@ -1241,7 +1242,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"sdh79z9cwqeOYCgABCqTiQ==","iv":"14LGX6srZhHdIUDy","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"/UBSGcQ892Xe0IElyvXXgg==","iv":"6L9ZPxnSZeoecDQx","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -3315,19 +3316,24 @@ if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
   });
 }
 </script>
-  <!-- ======================= TEMPORARY: the veil's five-tap latch ======================= -->
+  <!-- ======================= TEMPORARY: the veil's only door ======================= -->
   <script>
   (function () {
     var veil = document.getElementById("veil");
     if (!veil) return;
-    var KEY = "mv_veil_open";
-    // The ONLY way past this is #letmein on the URL — or having used it before on this device. There is no
-    // gesture and no listener, so there is nothing on the page to discover by poking at it.
-    var open = false;
-    try { open = localStorage.getItem(KEY) === "1"; } catch (e) { }
-    if (!open && !/[?&#]letmein\b/.test(location.search + location.hash)) return;
-    try { localStorage.setItem(KEY, "1"); } catch (e) { }
-    veil.parentNode.removeChild(veil);   // before the first paint, so there's no flash of white for us
+    // Ten taps to get in. The 2.5s is the most that may pass BETWEEN consecutive taps, rather than a window
+    // for all ten: at ten taps inside a single 2.5s window you'd need four a second through touch latency,
+    // which fails more often than it works. A rolling gap still means ten deliberate taps in a row and
+    // nothing accumulates from the odd stray one.
+    var taps = 0, last = 0;
+    veil.addEventListener("click", function () {
+      var now = Date.now();
+      taps = (now - last > 2500) ? 1 : taps + 1;
+      last = now;
+      if (taps < 10) return;
+      veil.classList.add("lifting");
+      setTimeout(function () { if (veil.parentNode) veil.parentNode.removeChild(veil); }, 520);
+    });
   })();
   </script>
 </body>
