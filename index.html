@@ -1251,7 +1251,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"CqPkdOPgarOsZetE+loC4g==","iv":"AWuuEWvREEshTTJr","ct":"lkHQpUO5AaNrk5JImna+xrtuHHcH+0DENbBzPwdvInSREqYK8w1hLDPP7R4KNiGbRIZhmfaVNWwDUs9x+maLV4yDlIYvG7jvVb9JcJeI+pDMd+Y9iXItNJ3dmBkGP7r8vBecoWZI95uIScWlsAAaXbDhQLBxy86orQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"KNdXULVCyQrPASMQWBY0gg==","iv":"YuYaGuHDvlG/Pm+5","ct":"oeTEed7A0hzmggcx5xDX8KN+VPHEK2MiWGY7mtrD4u4rIv+Zd6iO9HFx2TLNMOBxES6bNRY2A5QPEDNjCl4V5VQDSwZ7Q+EyF9iQ/NojtRivSbEzUp+xthngIouwgFaZP9taFDhjSx3XWIPR7PVyQiRNLm8e1sSXeg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1473,7 +1473,10 @@
     markDebug("lock");
   }
   function showBloom() {
-    showChrome(false);
+    // The curtain comes up WITH the blossom, not with the board. It used to ride the heart reveal, so it
+    // only existed once the board did — which read as the curtain arriving late no matter how fast it
+    // painted. It's the room the blossom opens in: up and drifting from the moment the passcode lands.
+    showChrome(true);
     chromeMask(null);
     rootSkin("");
     clearBloomTimers();
@@ -1510,12 +1513,15 @@
   // expensive part — building ~N note DOM trees, laying them out, decoding the paper/heart tile images and
   // loading the cursive webfonts — into the blossom's idle seconds instead of the frame right before the
   // reveal, which is what made the reveal stutter and the notes appear to pop in late.
-  // The curtain is a sibling of the board now, not a child, so the heart reveal has to open the two together
-  // or the ornament would simply appear over the blossom while the board was still hidden. Same mask image,
-  // same size, set in the same frame.
+  // The curtain is NOT part of the reveal any more — it is already up over the blossom, and the heart opens
+  // the board underneath it. chromeMask() survives for the one thing that still needs it: clearing a mask
+  // left over from an older path (and it is what showWall/showBloom call with null).
   function chromeMask(size) {
     if (!chromeEl) return;
     if (size == null) {
+      // the class matters as much as the inline styles: .chrome-only.heart-reveal carries mask-size:0% 0%
+      // in the CSS, so leaving it on would hold the curtain shut with nothing inline to explain why.
+      chromeEl.classList.remove("heart-reveal");
       chromeEl.style.webkitMaskImage = chromeEl.style.maskImage = "";
       chromeEl.style.webkitMaskSize = chromeEl.style.maskSize = "";
       return;
@@ -1527,7 +1533,7 @@
 
   function prewarmWall() {
     showChrome(true);
-    chromeMask("0% 0%");                             // hidden along with the board it belongs to
+    chromeMask(null);                                // already up over the blossom — never masked shut
     if (wallEl.classList.contains("show")) return;   // already up (or already prewarmed)
     wallEl.classList.add("show", "heart-reveal");
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
@@ -1557,7 +1563,8 @@
     }
     wallEl.classList.add("heart-reveal");
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
-    showChrome(true); chromeMask("0% 0%");
+    showChrome(true); chromeMask(null);
+    if (chromeEl) chromeEl.classList.remove("heart-reveal");
     var t0 = null, dur = 1300, to = 650;
     function grow(ts) {
       if (t0 == null) t0 = ts;
@@ -1565,7 +1572,6 @@
       var e = 1 - Math.pow(1 - p, 3);          // ease-out
       var sz = (to * e).toFixed(1) + "%";
       wallEl.style.webkitMaskSize = wallEl.style.maskSize = sz + " " + sz;
-      chromeMask(sz + " " + sz);
       if (p < 1) requestAnimationFrame(grow);
       else showWall({ keepRendered: true });    // heart filled the screen → settle (don't rebuild the DOM
     }                                          // we just revealed; that would blink the notes)
