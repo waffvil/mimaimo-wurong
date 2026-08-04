@@ -508,7 +508,8 @@
      Hand-drawn SVG rather than emoji, so they sit in the same ink as everything else and can't change
      shape under us when a platform updates its emoji font. Room for more than one: the calendar is first,
      with the reaction face and the jar to come. */
-  .wall-rail { position: absolute; z-index: 9; display: flex; flex-direction: column; gap: 8px; }
+  /* a row, not a column: side by side reads as one little set of tools rather than a stack */
+  .wall-rail { position: absolute; z-index: 9; display: flex; flex-direction: row; align-items: center; gap: 6px; }
   .wall-icon {
     /* just the drawing — no chip, no border, no shadow. The 40px box stays for the thumb; only the ink
        inside it is visible. A soft white halo keeps the line readable when a note scrolls under it. */
@@ -1099,7 +1100,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"r4SjeSY817X4ePPj4iKiiA==","iv":"vaxNCdL38rRLGaXg","ct":"Pe6LiLm/3yw7JjrD+dlQnPWTMhOIF8yPYTyU8u3D3zgWfPtnxMW9LY82G8Y12mc6fxbeD4Xc/TvBBHNTOOh2hhPLu75AISzzxCx5FZYb3d7rESNYlgFEXkmj7j9Obr3/kU+QVHSSKruG2TPLikBvymtV4Z8kjB1bYA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"bpjxPB3TRg53FZdCj1WeEQ==","iv":"LJT2yFtm7SNkHmM+","ct":"F6+hOEg4IBvWHYOsxAVYvdqlo58EYSOBmOd63Bl6kHYqjUBWAdfENRwUpWcsrICPUzxTk1ifRvKFCAhLODtfEo/orwCWLtM7kvfqe7sZpvMKu3e8MAjJf07uxmnmGTN2qUaQYPjpDScIACelPem4do+6ltYuKJp0kg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
