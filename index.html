@@ -860,22 +860,34 @@
     0%   { transform: scale(0.94) translateY(14px) rotate(-0.6deg); opacity: 0; }
     100% { transform: scale(1) translateY(0) rotate(-0.5deg); opacity: 1; }
   }
-  .lt-letter {
-    position: relative; padding: 40px 22px 26px; border: none; border-radius: 4px;
+  /* The sheet paints through a pseudo-element rather than its own background, because the corner has to be
+     CUT AWAY for the fold to be a fold — and a clip-path on .lt-letter itself would take the washi tape
+     (which deliberately hangs outside the box) with it. drop-shadow, not box-shadow: a box-shadow is part of
+     the element's own painting and gets clipped by the same path, which would leave the sheet with no shadow
+     at all. A filter follows the clipped shape, so the shadow turns the corner with it. */
+  /* .add-inner brings a card of its own — background, dashed border, 24px radius, shadow. All of it has to
+     go, or its square-ish corner paints under the flap and the fold has nothing to cut. */
+  .lt-letter { position: relative; padding: 40px 22px 26px;
+    border: none; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
     transform: rotate(-0.5deg);
     animation: letterIn 0.6s cubic-bezier(0.34,1.4,0.64,1) both;
-    background-color: #fffdf6;
-    box-shadow: 0 12px 28px rgba(190,130,150,0.2), 0 2px 5px rgba(190,130,150,0.14);
+    --fold: 34px;
   }
-  /* ONE folded corner, bottom right. The ruling used to live on this element, but its 40px top padding and
-     the variable-height heading above the text meant the rules fell wherever they fell — straight through
-     the middle of the words. It belongs to the ruled text now (see .lt-l-body). */
-  .lt-fold-br { position: absolute; bottom: 0; right: 0; width: 30px; height: 30px;
-    /* a crisp 45° flap — the back of the sheet turned up, with a hairline crease. No blur: a soft-edged
-       triangle reads as a shadow on the paper rather than a fold in it. */
+  .lt-letter::before {
+    content: ""; position: absolute; inset: 0; z-index: -1;   /* -1: under the text, over nothing else */
+    background-color: #fffdf6; border-radius: 4px;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--fold)), calc(100% - var(--fold)) 100%, 0 100%);
+    filter: drop-shadow(0 10px 16px rgba(190,130,150,0.22)) drop-shadow(0 2px 4px rgba(190,130,150,0.16));
+  }
+  /* ONE folded corner, bottom right — the cut-away triangle turned up onto the front of the sheet. It is the
+     MIRROR of the missing piece (135deg fills the half toward the top-left), it is a shade darker because
+     you are looking at the back of the paper, and it casts a shadow up-left along the crease so the paper
+     reads as lifted rather than as a triangle someone drew on it. */
+  .lt-fold-br { position: absolute; bottom: 0; right: 0; width: var(--fold); height: var(--fold);
     background:
-      linear-gradient(315deg, transparent 0 calc(50% - 1px), rgba(202,150,166,0.6) calc(50% - 1px) 50%, transparent 50%),
-      linear-gradient(315deg, #eddcc6 0 50%, transparent 50%); }
+      linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(198,146,162,0.5) calc(50% - 1px) 50%, transparent 50%),
+      linear-gradient(135deg, #f1e2cd 0 50%, transparent 50%);
+    filter: drop-shadow(-2px -2px 3px rgba(178,124,142,0.34)); }
   /* washi tape holding it down */
   .lt-tape-t, .lt-tape-b { position: absolute; }
   .lt-tape-t { top: -12px; left: 50%; margin-left: -48px; width: 96px; height: 26px; transform: rotate(-2.5deg);
@@ -1267,7 +1279,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"ofFWeBcqBzdDvqPjYx8TLA==","iv":"I4Baugfsnhj0BFXx","ct":"0zJyP+I2FclpMmVuiQVlA3Claozf5lKcA/3QavYV4wXqehnAudMpPS+f777S/FiOHzP11wap2JCfC/LC1Amw0q0VsMzwZRHaADpbN985/uQZAPFczK2hE7w+4EzaI31AnnvOxJaBLV1zkF9a1cFG1hyU7c272xd6cQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"GkrRsH/cx6BoFH17nsOU9w==","iv":"AcU/vEKr6TYrv617","ct":"FFU4493cn5dlKfoDsu76tgFKujxg2A025h+zC8BpEgs7tLA9/Kmlt7CjkqSaPehlBENeOnbR5TZsjmJ9iKyW2UvuxjOdf85BP/9BxTGdQVF7WaQgdgJfdtPpr4sjv6jWWUKT/sZb61HY9ZLmrEu4Ox2psVgOlTC6wQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2722,7 +2734,7 @@
     function tally() {
       var t = body.value.trim();
       var words = t ? t.split(/\s+/).length : 0;
-      count.textContent = words ? words + (words === 1 ? " word" : " words") + " — as long as you like" : "";
+      count.textContent = words ? words + (words === 1 ? " word" : " words") : "";
     }
     body.addEventListener("input", function () { letterView.draft = body.value; tally(); });
     title.addEventListener("input", function () { letterView.title = title.value; });
