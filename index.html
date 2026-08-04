@@ -904,7 +904,7 @@
      at all. A filter follows the clipped shape, so the shadow turns the corner with it. */
   /* .add-inner brings a card of its own — background, dashed border, 24px radius, shadow. All of it has to
      go, or its square-ish corner paints under the flap and the fold has nothing to cut. */
-  .lt-letter { position: relative; padding: 21px 22px 26px;
+  .letters .lt-letter { position: relative; padding: 10px 20px 24px;
     border: none; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
     transform: rotate(-0.5deg);
     animation: letterIn 0.6s cubic-bezier(0.34,1.4,0.64,1) both;
@@ -927,7 +927,9 @@
     filter: drop-shadow(-2px -2px 3px rgba(178,124,142,0.34)); }
   /* washi tape holding it down */
   .lt-tape-t, .lt-tape-b { position: absolute; }
-  .lt-tape-t { top: -12px; left: 50%; margin-left: -48px; width: 96px; height: 26px; transform: rotate(-2.5deg);
+  /* 21px, not 26: with the sheet's top padding cut to 10px the taller strip reached 14px INTO the paper and
+     sat on top of the flourish. Same weight as the bottom strip now, and it clears the marks by 2px. */
+  .lt-tape-t { top: -13px; left: 50%; margin-left: -48px; width: 96px; height: 21px; transform: rotate(-2.5deg);
     background: repeating-linear-gradient(135deg, var(--lta, rgba(255,255,255,0.9)) 0 7px, var(--ltb, rgba(255,206,222,0.88)) 7px 14px);
     box-shadow: 0 2px 5px rgba(190,130,150,0.2); }
   /* on the LEFT now — at bottom right it sat straight on top of the folded corner and hid it */
@@ -937,12 +939,14 @@
   .lt-letter .add-back { top: 14px; left: 14px; z-index: 3; }
   /* heading. The date is dated in the corner the way you date a letter — top right, small — instead of
      sitting centred under the title, where it cost a whole line of empty paper before a word was read. */
-  .lt-l-head { text-align: center; margin-bottom: 2px; }
-  .lt-l-flourish { font-size: 11px; letter-spacing: 3px; color: #dda9bc; }
-  .lt-l-title { font-family: "Parisienne", cursive; font-size: 34px; color: #cc6488; line-height: 1.25; margin-top: 1px; }
+  .lt-l-head { text-align: center; margin-bottom: 0; }
+  .lt-l-flourish { font-size: 11px; letter-spacing: 3px; color: #dda9bc; line-height: 1; }
+  /* 1.1 rather than 1.25: Parisienne's own font box is 43.6px at this size, so the extra leading was pure
+     empty paper above the glyphs. The margin keeps its ascenders off the flourish. */
+  .lt-l-title { font-family: "Parisienne", cursive; font-size: 34px; color: #cc6488; line-height: 1.1; margin-top: 12px; }
   .lt-l-date { position: absolute; top: 13px; right: 16px;
     font-family: "Caveat", cursive; font-size: 13px; color: #bd93a4; letter-spacing: 0.3px; }
-  .lt-rule { display: flex; align-items: center; gap: 8px; margin: 14px 0 18px; color: #e5b3c4; font-size: 10px; }
+  .lt-rule { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px; color: #e5b3c4; font-size: 10px; }
   .lt-rule span.line { flex: 1; height: 1px;
     background: repeating-linear-gradient(90deg, #ecc3d1 0 5px, transparent 5px 10px); }
   /* the letter */
@@ -1371,7 +1375,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"Y8e962WvN681gkAvPo+HMw==","iv":"pZ2rrIc8LSK9feYX","ct":"k/OvOVyGgNSPjKzMjLpqpNv1LGZEA8fsJifbM7caNF073PYoOhx9TRdJPwk7iNB0qjlEUHJqZSqltR6keORNbYPjyhK4eV+AHp5VxRQa1O8CKiARFeQDWmfh7etKxex0qzhGgo0pIRfttwckitJyRBCVL5Y1Kq0lYQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"wiak0a7DhlgLsD11Oj44RQ==","iv":"RTd4o9kxt+5fHiOi","ct":"BGL5CDKzhnvumUWn5uPpSwsNQhtoG4ckraPRUa2mgZCoB7dYBhxlFH7cr6+1yR9GcQeXuohol3mVFxpzEGV4uWeCle14vrynqBc2ERQGVB3cGGCXCdtmIHVPVosMCBlflaZ6cOiebNgLzcNSnewJyUhHMfYBE1YI/Q==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
