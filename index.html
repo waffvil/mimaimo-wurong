@@ -1107,7 +1107,22 @@
     width: 34px; height: 34px; padding: 0; font-size: 18px; border-radius: 10px;
     display: inline-flex; align-items: center; justify-content: center;
   }
-  .cust .opt-swatch { width: 34px; height: 34px; border-radius: 10px; }
+  /* ONE chip language across the app: the creator's swatches are round with the same pink ring the letters'
+     dressing uses, so notes and letters read as dressed from one set of controls. The edge pair is the
+     exception ON PURPOSE — it sets its own radius inline (that corner IS the choice), and an inline value
+     out-ranks this rule, so those two stay square-and-round without a special case. */
+  .cust .opt-swatch { width: 34px; height: 34px; border-radius: 50%; }
+  .cust .opt[data-g="doodle"], .cust .opt[data-g="pin"] { border-radius: 50%; }
+  .cust .opt-swatch.sel, .cust .opt[data-g="doodle"].sel, .cust .opt[data-g="pin"].sel {
+    box-shadow: 0 0 0 2.5px #e2789f;
+  }
+  /* the sticker chips carry a drawing rather than a colour, so they show the paper behind it */
+  .cust .opt-swatch.stk { display: inline-flex; align-items: center; justify-content: center;
+    background: #fffdf6; box-shadow: 0 1px 3px rgba(190,130,150,0.28); }
+  .cust .opt-swatch.stk svg { width: 30px; height: 30px; display: block; }
+  .cust .opt-swatch.stk.sel { box-shadow: 0 0 0 2.5px #e2789f; }
+  .cust .opt-swatch.stk.none::before { content: ""; width: 18px; height: 1.5px; background: #d9aebe;
+    transform: rotate(-45deg); }
   /* Finger-sized target without finger-sized ink: an invisible 4px skirt on every control takes the touch,
      which brings a 34px chip up to ~42px of tappable area. The inset matches half the 8px gap, so skirts
      meet exactly and never steal a neighbour's tap. */
@@ -1363,7 +1378,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"HkgCoJh9dCmimEN+7mS2Ow==","iv":"cnwyW78oci4atMo1","ct":"y+Ox0mB9xEv9sIBTQmj/vSU+G2yF82YmE27fHYcurAzZ+JiUKKq57Ov1dwHUahz0uOst9grvtCGVXOrOlX7B5e0aYUw1apaEyvBoN80QpOhg6TD384BMDqul38/p+aNvs4s1yEnoXZ9u0mwj2RIYIzTvgTR/pfEjOg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"+RNhvQyL3Usjslcd7Iq04A==","iv":"P/KPiyDO0kK+5pi1","ct":"+GdQyaMrehGJVUuLnyDpHvF9gWs/qc+ot7aCfEdJ++L+oY8boiOi8IJn4vOYmzTKmjm8is1TBD+xQpLsUeqhuoVVXGrju2skJYLJ3Z9rhbg2EmLMRk+K27u9ddbX80Y3pFaVHfQA7olX5mYhZKMjBLaWNf0pKFXGpw==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1781,7 +1796,7 @@
     if (json) h["Content-Type"] = "application/json";
     return h;
   }
-  var STYLE_KEYS = ["color","inkColor","paper","edge","folded","doodle","fasten","pin","pinColor","tape","tapePat","tilt","size","strokes"];
+  var STYLE_KEYS = ["color","inkColor","paper","edge","folded","doodle","fasten","pin","pinColor","tape","tapePat","tilt","size","sticker","strokes"];
   function noteRowToObj(r) {
     var s = r.style || {}, o = { id: r.id, body: r.body, author: r.author, x: r.x, y: r.y, locked: true, created_at: r.created_at };
     STYLE_KEYS.forEach(function (k) { o[k] = s[k]; });
@@ -2142,6 +2157,9 @@
       inkColor: n.inkColor != null ? n.inkColor : -1,   // -1 = auto (matches the paper tone)
       tilt: n.tilt != null ? n.tilt : ((seed >> 3) % 120) / 10 - 6,
       doodle: n.doodle != null ? n.doodle : WDOODLE_CHOICES[(seed >> 13) % WDOODLE_CHOICES.length],
+      // 0 = none, and it is NOT seeded from the body like the rest: every note written before stickers
+      // existed must keep looking exactly as it did.
+      sticker: n.sticker != null ? +n.sticker : 0,
       size: n.size || ["s", "l"][(seed >> 19) % 2], // explicit wins; else a varied small/large mix
       strokes: n.strokes || []
     };
@@ -2200,6 +2218,13 @@
     var card = { position: "relative", width: sizePx + "px", height: sizePx + "px", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: (22 * k) + "px " + (12 * k) + "px " + (9 * k) + "px", backgroundImage: noteCardBg(s), borderRadius: (s.curved ? 12 * k : 2) + "px", boxShadow: "0 " + (7 * k) + "px " + (15 * k) + "px rgba(170,135,145,0.2), inset 0 " + (-10 * k) + "px " + (16 * k) + "px rgba(0,0,0,0.028)" };
     var foldStyle = s.folded ? { position: "absolute", right: 0, bottom: 0, width: (15 * k) + "px", height: (15 * k) + "px", background: "linear-gradient(135deg, transparent 50%, " + pad.fold + " 50%)" } : { display: "none" };
     return noteDecoHTML(s, k) +
+      // Stuck over the top-left corner, in the deco layer OUTSIDE the card — the pin and tape sit top
+      // centre, the date top right, the doodle and the fold bottom right, and inside the card it would have
+      // sat on the first line of the writing. Overhanging the corner it covers only the paper's own margin.
+      (s.sticker ? '<span style="' + stW({ position: "absolute", top: (-6 * k) + "px", left: (-6 * k) + "px",
+        width: (28 * k) + "px", height: (28 * k) + "px", zIndex: 6, transform: "rotate(-10deg)",
+        filter: "drop-shadow(0 " + (1.5 * k) + "px " + (2.5 * k) + "px rgba(150,110,125,0.34))" }) + '">' +
+        ltStickerSVG(s.sticker, 28 * k) + "</span>" : "") +
       '<div class="wnote-card" style="' + stW(card) + '">' +
         '<p style="' + stW({ margin: 0, flex: 1, overflow: "hidden", fontFamily: WFONT, fontSize: (14 * k) + "px", lineHeight: (18 * k) + "px", color: ink, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }) + '">' + escW(body) + "</p>" +
         '<div style="display:flex;align-items:center;justify-content:space-between;">' +
@@ -2719,7 +2744,7 @@
     function editNote(idx) {
       var n = NOTES[idx], s = resolveNoteStyle(n);
       editingNote = n;
-      addDraft = { body: n.body, author: n.author, color: s.color, inkColor: s.inkColor >= 0 ? s.inkColor : 0, paper: s.paper, edge: s.curved ? "curved" : "sharp", folded: s.folded, doodle: s.doodle, fasten: s.fasten, pin: s.pin, pinColor: s.pinColor, tape: s.tape, tapePat: s.tapePat, tilt: s.tilt, size: s.size, strokes: (n.strokes || []).map(function (st) { return { color: st.color, w: st.w, pts: st.pts.slice() }; }) };
+      addDraft = { body: n.body, author: n.author, color: s.color, inkColor: s.inkColor >= 0 ? s.inkColor : 0, paper: s.paper, edge: s.curved ? "curved" : "sharp", folded: s.folded, doodle: s.doodle, fasten: s.fasten, pin: s.pin, pinColor: s.pinColor, tape: s.tape, tapePat: s.tapePat, tilt: s.tilt, size: s.size, sticker: s.sticker, strokes: (n.strokes || []).map(function (st) { return { color: st.color, w: st.w, pts: st.pts.slice() }; }) };
       showAdd();
     }
 
@@ -2782,7 +2807,7 @@
   }
 
   // ---------- the "add a note" creator (its own screen) ----------
-  var addDraft = { body: "", author: EM, color: 1, inkColor: 0, paper: "plain", edge: "curved", folded: false, doodle: "♡", fasten: "tape", pin: "heart", pinColor: 0, tape: 0, tapePat: "stripe", tilt: -2, size: "l", strokes: [] };
+  var addDraft = { body: "", author: EM, color: 1, inkColor: 0, paper: "plain", edge: "curved", folded: false, doodle: "♡", fasten: "tape", pin: "heart", pinColor: 0, tape: 0, tapePat: "stripe", tilt: -2, size: "l", sticker: 0, strokes: [] };
   var drawStrokes = [], drawColor = "#c0567e", drawW = 2;
   var DRAW_COLORS = ["#c0567e", "#e8577b", "#5b8de8", "#5bb56a", "#e8a83a", "#7c5566", "#3a3a44", "#ffffff"];
   var DRAW_SIZES = [{ label: "fine", w: 1.1 }, { label: "medium", w: 2 }, { label: "bold", w: 3.4 }];
@@ -3293,6 +3318,12 @@
       cell("colour", swatches("color", WPADS, function (p) { return "background-image:" + p.bg; })) +
       cell("ink", swatches("inkColor", WINK, function (c) { return "background:" + c; })) +
       cell("doodle", chips("doodle", WDOODLE_CHOICES.map(function (d) { return { v: d, label: d }; }))) +
+      // the same drawn stickers the letters use, so a note and a letter are dressed from one set
+      cell("sticker", [0, 1, 2, 3, 4].map(function (i) {
+        var sel = +addDraft.sticker === i ? " sel" : "";
+        return '<span class="opt-swatch' + (i ? " stk" : " stk none") + sel + '" data-g="sticker" data-v="' + i +
+          '" title="' + (i ? "sticker" : "no sticker") + '">' + (i ? ltStickerSVG(i, 30) : "") + "</span>";
+      }).join("")) +
       cell("pin", pinRow, addDraft.fasten === "pin" ? "" : " dim") +
       cell("tape", tapeRow, addDraft.fasten === "tape" ? "" : " dim") +
       cell("from", grp(chips("author", [{ v: EM, label: "em yêu" }, { v: ANH, label: "anh yêu" }])) +
@@ -3326,7 +3357,7 @@
         var o = e.target.closest("[data-g]");
         if (!o) return;
         var g = o.getAttribute("data-g"), v = o.getAttribute("data-v");
-        if (g === "color" || g === "pinColor" || g === "tape" || g === "inkColor") addDraft[g] = +v;
+        if (g === "color" || g === "pinColor" || g === "tape" || g === "inkColor" || g === "sticker") addDraft[g] = +v;
         else if (g === "folded") addDraft.folded = v === "folded";
         else addDraft[g] = v;
         // choosing from either fastening row selects that fastening — see the note in custHTML()
@@ -3428,7 +3459,8 @@
       n.body = body; n.author = addDraft.author; n.color = addDraft.color; n.inkColor = addDraft.inkColor;
       n.paper = addDraft.paper; n.edge = addDraft.edge; n.folded = addDraft.folded; n.doodle = addDraft.doodle;
       n.fasten = addDraft.fasten; n.pin = addDraft.pin; n.pinColor = addDraft.pinColor;
-      n.tape = addDraft.tape; n.tapePat = addDraft.tapePat; n.tilt = addDraft.tilt; n.size = addDraft.size; n.strokes = addDraft.strokes;
+      n.tape = addDraft.tape; n.tapePat = addDraft.tapePat; n.tilt = addDraft.tilt; n.size = addDraft.size;
+      n.sticker = addDraft.sticker; n.strokes = addDraft.strokes;
       var row = noteObjToRow(n);
       patchNote(n, { body: row.body, author: row.author, style: row.style }); // persist the edit
     } else {
@@ -3437,7 +3469,8 @@
         body: body, author: addDraft.author, color: addDraft.color, inkColor: addDraft.inkColor,
         paper: addDraft.paper, edge: addDraft.edge, folded: addDraft.folded, doodle: addDraft.doodle,
         fasten: addDraft.fasten, pin: addDraft.pin, pinColor: addDraft.pinColor, tape: addDraft.tape,
-        tapePat: addDraft.tapePat, tilt: addDraft.tilt, size: addDraft.size, strokes: addDraft.strokes, locked: false,
+        tapePat: addDraft.tapePat, tilt: addDraft.tilt, size: addDraft.size, sticker: addDraft.sticker,
+        strokes: addDraft.strokes, locked: false,
         created_at: new Date().toISOString(),   // so it reads right away, without waiting for a reload
         x: 50, y: 10    // % of board — lands centre-top; drag it anywhere, which saves the spot
       };
