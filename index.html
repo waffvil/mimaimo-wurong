@@ -782,8 +782,14 @@
   .add-msg::placeholder { color: currentColor; opacity: 0.42; }
   .add-msg::-webkit-input-placeholder { color: currentColor; opacity: 0.42; }
   /* A screen wearing the board's top ornament: same rules, none of the board. */
-  .chrome-only { background: none !important; pointer-events: none; z-index: 3; }
-  .chrome-only .wall-banner, .chrome-only .wall-ears { pointer-events: none; }
+  /* The shared ornament sits ABOVE the screens (the board is z6, the letters/creator z7) so the curtain
+     covers what scrolls under it, and BELOW the modals (z20) so a picker still opens over it. It paints no
+     background of its own and takes no taps. */
+  .chrome-only {
+    background: none !important; pointer-events: none; z-index: 8;
+    height: 100vh;
+  }
+  .chrome-only * { pointer-events: none; }
 
   /* ---------- letters ----------
      A letter has to READ like a letter: a generous measure, real paragraph spacing, handwriting rather
@@ -953,7 +959,8 @@
     transition: transform 0.7s cubic-bezier(0.6, 0, 0.85, 0.2), opacity 0.7s ease;
   }
   .blossom.shrink { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-  /* the board gets the same soft-heart reveal when we bloom straight into it */
+  /* the board — and the shared ornament above it — get the same soft-heart reveal */
+  .chrome-only.heart-reveal,
   .wall.heart-reveal {
     z-index: 7;
     -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
@@ -1124,6 +1131,11 @@
     </div>
   </div>
 
+  <!-- 🎀 The curtain, its drifting hearts and the cat ears. ONE element for the whole app, a sibling of the
+       screens rather than a child of any of them: rebuilt per screen it restarted the hearts' drift and
+       re-rendered the curtain on every switch. Screens just show or hide it. -->
+  <div class="wall chrome-only" id="chrome"></div>
+
   <!-- 🌸 Bloom transition screen — petals recreated in pure CSS (no image assets). -->
   <div class="bloom" id="bloom"></div>
 
@@ -1143,7 +1155,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"ktLS35S32las4s6Ckpraiw==","iv":"4R9hZlq5KtJk3TK+","ct":"yu3LLq7SA/rnG2nYT5C5VibQrrRT+eNP8xrTizp6zhRD4SKaodM350fqsTwbt6UaAYlFwEENlF6EySU0mge8jv3MWmCbBHMkB7JyNIV/BbGfKxq0FJXY2n3K/0lnlFU4MgzOkhOJnbbJmoypriaHInBT9E0Dxvp1Lg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"+uo0egH+BsDimAYZNh+Nzw==","iv":"gnNUXIBLxdaEfu2w","ct":"NOTjaKzD1O3u1XtWmrw/CKgk9hlsk6udXrmb0NqGjml1YmItESQsIErIFWccF8O9265RACVCvO3tM5ad32PkJw9zyEIC49TCbVbWZpQ9x9yzrM8xhbEidAkHjQDB0XXrZlJKBTllW6CM+mezmUoCfp4dFdzaUPGacw==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1350,6 +1362,7 @@
   function rootSkin(name) { document.documentElement.className = name || ""; }
 
   function showLock() {
+    showChrome(false);
     rootSkin("");
     clearBloomTimers();
     backdropEl.style.display = "";
@@ -1364,6 +1377,8 @@
     markDebug("lock");
   }
   function showBloom() {
+    showChrome(false);
+    chromeMask(null);
     rootSkin("");
     clearBloomTimers();
     backdropEl.style.display = "";
@@ -1399,7 +1414,24 @@
   // expensive part — building ~N note DOM trees, laying them out, decoding the paper/heart tile images and
   // loading the cursive webfonts — into the blossom's idle seconds instead of the frame right before the
   // reveal, which is what made the reveal stutter and the notes appear to pop in late.
+  // The curtain is a sibling of the board now, not a child, so the heart reveal has to open the two together
+  // or the ornament would simply appear over the blossom while the board was still hidden. Same mask image,
+  // same size, set in the same frame.
+  function chromeMask(size) {
+    if (!chromeEl) return;
+    if (size == null) {
+      chromeEl.style.webkitMaskImage = chromeEl.style.maskImage = "";
+      chromeEl.style.webkitMaskSize = chromeEl.style.maskSize = "";
+      return;
+    }
+    chromeEl.classList.add("heart-reveal");
+    chromeEl.style.webkitMaskImage = chromeEl.style.maskImage = HEART_MASK;
+    chromeEl.style.webkitMaskSize = chromeEl.style.maskSize = size;
+  }
+
   function prewarmWall() {
+    showChrome(true);
+    chromeMask("0% 0%");                             // hidden along with the board it belongs to
     if (wallEl.classList.contains("show")) return;   // already up (or already prewarmed)
     wallEl.classList.add("show", "heart-reveal");
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
@@ -1429,6 +1461,7 @@
     }
     wallEl.classList.add("heart-reveal");
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
+    showChrome(true); chromeMask("0% 0%");
     var t0 = null, dur = 1300, to = 650;
     function grow(ts) {
       if (t0 == null) t0 = ts;
@@ -1436,6 +1469,7 @@
       var e = 1 - Math.pow(1 - p, 3);          // ease-out
       var sz = (to * e).toFixed(1) + "%";
       wallEl.style.webkitMaskSize = wallEl.style.maskSize = sz + " " + sz;
+      chromeMask(sz + " " + sz);
       if (p < 1) requestAnimationFrame(grow);
       else showWall({ keepRendered: true });    // heart filled the screen → settle (don't rebuild the DOM
     }                                          // we just revealed; that would blink the notes)
@@ -1445,6 +1479,9 @@
   // revealed it), so skip the rebuild — re-running renderWall() there blinks every note and restarts
   // the sway animations for no reason.
   function showWall(opts) {
+    showChrome(true);
+    chromeMask(null);          // the reveal is over: drop the mask so the curtain is simply itself again
+    if (chromeEl) chromeEl.classList.remove("heart-reveal");
     clearBloomTimers();
     editingNote = null;
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
@@ -1953,10 +1990,23 @@
         '<span class="wcd-since' + (t.special ? " today" : "") + '">' + escW(t.short) + "</span></div>" +
       '<div class="wall-ears">' + earSVG("l") + earSVG("r") + "</div>";
   }
-  // Worn by a screen that isn't the board. It borrows .wall.show purely so every existing `.wall …` rule
-  // (and the --bh the ears and curtain are positioned from) applies unchanged — but paints nothing and
-  // takes no taps, so it is only the ornament.
-  function chromeLayer() { return '<div class="wall show chrome-only">' + topChrome() + "</div>"; }
+  // The shared ornament. Built ONCE — rebuilding it would restart the hearts' drift — and after that only
+  // its "together" stamp is refreshed, since that's the one part that changes with the date. It carries the
+  // .wall classes so every existing `.wall …` rule (and the --bh the ears and curtain are positioned from)
+  // applies unchanged, while painting nothing and taking no taps.
+  var chromeEl = document.getElementById("chrome");
+  function showChrome(on) {
+    if (!chromeEl) return;
+    if (on && !chromeEl.getAttribute("data-built")) {
+      chromeEl.innerHTML = topChrome();
+      chromeEl.setAttribute("data-built", "1");
+    }
+    if (on) {
+      var st = chromeEl.querySelector(".wcd-since"), t = togetherText();
+      if (st) { st.textContent = t.short; st.classList.toggle("today", !!t.special); }
+    }
+    chromeEl.classList.toggle("show", !!on);
+  }
 
   function renderWall() {
     var NOTES = notesInView(WALL_NOTES);
@@ -1985,8 +2035,9 @@
     var isThisMonth = !monthView.all && monthView.y === nowV.y && monthView.m === nowV.m;
     // phone-only cute chrome (scalloped pink banner + ears round the island + the pinned dotted frame).
     // Hidden on desktop via CSS; the desktop keeps the plain .wall-frame.
+    // The curtain/hearts/ears are the shared #chrome element now — the board only owns its own frame.
     var phoneChrome =
-      '<div class="wall-safebot"></div>' + topChrome() +
+      '<div class="wall-safebot"></div>' +
       '<div class="wall-pinframe"><span class="ws-heart ws-hl">♡</span><span class="ws-heart ws-hr">♡</span></div>';
     wallEl.innerHTML =
       '<div class="wall-floaters">' + floaters + "</div>" +
@@ -2371,6 +2422,7 @@
   var letterView = { mode: "stack", letter: null, draft: "", title: "", author: null };
 
   function showLetters(mode) {
+    showChrome(true);
     rootSkin("rt-board");
     clearBloomTimers();
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
@@ -2408,7 +2460,7 @@
       "</button>";
     }).join("");
 
-    lettersEl.innerHTML = chromeLayer() +
+    lettersEl.innerHTML =
       '<div class="add-inner">' +
         '<button class="add-back" id="ltBack" title="to the board">←</button>' +
         '<div class="add-title">our letters</div>' +
@@ -2442,7 +2494,7 @@
       return "<p>" + escW(p.trim()).replace(/\n/g, "<br>") + "</p>";
     }).join("");
 
-    lettersEl.innerHTML = chromeLayer() +
+    lettersEl.innerHTML =
       '<div class="add-inner lt-paper">' +
         '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
         '<div class="lt-head">' +
@@ -2464,7 +2516,7 @@
   function renderLetterWrite() {
     // Shaped like a letter: title, then the message, then who it's from at the END where a signature goes —
     // with send beside it, because signing it and sending it are the same gesture.
-    lettersEl.innerHTML = chromeLayer() +
+    lettersEl.innerHTML =
       '<div class="add-inner lt-paper lt-writing">' +
         '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
         '<input class="lt-titlein" id="ltTitle" maxlength="120" placeholder="a title..." value="' + escW(letterView.title) + '">' +
@@ -2524,6 +2576,7 @@
   // needs no password of its own. Everything here used to be unreachable or hidden behind a URL flag.
   var settingsEl = document.getElementById("settings");
   function showSettings() {
+    showChrome(false);
     rootSkin("rt-board");
     clearBloomTimers();
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
@@ -2614,6 +2667,7 @@
   }
 
   function showAdd() {
+    showChrome(false);
     rootSkin("rt-board");
     clearBloomTimers();
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
@@ -2858,6 +2912,7 @@
 
   // ---------- the drawing screen ----------
   function showDraw() {
+    showChrome(false);
     rootSkin("rt-board");
     clearBloomTimers();
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
