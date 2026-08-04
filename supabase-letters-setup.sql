@@ -13,7 +13,12 @@ create table if not exists public.letters (
   -- and that is what decides whether a letter is sealed "for you"
   sent_by    text check (sent_by is null or sent_by in ('em yêu', 'anh yêu')),
   created_at timestamptz not null default now(),
-  opened_at  timestamptz                       -- null = still sealed
+  opened_at  timestamptz,                      -- null = still sealed
+  -- How the writer dressed it: paper tint, tape colour, sticker — a tiny JSON blob of INDICES written by the
+  -- client ({"p":1,"t":2,"s":3}), null when everything is the default. Indices rather than colours, so
+  -- restyling the app restyles every letter already sent instead of leaving old ones in dead hex codes.
+  -- (Applied live as migration `letters_style_column`.)
+  style      text check (style is null or char_length(style) <= 200)
 );
 create index if not exists letters_created_at_idx on public.letters (created_at desc);
 

@@ -828,28 +828,51 @@
      that they exist and who they're for. */
   .letters .add-inner { max-width: 620px; }
   .lt-sub { margin: 0 0 14px; text-align: center; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13.5px; color: #a5808d; }
-  .lt-stack { display: flex; flex-direction: column; gap: 9px; }
+  /* THE STACK. Every row is a small sheet of the same paper the letter itself is written on, tilted a little
+     and taped down — a pile of letters rather than a list of list items. It carries the HEADER only: the
+     title, who it went from and to, and the date. Never a line of what's inside; that is the letter's to
+     tell. The old row had a pink pill and a circled heart glued to the front of it, which looked like a
+     notification and nothing like paper. Sealed and opened say themselves now, in the same language the
+     letter uses: still taped shut, or with its corner folded back. */
+  .lt-stack { display: flex; flex-direction: column; gap: 14px; }
   .lt-row {
-    display: flex; align-items: center; gap: 11px; width: 100%; cursor: pointer; text-align: left;
-    padding: 12px 13px; border-radius: 15px; border: 1.5px solid rgba(228,168,190,0.45);
-    background: rgba(255,255,255,0.66);
+    position: relative; display: block; width: 100%; cursor: pointer; text-align: left;
+    padding: 16px 74px 14px 17px;      /* room at the right for the date, at the corner for the fold */
+    border: none; border-radius: 3px; background: var(--lp, #fffdf6);
+    box-shadow: 0 6px 15px rgba(190,130,150,0.17), 0 1px 3px rgba(190,130,150,0.15);
+    --fold: 22px;
   }
-  .lt-row:hover { background: #fff6fa; }
-  .lt-row.sealed { border-color: rgba(216,105,138,0.6); background: linear-gradient(135deg, #fff4f8, #ffe9f1); }
-  /* the wax seal. Drawn, not an emoji: a sealed letter gets an envelope, an opened one a heart. */
-  .lt-wax {
-    flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; color: #fff;
-    background: linear-gradient(135deg, #ffa6c9, #d8698a); box-shadow: 0 3px 8px rgba(216,105,138,0.35);
+  /* the pile leans: alternating so no two neighbours line up */
+  .lt-row:nth-child(odd)  { transform: rotate(-0.5deg); }
+  .lt-row:nth-child(even) { transform: rotate(0.42deg); }
+  .lt-row:hover { background: #fffefa; }
+  /* a strip of washi tape holding each one down, hanging over the top edge like the letter's own */
+  .lt-r-tape {
+    position: absolute; top: -7px; left: 20px; width: 52px; height: 17px; transform: rotate(-3.5deg);
+    background: repeating-linear-gradient(135deg, var(--lta, rgba(255,255,255,0.92)) 0 6px, var(--ltb, rgba(255,206,222,0.9)) 6px 12px);
+    box-shadow: 0 2px 4px rgba(190,130,150,0.18);
   }
-  .lt-wax svg { width: 16px; height: 16px; display: block; }
-  .lt-wax.open { background: rgba(255,255,255,0.9); color: #e290ad; box-shadow: 0 0 0 1.5px rgba(226,144,173,0.5); }
-  .lt-wax.open svg { width: 13px; height: 13px; }
-  .lt-row-mid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-  .lt-from { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 19px; color: #cc6488; }
-  .lt-prev { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12.5px; color: #9a7683;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lt-when { flex: 0 0 auto; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11px; color: #b892a1; }
+  /* SEALED: taped across the corner, still shut. OPENED: that corner folded back, exactly as on the letter. */
+  .lt-r-seal {
+    position: absolute; right: -9px; bottom: 11px; width: 54px; height: 15px; transform: rotate(-45deg);
+    background: repeating-linear-gradient(135deg, var(--lta, rgba(255,255,255,0.92)) 0 6px, var(--ltb, rgba(255,178,205,0.92)) 6px 12px);
+    box-shadow: 0 2px 4px rgba(190,130,150,0.2);
+  }
+  .lt-row.sealed { background: #fffefb; box-shadow: 0 7px 17px rgba(216,105,138,0.2), 0 1px 3px rgba(190,130,150,0.16); }
+  .lt-r-fold {
+    position: absolute; right: 0; bottom: 0; width: var(--fold); height: var(--fold);
+    background:
+      linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(198,146,162,0.45) calc(50% - 1px) 50%, transparent 50%),
+      linear-gradient(135deg, #f1e2cd 0 50%, transparent 50%);
+    filter: drop-shadow(-1px -1px 2px rgba(178,124,142,0.3));
+  }
+  .lt-r-title { display: block; font-family: "Parisienne", cursive; font-size: 23px; line-height: 1.25;
+    color: #cc6488; overflow-wrap: anywhere; }
+  .lt-r-who { display: block; margin-top: 2px; font-family: "Caveat", cursive; font-weight: 500;
+    font-size: 14.5px; color: #a5808d; }
+  .lt-r-who i { font-style: normal; color: #ddaec0; padding: 0 3px; }
+  .lt-r-date { position: absolute; top: 15px; right: 15px;
+    font-family: "Caveat", cursive; font-size: 12.5px; color: #c2a0ad; }
 
   /* ---------- the letter itself ----------
      Your template: ruled paper on a slight tilt, folded corners, washi tape top and bottom, a Parisienne
@@ -867,7 +890,7 @@
      at all. A filter follows the clipped shape, so the shadow turns the corner with it. */
   /* .add-inner brings a card of its own — background, dashed border, 24px radius, shadow. All of it has to
      go, or its square-ish corner paints under the flap and the fold has nothing to cut. */
-  .lt-letter { position: relative; padding: 40px 22px 26px;
+  .lt-letter { position: relative; padding: 21px 22px 26px;
     border: none; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
     transform: rotate(-0.5deg);
     animation: letterIn 0.6s cubic-bezier(0.34,1.4,0.64,1) both;
@@ -875,7 +898,7 @@
   }
   .lt-letter::before {
     content: ""; position: absolute; inset: 0; z-index: -1;   /* -1: under the text, over nothing else */
-    background-color: #fffdf6; border-radius: 4px;
+    background-color: var(--lp, #fffdf6); border-radius: 4px;
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--fold)), calc(100% - var(--fold)) 100%, 0 100%);
     filter: drop-shadow(0 10px 16px rgba(190,130,150,0.22)) drop-shadow(0 2px 4px rgba(190,130,150,0.16));
   }
@@ -891,18 +914,20 @@
   /* washi tape holding it down */
   .lt-tape-t, .lt-tape-b { position: absolute; }
   .lt-tape-t { top: -12px; left: 50%; margin-left: -48px; width: 96px; height: 26px; transform: rotate(-2.5deg);
-    background: repeating-linear-gradient(135deg, rgba(255,255,255,0.9) 0 7px, rgba(255,206,222,0.88) 7px 14px);
+    background: repeating-linear-gradient(135deg, var(--lta, rgba(255,255,255,0.9)) 0 7px, var(--ltb, rgba(255,206,222,0.88)) 7px 14px);
     box-shadow: 0 2px 5px rgba(190,130,150,0.2); }
   /* on the LEFT now — at bottom right it sat straight on top of the folded corner and hid it */
   .lt-tape-b { bottom: -10px; left: 22px; width: 62px; height: 21px; transform: rotate(4deg);
-    background: repeating-linear-gradient(135deg, rgba(255,255,255,0.9) 0 7px, rgba(255,240,200,0.88) 7px 14px);
+    background: repeating-linear-gradient(135deg, var(--lta, rgba(255,255,255,0.9)) 0 7px, var(--ltb, rgba(255,240,200,0.88)) 7px 14px);
     box-shadow: 0 2px 5px rgba(190,130,150,0.16); }
   .lt-letter .add-back { top: 14px; left: 14px; z-index: 3; }
-  /* heading */
-  .lt-l-head { text-align: center; margin-bottom: 4px; }
+  /* heading. The date is dated in the corner the way you date a letter — top right, small — instead of
+     sitting centred under the title, where it cost a whole line of empty paper before a word was read. */
+  .lt-l-head { text-align: center; margin-bottom: 2px; }
   .lt-l-flourish { font-size: 11px; letter-spacing: 3px; color: #dda9bc; }
-  .lt-l-title { font-family: "Parisienne", cursive; font-size: 34px; color: #cc6488; line-height: 1.3; margin-top: 2px; }
-  .lt-l-date { font-family: "Caveat", cursive; font-size: 15px; color: #b98da0; letter-spacing: 0.4px; }
+  .lt-l-title { font-family: "Parisienne", cursive; font-size: 34px; color: #cc6488; line-height: 1.25; margin-top: 1px; }
+  .lt-l-date { position: absolute; top: 13px; right: 16px;
+    font-family: "Caveat", cursive; font-size: 13px; color: #bd93a4; letter-spacing: 0.3px; }
   .lt-rule { display: flex; align-items: center; gap: 8px; margin: 14px 0 18px; color: #e5b3c4; font-size: 10px; }
   .lt-rule span.line { flex: 1; height: 1px;
     background: repeating-linear-gradient(90deg, #ecc3d1 0 5px, transparent 5px 10px); }
@@ -913,7 +938,7 @@
      through the middle of the words. background-origin: content-box keeps it true even if this ever gains
      padding. */
   .lt-l-body {
-    background-image: repeating-linear-gradient(180deg, transparent 0 27px, rgba(206,168,180,0.16) 27px 28px);
+    background-image: repeating-linear-gradient(180deg, transparent 0 27px, var(--lr, rgba(206,168,180,0.16)) 27px 28px);
     background-origin: content-box;
   }
   .lt-l-body p {
@@ -976,8 +1001,8 @@
   .lt-write {
     padding: 13px 15px; min-height: 46vh; resize: vertical;
     font-family: "Caveat", cursive; font-weight: 500; font-size: 19px; line-height: 28px;
-    background-color: #fffdf6;
-    background-image: repeating-linear-gradient(180deg, transparent 0 27px, rgba(206,168,180,0.16) 27px 28px);
+    background-color: var(--lp, #fffdf6);
+    background-image: repeating-linear-gradient(180deg, transparent 0 27px, var(--lr, rgba(206,168,180,0.16)) 27px 28px);
     /* content-box, so the tiling starts where the TEXT starts and not 13px of padding above it — otherwise
        every rule sits halfway up a line of your own handwriting. */
     background-origin: content-box;
@@ -985,6 +1010,33 @@
   }
   .lt-titlein:focus, .lt-write:focus { border-color: #ff9dc2; }
   .lt-count { margin-top: 9px; text-align: right; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11.5px; color: #b892a1; }
+
+  /* ---------- dressing the letter ----------
+     Paper, tape and a sticker — the same three choices whether you are writing it, reading it, or looking at
+     it in the stack. Thumb-sized targets (the chips are 34px of ink in a 42px hit area), because this is a
+     phone: a 22px swatch is a cursor size, not a finger size. */
+  .lt-custom { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
+  .lt-crow { display: flex; align-items: center; gap: 2px; }
+  .lt-clabel { flex: 0 0 auto; width: 52px; font-family: "Bradley Hand","Segoe Print",cursive;
+    font-size: 12px; color: #a5808d; }
+  .lt-chip {
+    position: relative; width: 42px; height: 42px; padding: 0; border: none; background: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .lt-chip i {   /* the ink: the swatch itself */
+    display: block; width: 32px; height: 32px; border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(190,130,150,0.28), inset 0 0 0 1px rgba(255,255,255,0.6);
+  }
+  .lt-chip.on::after { content: ""; position: absolute; inset: 4px; border-radius: 50%;
+    box-shadow: 0 0 0 2.5px #e2789f; }
+  .lt-chip svg { width: 26px; height: 26px; display: block; }
+  .lt-chip.none i { background: #fffdf6; display: flex; align-items: center; justify-content: center; }
+  .lt-chip.none i::after { content: ""; width: 18px; height: 1.5px; background: #d9aebe; transform: rotate(-45deg); }
+  /* the sticker, as it sits on the letter: top right under the date, tilted, with its own little shadow */
+  .lt-letter.has-sticker .lt-l-head { padding: 0 44px; }   /* keep the title centred AND clear of it */
+  .lt-sticker { position: absolute; top: 40px; right: 13px; width: 40px; height: 40px;
+    transform: rotate(9deg); filter: drop-shadow(0 2px 3px rgba(190,130,150,0.32)); pointer-events: none; }
+  .lt-sticker svg { width: 100%; height: 100%; display: block; }
 
   /* ---------- the secret settings ---------- */
   .settings .add-inner { max-width: 460px; }
@@ -1279,7 +1331,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"GkrRsH/cx6BoFH17nsOU9w==","iv":"AcU/vEKr6TYrv617","ct":"FFU4493cn5dlKfoDsu76tgFKujxg2A025h+zC8BpEgs7tLA9/Kmlt7CjkqSaPehlBENeOnbR5TZsjmJ9iKyW2UvuxjOdf85BP/9BxTGdQVF7WaQgdgJfdtPpr4sjv6jWWUKT/sZb61HY9ZLmrEu4Ox2psVgOlTC6wQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"At2WuEuEgYJVMsLlkn/Vkg==","iv":"jaQR938Lm2Pgkz60","ct":"0eN4VRihd0W3f3n3PZH0K0BfoN830CnQL0JIs84Wo+1H/URxBZHvtS6PSe78sAO2oVscUR/EWn2lStHz2L9rWHvg5pN7UYBSav//hRxzRHAugDlk7QTZuqVzL3izdJv3HHsAeUR4DwGV6a7UWrkB+yxa3SGpo2DKIg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1762,11 +1814,76 @@
       .then(function (rows) { LETTERS = rows || []; })
       .catch(function (e) { console.error("[letters] load failed", e); });
   }
+  // ---------- how a letter is dressed ----------
+  // Three small fixed catalogues: the paper it's written on, the washi tape holding it down, and one sticker.
+  // The choice is stored on the row as a tiny JSON blob of INDICES, not colours — so restyling the app later
+  // restyles every letter already sent, instead of leaving old ones wearing dead hex codes.
+  var LT_PAPER = [
+    { n: "cream", bg: "#fffdf6", rule: "rgba(206,168,180,0.16)" },
+    { n: "blush", bg: "#fff5f7", rule: "rgba(214,150,175,0.20)" },
+    { n: "mint",  bg: "#f4fbf6", rule: "rgba(140,190,165,0.22)" },
+    { n: "sky",   bg: "#f5f9ff", rule: "rgba(150,175,215,0.20)" },
+    { n: "lilac", bg: "#f9f6ff", rule: "rgba(170,158,208,0.20)" }
+  ];
+  var LT_TAPE = [
+    { n: "pink",  a: "rgba(255,255,255,0.92)", b: "rgba(255,206,222,0.90)" },
+    { n: "lemon", a: "rgba(255,255,255,0.92)", b: "rgba(255,238,196,0.92)" },
+    { n: "mint",  a: "rgba(255,255,255,0.92)", b: "rgba(200,238,218,0.92)" },
+    { n: "sky",   a: "rgba(255,255,255,0.92)", b: "rgba(203,226,252,0.92)" },
+    { n: "lilac", a: "rgba(255,255,255,0.92)", b: "rgba(222,212,250,0.92)" }
+  ];
+  // Drawn, not emoji — same rule as the rail icons: they have to look like they belong to the paper.
+  function ltStickerSVG(i, px) {
+    var w = px || 40;
+    var open = '<svg viewBox="0 0 40 40" width="' + w + '" height="' + w + '">';
+    if (i === 1) {   // a heart sticker on a white peel
+      return open + '<circle cx="20" cy="20" r="17" fill="#fff" stroke="rgba(226,144,173,0.5)"/>' +
+        '<path d="M20 29 C10 22 7 16 10 12 C13 8 18 10 20 14 C22 10 27 8 30 12 C33 16 30 22 20 29 Z" fill="#f083ab"/></svg>';
+    }
+    if (i === 2) {   // a star
+      return open + '<circle cx="20" cy="20" r="17" fill="#fff" stroke="rgba(226,180,120,0.45)"/>' +
+        '<path d="M20 8 L23.4 16.6 L32.5 17.2 L25.4 23 L27.8 31.8 L20 26.9 L12.2 31.8 L14.6 23 L7.5 17.2 L16.6 16.6 Z" fill="#f7c25e"/></svg>';
+    }
+    if (i === 3) {   // a flower
+      return open + '<circle cx="20" cy="20" r="17" fill="#fff" stroke="rgba(200,170,220,0.45)"/>' +
+        '<g fill="#e79ec6"><ellipse cx="20" cy="11.5" rx="4.6" ry="6"/><ellipse cx="20" cy="28.5" rx="4.6" ry="6"/>' +
+        '<ellipse cx="11.5" cy="20" rx="6" ry="4.6"/><ellipse cx="28.5" cy="20" rx="6" ry="4.6"/></g>' +
+        '<circle cx="20" cy="20" r="4.2" fill="#f9d76a"/></svg>';
+    }
+    if (i === 4) {   // a bow
+      return open + '<circle cx="20" cy="20" r="17" fill="#fff" stroke="rgba(226,144,173,0.45)"/>' +
+        '<path d="M19 20 L9.5 13.5 C8 12.5 7 14 7.6 15.6 L11 20 L7.6 24.4 C7 26 8 27.5 9.5 26.5 Z" fill="#f292b4"/>' +
+        '<path d="M21 20 L30.5 13.5 C32 12.5 33 14 32.4 15.6 L29 20 L32.4 24.4 C33 26 32 27.5 30.5 26.5 Z" fill="#f292b4"/>' +
+        '<circle cx="20" cy="20" r="3.1" fill="#e2789f"/></svg>';
+    }
+    return "";       // 0 = no sticker
+  }
+  // Read the stored blob back, and never trust it: an index out of range falls back to the default rather
+  // than painting `undefined` into a style attribute.
+  function letterStyle(l) {
+    var raw = l && l.style, o = null;
+    if (raw) { try { o = JSON.parse(raw); } catch (e) { o = null; } }
+    o = o || {};
+    var clamp = function (v, max) { v = parseInt(v, 10); return v >= 0 && v <= max ? v : 0; };
+    return { p: clamp(o.p, LT_PAPER.length - 1), t: clamp(o.t, LT_TAPE.length - 1), s: clamp(o.s, 4) };
+  }
+  /** The four custom properties every dressed element reads (see --lp/--lr/--lta/--ltb in the CSS). */
+  function ltStyleVars(st) {
+    var p = LT_PAPER[st.p], t = LT_TAPE[st.t];
+    return stW({ "--lp": p.bg, "--lr": p.rule, "--lta": t.a, "--ltb": t.b });
+  }
+  /** null when everything is default, so a plain letter stores nothing at all. */
+  function ltStyleJSON(st) {
+    if (!st || (!st.p && !st.t && !st.s)) return null;
+    return JSON.stringify({ p: st.p | 0, t: st.t | 0, s: st.s | 0 });
+  }
+
   // `author` is whose name goes ON the letter — the writer's choice. `sent_by` is which phone it actually
   // came from, which is what the seal depends on: a letter is for you if you didn't send it, regardless of
   // whose name is signed at the bottom.
-  function sendLetter(body, author, title) {
-    var row = { body: body, author: author, title: (title || "").trim() || null, sent_by: pushWho || null };
+  function sendLetter(body, author, title, style) {
+    var row = { body: body, author: author, title: (title || "").trim() || null, sent_by: pushWho || null,
+      style: ltStyleJSON(style) };
     return fetch(lettersEndpoint(), {
       method: "POST",
       headers: (function () { var h = wallHeaders(true); h.Prefer = "return=representation"; return h; })(),
@@ -2598,7 +2715,7 @@
 
   // ✉ LETTERS — one screen, three views: the stack, reading one, writing one.
   var lettersEl = document.getElementById("letters");
-  var letterView = { mode: "stack", letter: null, draft: "", title: "", author: null };
+  var letterView = { mode: "stack", letter: null, draft: "", title: "", author: null, style: { p: 0, t: 0, s: 0 } };
 
   function showLetters(mode) {
     showChrome(true);
@@ -2611,7 +2728,8 @@
     if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
-    letterView = { mode: mode || "stack", letter: null, draft: "", title: "", author: pushWho || EM };
+    letterView = { mode: mode || "stack", letter: null, draft: "", title: "", author: pushWho || EM,
+      style: { p: 0, t: 0, s: 0 } };
     lettersEl.classList.add("show");
     document.body.style.overflow = "auto";
     markDebug("letters");
@@ -2628,14 +2746,17 @@
     var mine = lettersForMe().length;
     var rows = LETTERS.map(function (l, i) {
       var sealed = !l.opened_at && pushWho && letterFrom(l) !== pushWho;
-      var preview = l.body.replace(/\s+/g, " ").trim().slice(0, 72);
-      return '<button class="lt-row' + (sealed ? " sealed" : "") + '" data-i="' + i + '">' +
-        '<span class="lt-wax' + (sealed ? "" : " open") + '">' + (sealed ? envelopeIcon() : heartIcon()) + "</span>" +
-        '<span class="lt-row-mid">' +
-          '<span class="lt-from">' + escW(l.title || ("from " + l.author)) + "</span>" +
-          '<span class="lt-prev">' + (sealed ? "sealed — for you" : escW(preview) + (l.body.length > 72 ? "…" : "")) + "</span>" +
-        "</span>" +
-        '<span class="lt-when">' + escW(letterDate(l.created_at)) + "</span>" +
+      // from → to. The signature is who it says it is from; the phone it was sent from tells us who the
+      // other one is. Without that we only know the signature, so we only claim the signature.
+      var to = l.sent_by === EM ? ANH : l.sent_by === ANH ? EM : "";
+      var who = escW(l.author) + (to ? ' <i>→</i> ' + escW(to) : "");
+      return '<button class="lt-row' + (sealed ? " sealed" : "") + '" data-i="' + i + '"' +
+        ' style="' + ltStyleVars(letterStyle(l)) + '">' +
+        '<span class="lt-r-tape"></span>' +
+        (sealed ? '<span class="lt-r-seal"></span>' : '<span class="lt-r-fold"></span>') +
+        '<span class="lt-r-date">' + escW(letterDate(l.created_at)) + "</span>" +
+        '<span class="lt-r-title">' + escW(l.title || "a letter") + "</span>" +
+        '<span class="lt-r-who">' + who + "</span>" +
       "</button>";
     }).join("");
 
@@ -2681,10 +2802,12 @@
       return "<p>" + escW(p).replace(/\n/g, "<br>") + "</p>";
     }).join("");
 
+    var lst = letterStyle(l);
     lettersEl.innerHTML =
-      '<div class="add-inner lt-letter">' +
+      '<div class="add-inner lt-letter' + (lst.s ? " has-sticker" : "") + '" style="' + ltStyleVars(lst) + '">' +
         '<span class="lt-fold-br"></span>' +
         '<span class="lt-tape-t"></span><span class="lt-tape-b"></span>' +
+        (lst.s ? '<span class="lt-sticker">' + ltStickerSVG(lst.s) + "</span>" : "") +
         '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
         '<div class="lt-l-head">' +
           '<div class="lt-l-flourish">‧₊˚ ୨♡୧ ˚₊‧</div>' +
@@ -2712,12 +2835,39 @@
   function renderLetterWrite() {
     // Shaped like a letter: title, then the message, then who it's from at the END where a signature goes —
     // with send beside it, because signing it and sending it are the same gesture.
+    var st = letterView.style;
+    // Every swatch is a real chip of the thing it picks — the paper chips ARE that paper, the tape chips are
+    // that tape's stripe — so nothing needs a name written under it.
+    function chips(group, n, ink) {
+      var out = "";
+      for (var i = 0; i < n; i++) {
+        out += '<button class="lt-chip' + (st[group] === i ? " on" : "") + (ink(i) ? "" : " none") + '"' +
+          ' data-g="' + group + '" data-v="' + i + '" type="button">' +
+          (/^</.test(ink(i)) ? ink(i) : '<i style="' + ink(i) + '"></i>') + "</button>";
+      }
+      return out;
+    }
+    var picker =
+      '<div class="lt-custom" id="ltCustom">' +
+        '<div class="lt-crow"><span class="lt-clabel">paper</span>' +
+          chips("p", LT_PAPER.length, function (i) {
+            return "background:" + LT_PAPER[i].bg + ";box-shadow:0 1px 3px rgba(190,130,150,0.28),inset 0 0 0 1px rgba(0,0,0,0.05)";
+          }) + "</div>" +
+        '<div class="lt-crow"><span class="lt-clabel">tape</span>' +
+          chips("t", LT_TAPE.length, function (i) {
+            return "background:repeating-linear-gradient(135deg," + LT_TAPE[i].a + " 0 5px," + LT_TAPE[i].b + " 5px 10px)";
+          }) + "</div>" +
+        '<div class="lt-crow"><span class="lt-clabel">sticker</span>' +
+          chips("s", 5, function (i) { return i ? ltStickerSVG(i, 26) : ""; }) + "</div>" +
+      "</div>";
+
     lettersEl.innerHTML =
-      '<div class="add-inner lt-paper lt-writing">' +
+      '<div class="add-inner lt-paper lt-writing" style="' + ltStyleVars(st) + '">' +
         '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
         '<input class="lt-titlein" id="ltTitle" maxlength="120" placeholder="a title..." value="' + escW(letterView.title) + '">' +
         '<textarea class="lt-write" id="ltBody" placeholder="a message..." spellcheck="false">' + escW(letterView.draft) + "</textarea>" +
         '<div class="lt-count" id="ltCount"></div>' +
+        picker +
         '<div class="lt-foot">' +
           '<span class="lt-fromlabel">from</span>' +
           '<input class="lt-fromin" id="ltFrom" maxlength="40" placeholder="your name" ' +
@@ -2742,6 +2892,20 @@
     tally();
     body.focus();
 
+    var sheet = lettersEl.querySelector(".lt-writing");
+    var custom = document.getElementById("ltCustom");
+    custom.addEventListener("click", function (e) {
+      var c = e.target.closest(".lt-chip");
+      if (!c) return;
+      var g = c.getAttribute("data-g");
+      st[g] = parseInt(c.getAttribute("data-v"), 10);
+      // repaint in place: re-rendering the screen here would drop the caret and the keyboard with it
+      [].forEach.call(custom.querySelectorAll('.lt-chip[data-g="' + g + '"]'), function (o) {
+        o.classList.toggle("on", parseInt(o.getAttribute("data-v"), 10) === st[g]);
+      });
+      sheet.setAttribute("style", ltStyleVars(st));
+    });
+
     lettersEl.onclick = function (e) {
       var b = e.target.closest("button");
       if (!b) return;
@@ -2753,7 +2917,7 @@
         // whatever they signed it with; falls back to this phone's own name if they left it blank
         var signed = (from.value || "").trim() || pushWho || EM;
         b.disabled = true; msg.textContent = "sealing…"; msg.classList.remove("bad");
-        sendLetter(text, signed, letterView.title)
+        sendLetter(text, signed, letterView.title, st)
           .then(function () {
             msg.textContent = "sent ♡";
             letterView.draft = ""; letterView.title = "";
