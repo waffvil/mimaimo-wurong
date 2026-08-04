@@ -769,6 +769,51 @@
   /* currentColor = the note's ink, which styleWriteField() sets */
   .add-msg::placeholder { color: currentColor; opacity: 0.42; }
   .add-msg::-webkit-input-placeholder { color: currentColor; opacity: 0.42; }
+  /* ---------- letters ----------
+     A letter has to READ like a letter: a generous measure, real paragraph spacing, handwriting rather
+     than UI type, and no length limit anywhere in the chain. The stack lists them; sealed ones say only
+     that they exist and who they're for. */
+  .letters .add-inner { max-width: 620px; }
+  .lt-sub { margin: 0 0 14px; text-align: center; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13.5px; color: #a5808d; }
+  .lt-stack { display: flex; flex-direction: column; gap: 9px; }
+  .lt-row {
+    display: flex; align-items: center; gap: 11px; width: 100%; cursor: pointer; text-align: left;
+    padding: 12px 13px; border-radius: 15px; border: 1.5px solid rgba(228,168,190,0.45);
+    background: rgba(255,255,255,0.66);
+  }
+  .lt-row:hover { background: #fff6fa; }
+  .lt-row.sealed { border-color: rgba(216,105,138,0.6); background: linear-gradient(135deg, #fff4f8, #ffe9f1); }
+  .lt-wax {
+    flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 15px; color: #fff;
+    background: linear-gradient(135deg, #ffa6c9, #d8698a); box-shadow: 0 3px 8px rgba(216,105,138,0.35);
+  }
+  .lt-row-mid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .lt-from { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 19px; color: #cc6488; }
+  .lt-prev { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12.5px; color: #9a7683;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lt-when { flex: 0 0 auto; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11px; color: #b892a1; }
+
+  /* reading + writing share the paper */
+  .lt-paper { background: #fffdf6; border-style: solid; border-color: rgba(228,196,150,0.5); }
+  .lt-head { text-align: center; margin-bottom: 16px; }
+  .lt-title { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 30px; color: #cc6488; line-height: 1.2; }
+  .lt-meta { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12px; color: #b08b99; margin-top: 2px; }
+  .lt-body { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 17px; line-height: 1.85; color: #6a4a54; }
+  .lt-body p { margin: 0 0 15px; }
+  .lt-sign { margin-top: 18px; text-align: right; font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 24px; color: #a05a72; }
+  .lt-fromrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .lt-fromlabel { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #b07890; }
+  .lt-titlein, .lt-write {
+    width: 100%; box-sizing: border-box; border: 1.5px solid rgba(216,105,138,0.28); border-radius: 13px;
+    background: #fffdfc; outline: none; color: #6a4a54;
+    font-family: "Bradley Hand","Segoe Print",cursive;
+  }
+  .lt-titlein { padding: 10px 13px; font-size: 15px; margin-bottom: 10px; }
+  .lt-write { padding: 13px 15px; font-size: 17px; line-height: 1.8; min-height: 46vh; resize: vertical; }
+  .lt-titlein:focus, .lt-write:focus { border-color: #ff9dc2; }
+  .lt-count { margin-top: 7px; text-align: right; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11.5px; color: #b892a1; }
+
   /* ---------- the secret settings ---------- */
   .settings .add-inner { max-width: 460px; }
   .set-sec { margin: 18px 0 0; padding: 14px 15px 15px; border-radius: 16px;
@@ -1045,6 +1090,8 @@
   <div class="add" id="add"></div>
   <!-- ⚙ the secret settings, reached by arming the heart on the lock screen -->
   <div class="add settings" id="settings"></div>
+  <!-- ✉ letters — long-form, written and read as letters -->
+  <div class="add letters" id="letters"></div>
 
   <!-- ✎ Drawing screen -->
   <div class="draw" id="draw"></div>
@@ -1052,7 +1099,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"W2V2FSCyXcQgGV8SB1TbpQ==","iv":"A4+nPCx/I/moj0y0","ct":"kRL0O1SqdONExVJPQGcKkANA7U9quj9F4Q5zAJ7JaQKAXED6F7VlhhPushrQB0bDutePQj0d+GSk5H12PnMfGWGNzl5IsErV+zb9gFSmZE5mYfsmt93i73D/ihgPEAd2q2l4iO9d8WpFKEmJk4lmte1uAvAk2HmVOA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"r4SjeSY817X4ePPj4iKiiA==","iv":"vaxNCdL38rRLGaXg","ct":"Pe6LiLm/3yw7JjrD+dlQnPWTMhOIF8yPYTyU8u3D3zgWfPtnxMW9LY82G8Y12mc6fxbeD4Xc/TvBBHNTOOh2hhPLu75AISzzxCx5FZYb3d7rESNYlgFEXkmj7j9Obr3/kU+QVHSSKruG2TPLikBvymtV4Z8kjB1bYA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1265,7 +1312,7 @@
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
     lockEl.style.display = "";
     lockEl.classList.remove("dismiss");
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } if (lettersEl) { lettersEl.classList.remove("show"); lettersEl.innerHTML = ""; }
     if (panelEl) panelEl.classList.remove("fade");
     if (monoEl) monoEl.classList.remove("together");
     entered = ""; status = "idle"; renderDots();
@@ -1276,7 +1323,7 @@
     rootSkin("");
     clearBloomTimers();
     backdropEl.style.display = "";
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } if (lettersEl) { lettersEl.classList.remove("show"); lettersEl.innerHTML = ""; }
     lockEl.style.display = "none";
     renderBloom();                 // rebuild markup so the animation restarts
     bloomEl.classList.add("show");
@@ -1357,7 +1404,7 @@
     clearBloomTimers();
     editingNote = null;
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
+    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } if (lettersEl) { lettersEl.classList.remove("show"); lettersEl.innerHTML = ""; }
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
     // clear any leftover heart-reveal mask from the bloom→wall transition
@@ -1477,6 +1524,61 @@
     return fetch(notesEndpoint() + "?id=eq." + n.id, { method: "DELETE", headers: wallHeaders(false) })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); })
       .catch(function (e) { console.error("[wall] delete failed", e); });
+  }
+
+  // ---------- letters ----------
+  // A letter is not a note. A note is a scrap pinned to the board; a letter is long-form, has no length
+  // limit, arrives sealed and stays sealed until the person it was written for opens it. Its own table,
+  // its own screen, and it reads as a letter rather than as a list row.
+  var LETTERS = [];
+  function lettersEndpoint() { return SUPABASE_URL + "/rest/v1/letters"; }
+  // ALWAYS resolves (even on failure) so a screen can wait on it without hanging
+  function loadLetters() {
+    if (!SUPABASE_URL || !SUPABASE_KEY) return Promise.resolve();
+    return fetch(lettersEndpoint() + "?select=*&order=created_at.desc", { headers: wallHeaders(false) })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (rows) { LETTERS = rows || []; })
+      .catch(function (e) { console.error("[letters] load failed", e); });
+  }
+  function sendLetter(body, author, title) {
+    var row = { body: body, author: author, title: (title || "").trim() || null };
+    return fetch(lettersEndpoint(), {
+      method: "POST",
+      headers: (function () { var h = wallHeaders(true); h.Prefer = "return=representation"; return h; })(),
+      body: JSON.stringify(row)
+    }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function (rows) {
+      if (rows && rows[0]) LETTERS.unshift(rows[0]);
+      return rows && rows[0];
+    });
+  }
+  // Sealing is per letter, not per person: whoever opens it first breaks the seal, and it stays broken so
+  // it can be read again as many times as she likes.
+  function markLetterOpened(letter) {
+    if (!letter || letter.opened_at) return Promise.resolve();
+    var when = new Date().toISOString();
+    letter.opened_at = when;
+    return fetch(lettersEndpoint() + "?id=eq." + letter.id, {
+      method: "PATCH", headers: wallHeaders(true), body: JSON.stringify({ opened_at: when })
+    }).catch(function (e) { console.error("[letters] seal update failed", e); });
+  }
+  function deleteLetter(letter) {
+    LETTERS = LETTERS.filter(function (l) { return l.id !== letter.id; });
+    return fetch(lettersEndpoint() + "?id=eq." + letter.id, { method: "DELETE", headers: wallHeaders(false) })
+      .catch(function (e) { console.error("[letters] delete failed", e); });
+  }
+  // A letter is "for me" if the other one wrote it. Until this phone says which of us it is (in settings),
+  // nothing is treated as unread — better than guessing wrong and hiding a seal.
+  function lettersForMe() {
+    if (!pushWho) return [];
+    return LETTERS.filter(function (l) { return l.author !== pushWho && !l.opened_at; });
+  }
+  function letterDate(iso) {
+    var d = iso ? new Date(iso) : null;
+    if (!d || isNaN(d)) return "";
+    return d.getDate() + " " + MONTHS_LONG[d.getMonth()] + " " + d.getFullYear();
   }
 
   // ---------- push notifications ("she left you a note ♡") ----------
@@ -1780,6 +1882,15 @@
       "</svg>";
   }
 
+  // A drawn envelope: the flap is a real crease, not a triangle stuck on top.
+  function envelopeIcon() {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<rect x="2.6" y="5.4" width="18.8" height="13.6" rx="2.6"/>' +
+      '<path d="M2.6 7.2 12 13.4l9.4-6.2"/>' +
+      "</svg>";
+  }
+
   function renderWall() {
     var NOTES = notesInView(WALL_NOTES);
     var floaters = "";
@@ -1822,6 +1933,8 @@
       '<div class="wall-rail">' +
         '<button class="wall-icon' + (monthView.all || !isThisMonth ? " on" : "") + '" id="wallCal" ' +
           'title="pick a month" aria-label="pick a month">' + calendarIcon() + "</button>" +
+        '<button class="wall-icon' + (lettersForMe().length ? " on" : "") + '" id="wallLetters" ' +
+          'title="our letters" aria-label="our letters">' + envelopeIcon() + "</button>" +
       "</div>" +
       '<button class="wall-add" id="wallAdd" title="add a note"><span>+</span></button>' +
       '<button class="wall-place" id="wallPlace">place it here ♡</button>' +
@@ -1996,10 +2109,21 @@
 
     document.getElementById("wallAdd").addEventListener("click", showAdd);
     document.getElementById("wallCal").addEventListener("click", function () { openCalendar(); });
+    document.getElementById("wallLetters").addEventListener("click", function () { showLetters(); });
 
     // Notifications live on the settings screen now (arm the heart on the lock screen to get there). This
     // still runs on every board render, and it is what keeps this phone's registration alive.
     resyncPush();
+    // keep the letter count fresh so the envelope's bead is honest; redraw the rail if it changed
+    if (!renderWall._lettersOnce) {
+      renderWall._lettersOnce = true;
+      loadLetters().then(function () {
+        if (lettersForMe().length && wallEl.classList.contains("show")) {
+          var b = document.getElementById("wallLetters");
+          if (b) b.classList.add("on");
+        }
+      });
+    }
 
     // ----- drag to place · tap to open -----
     var modal = document.getElementById("wallModal");
@@ -2171,6 +2295,169 @@
   var DRAW_SIZES = [{ label: "fine", w: 1.1 }, { label: "medium", w: 2 }, { label: "bold", w: 3.4 }];
   var editingNote = null; // set when the creator is editing an existing note
 
+  // ✉ LETTERS — one screen, three views: the stack, reading one, writing one.
+  var lettersEl = document.getElementById("letters");
+  var letterView = { mode: "stack", letter: null, draft: "", title: "", author: null };
+
+  function showLetters(mode) {
+    rootSkin("rt-board");
+    clearBloomTimers();
+    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
+    wallEl.classList.remove("show"); wallEl.innerHTML = "";
+    addEl.classList.remove("show"); addEl.innerHTML = "";
+    drawEl.classList.remove("show"); drawEl.innerHTML = "";
+    if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
+    lockEl.style.display = "none";
+    backdropEl.style.display = "none";
+    letterView = { mode: mode || "stack", letter: null, draft: "", title: "", author: pushWho || EM };
+    lettersEl.classList.add("show");
+    document.body.style.overflow = "auto";
+    markDebug("letters");
+    renderLetters();
+    // the stack is drawn from whatever is already loaded, then again when the fetch lands, so opening it
+    // never waits on the network
+    loadLetters().then(function () { if (lettersEl.classList.contains("show")) renderLetters(); });
+  }
+
+  function renderLetters() {
+    if (letterView.mode === "read") return renderLetterRead();
+    if (letterView.mode === "write") return renderLetterWrite();
+
+    var mine = lettersForMe().length;
+    var rows = LETTERS.map(function (l, i) {
+      var sealed = !l.opened_at && pushWho && l.author !== pushWho;
+      var preview = l.body.replace(/\s+/g, " ").trim().slice(0, 72);
+      return '<button class="lt-row' + (sealed ? " sealed" : "") + '" data-i="' + i + '">' +
+        '<span class="lt-wax">' + (sealed ? "✉" : "♡") + "</span>" +
+        '<span class="lt-row-mid">' +
+          '<span class="lt-from">' + escW(l.title || ("from " + l.author)) + "</span>" +
+          '<span class="lt-prev">' + (sealed ? "sealed — for you" : escW(preview) + (l.body.length > 72 ? "…" : "")) + "</span>" +
+        "</span>" +
+        '<span class="lt-when">' + escW(letterDate(l.created_at)) + "</span>" +
+      "</button>";
+    }).join("");
+
+    lettersEl.innerHTML =
+      '<div class="add-inner">' +
+        '<button class="add-back" id="ltBack" title="to the board">←</button>' +
+        '<div class="add-title">✉ our letters</div>' +
+        '<p class="lt-sub">' + (LETTERS.length
+          ? (mine ? mine + (mine === 1 ? " letter is" : " letters are") + " waiting for you ♡" : "everything here has been read ♡")
+          : "no letters yet — write the first one ♡") + "</p>" +
+        '<div class="lt-stack">' + rows + "</div>" +
+        '<div class="add-actions"><button class="add-btn primary" id="ltNew">write a letter ✍</button></div>' +
+      "</div>";
+
+    lettersEl.onclick = function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      if (b.id === "ltBack") { showWall(); return; }
+      if (b.id === "ltNew") { letterView.mode = "write"; renderLetters(); return; }
+      var row = b.closest(".lt-row");
+      if (row) {
+        letterView.letter = LETTERS[+row.getAttribute("data-i")];
+        letterView.mode = "read";
+        markLetterOpened(letterView.letter);
+        renderLetters();
+      }
+    };
+  }
+
+  function renderLetterRead() {
+    var l = letterView.letter;
+    if (!l) { letterView.mode = "stack"; return renderLetters(); }
+    // paragraphs, not one wall of text: blank lines separate them, single newlines stay as line breaks
+    var paras = l.body.split(/\n\s*\n/).map(function (p) {
+      return "<p>" + escW(p.trim()).replace(/\n/g, "<br>") + "</p>";
+    }).join("");
+
+    lettersEl.innerHTML =
+      '<div class="add-inner lt-paper">' +
+        '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
+        '<div class="lt-head">' +
+          (l.title ? '<div class="lt-title">' + escW(l.title) + "</div>" : "") +
+          '<div class="lt-meta">' + escW(letterDate(l.created_at)) + "</div>" +
+        "</div>" +
+        '<div class="lt-body">' + paras + "</div>" +
+        '<div class="lt-sign">— ' + escW(l.author) + "</div>" +
+        '<div class="add-actions">' +
+          '<button class="add-btn ghost" id="ltDel">put it away 🗑</button>' +
+          '<button class="add-btn primary" id="ltDone">close it ♡</button>' +
+        "</div>" +
+      "</div>";
+
+    lettersEl.onclick = function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      if (b.id === "ltDel") {
+        deleteLetter(l);
+        letterView.mode = "stack"; letterView.letter = null; renderLetters(); return;
+      }
+      if (b.id === "ltBack" || b.id === "ltDone") { letterView.mode = "stack"; letterView.letter = null; renderLetters(); }
+    };
+  }
+
+  function renderLetterWrite() {
+    lettersEl.innerHTML =
+      '<div class="add-inner lt-paper">' +
+        '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
+        '<div class="add-title">✍ a letter</div>' +
+        '<div class="lt-fromrow">' +
+          '<span class="lt-fromlabel">from</span>' +
+          '<button class="set-btn' + (letterView.author === EM ? " sel" : "") + '" data-who="' + escW(EM) + '">em yêu (M)</button>' +
+          '<button class="set-btn' + (letterView.author === ANH ? " sel" : "") + '" data-who="' + escW(ANH) + '">anh yêu (V)</button>' +
+        "</div>" +
+        '<input class="lt-titlein" id="ltTitle" maxlength="120" placeholder="a title, if you want one" value="' + escW(letterView.title) + '">' +
+        '<textarea class="lt-write" id="ltBody" placeholder="dear you…" spellcheck="false">' + escW(letterView.draft) + "</textarea>" +
+        '<div class="lt-count" id="ltCount"></div>' +
+        '<div class="add-actions"><button class="add-btn primary" id="ltSend">seal it and send ✉</button></div>' +
+        '<div class="set-msg" id="ltMsg"></div>' +
+      "</div>";
+
+    var body = document.getElementById("ltBody");
+    var title = document.getElementById("ltTitle");
+    var count = document.getElementById("ltCount");
+    function tally() {
+      var t = body.value.trim();
+      var words = t ? t.split(/\s+/).length : 0;
+      count.textContent = words ? words + (words === 1 ? " word" : " words") + " — as long as you like" : "";
+    }
+    body.addEventListener("input", function () { letterView.draft = body.value; tally(); });
+    title.addEventListener("input", function () { letterView.title = title.value; });
+    tally();
+    body.focus();
+
+    lettersEl.onclick = function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      if (b.hasAttribute("data-who")) {
+        letterView.author = b.getAttribute("data-who");
+        [].forEach.call(lettersEl.querySelectorAll("[data-who]"), function (x) {
+          x.classList.toggle("sel", x.getAttribute("data-who") === letterView.author);
+        });
+        return;
+      }
+      if (b.id === "ltBack") { letterView.mode = "stack"; renderLetters(); return; }
+      if (b.id === "ltSend") {
+        var text = body.value.trim();
+        var msg = document.getElementById("ltMsg");
+        if (!text) { body.focus(); return; }
+        b.disabled = true; msg.textContent = "sealing…"; msg.classList.remove("bad");
+        sendLetter(text, letterView.author, letterView.title)
+          .then(function () {
+            msg.textContent = "sent ♡";
+            letterView.draft = ""; letterView.title = "";
+            setTimeout(function () { letterView.mode = "stack"; renderLetters(); }, 700);
+          })
+          .catch(function (err) {
+            b.disabled = false;
+            msg.textContent = (err && err.message) || "couldn't send that";
+            msg.classList.add("bad");
+          });
+      }
+    };
+  }
+
   // ⚙ The secret settings. Reached only by arming the heart on the lock screen and then unlocking, so it
   // needs no password of its own. Everything here used to be unreachable or hidden behind a URL flag.
   var settingsEl = document.getElementById("settings");
@@ -2268,7 +2555,7 @@
     rootSkin("rt-board");
     clearBloomTimers();
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } if (lettersEl) { lettersEl.classList.remove("show"); lettersEl.innerHTML = ""; }
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
     renderAdd();
@@ -2513,7 +2800,7 @@
     clearBloomTimers();
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
     wallEl.classList.remove("show"); wallEl.innerHTML = "";
-    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
+    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } if (lettersEl) { lettersEl.classList.remove("show"); lettersEl.innerHTML = ""; }
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
     renderDraw();
