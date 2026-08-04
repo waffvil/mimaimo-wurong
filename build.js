@@ -3,10 +3,10 @@
 //   node build.js              # passcode taken from index.src.html (the source of truth)
 //   MV_CODE=123456 node build.js   # or override it explicitly
 //
-// It reads index.src.html (git-ignored — contains the letter, passcode, and
-// Supabase key in the clear) and writes index.html (safe to publish):
-//   • the letter + notes board + Supabase creds are AES-256-GCM encrypted,
-//     unlockable only by the passcode (PBKDF2-SHA256 derived key);
+// It reads index.src.html (git-ignored — contains the passcode and the Supabase
+// key in the clear) and writes index.html (safe to publish):
+//   • the Supabase creds are AES-256-GCM encrypted, unlockable only by the
+//     passcode (PBKDF2-SHA256 derived key);
 //   • the passcode itself is NOT stored anywhere;
 //   • dev-only bits (debug bar, ?preview bypasses) are stripped.
 //
@@ -25,18 +25,14 @@ const codeMatch = src.match(/var CORRECT_CODE = "([^"]*)";/);
 const PASSCODE = process.env.MV_CODE || (codeMatch && codeMatch[1]);
 if (!PASSCODE) throw new Error("No passcode found — set MV_CODE or a CORRECT_CODE in index.src.html");
 
-// 1 — pull out the sensitive bits
-const siteRe = /(<main class="site" id="site">)([\s\S]*?)(<\/main>)/;
-const siteMatch = src.match(siteRe);
-if (!siteMatch) throw new Error('Could not find <main class="site" id="site"> … </main>');
-const siteInner = siteMatch[2];
-
+// 1 — pull out the sensitive bits. The retired #site screen used to be encrypted in here too; it and its
+// letter are gone from the app (kept in backup/letter-and-site-markup.html), so the payload is creds only.
 const urlMatch = src.match(/var SUPABASE_URL = "([^"]*)";/);
 const keyMatch = src.match(/var SUPABASE_KEY = "([^"]*)";/);
 if (!urlMatch || !keyMatch) throw new Error("Could not find Supabase creds");
 
-// 2 — encrypt { site, url, key } with a key derived from the passcode
-const payload = JSON.stringify({ site: siteInner, url: urlMatch[1], key: keyMatch[1] });
+// 2 — encrypt { url, key } with a key derived from the passcode
+const payload = JSON.stringify({ url: urlMatch[1], key: keyMatch[1] });
 const salt = crypto.randomBytes(16);
 const iv = crypto.randomBytes(12);
 const key = crypto.pbkdf2Sync(Buffer.from(PASSCODE, "utf8"), salt, ITER, 32, "sha256");
@@ -52,7 +48,6 @@ const enc = {
 
 // 3 — produce the published HTML
 let out = src
-  .replace(siteRe, "$1$3")                                   // empty the #site (content is encrypted)
   .replace(/var SUPABASE_URL = "[^"]*";/, 'var SUPABASE_URL = "";')
   .replace(/var SUPABASE_KEY = "[^"]*";/, 'var SUPABASE_KEY = "";')
   .replace(/var CORRECT_CODE = "[^"]*";/, "var CORRECT_CODE = null;") // no plaintext code shipped

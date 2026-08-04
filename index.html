@@ -54,7 +54,7 @@
      This default skin is the lock / bloom / celebration screens (whose backdrop is the root gradient). */
   html { background: linear-gradient(160deg, #ffe6ee 0%, #fff2e6 46%, #ffe0ea 78%, #ffd9e6 100%) #ffd9e6;
          background-attachment: fixed; }
-  /* home + site: matches .home-site / .site */
+  /* the warm cream of the board screens */
   html.rt-warm { background: linear-gradient(160deg, #fff6f2 0%, #fff8f0 100%) #fff8f0; background-attachment: fixed; }
   /* note board + add/draw: flat cream matching those screens' own base colour. The screens paint their
      own checkered pattern on top; this is just the backstop the safe-area zone shows. */
@@ -274,183 +274,11 @@
   .key.del:active { background: rgba(255,196,214,0.55); }
   .spacer { width: clamp(62px,19vw,76px); height: clamp(62px,19vw,76px); }
 
-  /* ---------- success ---------- */
-  .success {
-    position: fixed; inset: 0; z-index: 5;
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    padding: 24px;
-    background: linear-gradient(160deg, rgba(255,231,239,0.94), rgba(255,239,228,0.94));
-    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
-  }
-  .success.show { display: flex; animation: fadeIn 0.4s ease both; }
-  .confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-  .confetti span { position: absolute; top: -8vh; }
-  .success .card { position: relative; text-align: center; animation: cardIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both; }
-  .success .big { font-size: 64px; animation: heartBeat 1.4s ease-in-out infinite; margin-bottom: 10px; }
-  .success .mono { font-size: 40px; }   /* everything inside scales from this one value */
-  .success .msg { font-family: Georgia, serif; font-style: italic; font-size: 24px; color: #935767; margin: 0; }
-
-  /* ---------- lock fade-out + revealed site ---------- */
+  /* ---------- lock fade-out ---------- */
   .stage { transition: opacity 0.9s ease; }
   .stage.dismiss { opacity: 0; pointer-events: none; }
   .panel { transition: opacity 0.6s ease; }
   .panel.fade { opacity: 0; }
-
-  .site {
-    display: none;
-    min-height: 100dvh;
-    width: 100%;
-    background: linear-gradient(160deg, #fff6f2 0%, #fff8f0 100%);
-  }
-  .site.show { display: block; animation: fadeIn 0.9s ease both; }
-
-  /* starter content inside the revealed site */
-  .site .hero {
-    min-height: 100dvh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; text-align: center;
-    padding: 40px 24px; gap: 8px;
-  }
-  .site .hero-mono {
-    display: flex; align-items: center; margin-bottom: 12px;
-    font-size: 56px;   /* nudge dropped for the same reason as .mono */
-  }
-  .site .hero-mono .letter {
-    font-family: "Gochi Hand", "Bradley Hand", "Marker Felt", cursive;
-    font-size: 56px; font-weight: 400; color: #d8698a; line-height: 1;
-  }
-  .site .hero-mono .h { font-size: 26px; color: #e58aa4; margin: 0 0.65em; transform: translateY(-2px); }
-  .site .hero h1 {
-    font-family: Georgia, "Times New Roman", serif; font-style: italic;
-    font-weight: 500; font-size: clamp(28px, 8vw, 40px); color: #935767; margin: 0;
-  }
-  .site .hero p {
-    font-family: Georgia, serif; font-size: clamp(15px, 4.5vw, 18px);
-    color: #a06d7a; margin: 4px 0 0;
-  }
-  .site .scroll-hint {
-    margin-top: 34px; font: 12px -apple-system, system-ui, sans-serif;
-    letter-spacing: 2px; text-transform: uppercase; color: #c99; opacity: 0.8;
-    animation: floatHint 2s ease-in-out infinite;
-  }
-  @keyframes floatHint { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
-
-  /* --- cute decorative symbol lines (her aesthetic ♡) --- */
-  .site .deco {
-    text-align: center; color: #d78bac; opacity: 0.9;
-    font-size: 15px; letter-spacing: 1px; line-height: 1.6;
-    margin: 14px 0; font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-  }
-  .site .kao {
-    text-align: center; color: #cf7ba0; font-size: 17px;
-    margin: 6px 0; font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-  }
-  .site .deco--soft { color: #e0a6c1; font-size: 14px; }
-
-  /* --- the letter --- */
-  .letter { max-width: 640px; margin: 0 auto; padding: 20px 22px; }
-  .letter-card {
-    background: linear-gradient(#fffdfb, #fff6f1);
-    border: 1px solid rgba(216,105,138,0.10);
-    border-radius: 22px; padding: 38px 32px 26px;
-    box-shadow: 0 22px 60px rgba(216,105,138,0.14);
-  }
-  .letter-card h2 {
-    font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
-    font-weight: 600; color: #d8698a; font-size: clamp(30px, 9vw, 42px);
-    margin: 0 0 20px; text-align: center;
-  }
-  .letter-card p {
-    font-family: Georgia, "Times New Roman", serif; font-size: clamp(15px, 4.3vw, 17px);
-    line-height: 1.85; color: #7a5560; margin: 0 0 15px; text-wrap: pretty;
-  }
-  .letter-card .sign {
-    font-family: "Snell Roundhand", "Segoe Script", cursive;
-    font-size: 28px; color: #d8698a; text-align: right; margin-top: 10px;
-  }
-
-  /* --- notes board --- */
-  .board { max-width: 940px; margin: 0 auto; padding: 46px 18px 96px; }
-  .board h2 {
-    font-family: "Snell Roundhand", "Segoe Script", cursive;
-    color: #d8698a; font-weight: 600; font-size: clamp(28px, 8vw, 40px);
-    text-align: center; margin: 0 0 4px;
-  }
-  .board .sub {
-    text-align: center; font-family: Georgia, serif; font-style: italic;
-    color: #a06d7a; margin: 0 0 26px; font-size: 15px;
-  }
-  .note-form {
-    display: flex; flex-direction: column; gap: 10px;
-    max-width: 460px; margin: 0 auto 42px;
-    background: rgba(255,255,255,0.72); border-radius: 18px; padding: 16px;
-    box-shadow: 0 12px 34px rgba(216,105,138,0.12);
-  }
-  .note-form textarea, .note-form input {
-    border: 1px solid rgba(216,105,138,0.25); border-radius: 12px;
-    padding: 12px 14px; color: #7a5560; background: #fffdfc; outline: none;
-    font-family: Georgia, serif;
-  }
-  .note-form textarea { font-size: 16px; line-height: 1.5; resize: vertical; min-height: 74px; }
-  .note-form textarea:focus, .note-form input:focus { border-color: #ff9dc2; }
-  .note-form .row { display: flex; gap: 10px; }
-  .note-form input { flex: 1; font-size: 15px; }
-  .note-form button {
-    border: none; cursor: pointer; border-radius: 12px; padding: 11px 20px;
-    font: 600 15px -apple-system, system-ui, sans-serif; color: #fff; white-space: nowrap;
-    background: linear-gradient(135deg, #ff9dc2, #d8698a);
-    box-shadow: 0 6px 16px rgba(216,105,138,0.35);
-    transition: transform 0.12s ease, filter 0.15s ease;
-  }
-  .note-form button:active { transform: scale(0.96); }
-  .note-form button:disabled { filter: grayscale(0.4) opacity(0.6); cursor: default; }
-  .board .status {
-    text-align: center; color: #a06d7a; font-family: Georgia, serif;
-    font-style: italic; padding: 18px;
-  }
-  /* the cork pin-board the notes live on */
-  .notes-grid {
-    columns: 4 156px; column-gap: 18px;
-    padding: 28px 22px 32px;
-    border-radius: 12px;
-    background-color: #d3a969;
-    background-image:
-      radial-gradient(circle at 15% 25%, rgba(90,60,25,0.16) 0 1.5px, transparent 2px),
-      radial-gradient(circle at 60% 65%, rgba(90,60,25,0.13) 0 1.5px, transparent 2px),
-      radial-gradient(circle at 82% 32%, rgba(255,240,210,0.20) 0 1.5px, transparent 2px),
-      radial-gradient(circle at 38% 82%, rgba(90,60,25,0.12) 0 1.5px, transparent 2px);
-    background-size: 26px 26px, 34px 34px, 22px 22px, 30px 30px;
-    box-shadow: inset 0 0 44px rgba(80,50,20,0.35), 0 16px 36px rgba(120,80,40,0.28);
-    border: 11px solid #9c6a34;
-    border-image: linear-gradient(145deg, #b8834a, #7c4e22) 1;
-    min-height: 200px;
-  }
-  .note {
-    break-inside: avoid; margin: 0 0 18px; padding: 18px 15px 14px;
-    position: relative;
-    box-shadow: 0 7px 14px rgba(40,25,10,0.28);
-    transform: rotate(var(--tilt, -2deg));
-    animation: notePop 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
-  }
-  .note::before { /* pushpin */
-    content: ""; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
-    width: 15px; height: 15px; border-radius: 50%;
-    background: radial-gradient(circle at 34% 30%, #fff, var(--pin, #d63b3b) 60%, rgba(0,0,0,0.4));
-    box-shadow: 0 3px 4px rgba(0,0,0,0.35);
-  }
-  .note .body {
-    font-family: "Bradley Hand", "Marker Felt", "Segoe Print", "Comic Sans MS", cursive;
-    font-size: 16px; line-height: 1.45;
-    color: #4a3a2e; white-space: pre-wrap; word-break: break-word;
-  }
-  .note .meta {
-    margin-top: 10px; font: 12px "Bradley Hand", "Marker Felt", cursive;
-    color: rgba(60,45,30,0.6); display: flex; justify-content: space-between; gap: 8px;
-  }
-  .note .meta .who { font-weight: 700; color: rgba(60,45,30,0.85); }
-  @keyframes notePop {
-    0%   { opacity: 0; transform: rotate(var(--tilt, -2deg)) scale(0.7); }
-    100% { opacity: 1; transform: rotate(var(--tilt, -2deg)) scale(1); }
-  }
 
   /* ---------- note wall screen ---------- */
   /* the curtain's hearts glide sideways by exactly one tile period (300px), so it loops invisibly */
@@ -858,40 +686,6 @@
   .draw-size-row input[type=range] { flex: 1; accent-color: #d8698a; height: 6px; }
   .draw-size-dot { flex: 0 0 auto; border-radius: 50%; box-shadow: 0 1px 3px rgba(120,80,95,0.3); transition: width 0.1s, height 0.1s; }
 
-  /* ---------- merged site + board ---------- */
-  .home {
-    position: fixed; inset: 0; z-index: 6; display: none; overflow: hidden; color: #935767;
-    background: transparent;  /* board (#wall) sits behind — the CONTENT carries the background */
-  }
-  .home.show { display: block; }
-  /* transition: a soft transparent band that SWEEPS from the bottom upward, revealing the board.
-     The mask image is 200vh tall (opaque top half, feathering to transparent lower half); we slide
-     its position up over time so the transparent front rises bottom→top. The content also swipes
-     up. mask-position-y and translate are both driven from one eased progress. */
-  .home.revealing {
-    /* Solid plateau (0–45%) covers the whole viewport at rest → home fully opaque, no peek.
-       Then a SMOOTHSTEP ease to transparent (45→100%): the opacity slope starts at ~0 and grows
-       gradually, so there is NO knee/corner anywhere — nothing for the eye to read as a line as
-       the mask slides up. The fade front still enters from the bottom and sweeps upward. */
-    -webkit-mask-image: linear-gradient(to bottom,
-      #000 0%, #000 45%,
-      rgba(0,0,0,0.99) 50%, rgba(0,0,0,0.95) 56%, rgba(0,0,0,0.86) 62%,
-      rgba(0,0,0,0.72) 68%, rgba(0,0,0,0.55) 74%, rgba(0,0,0,0.38) 80%,
-      rgba(0,0,0,0.22) 86%, rgba(0,0,0,0.10) 92%, rgba(0,0,0,0.03) 96%, transparent 100%);
-    mask-image: linear-gradient(to bottom,
-      #000 0%, #000 45%,
-      rgba(0,0,0,0.99) 50%, rgba(0,0,0,0.95) 56%, rgba(0,0,0,0.86) 62%,
-      rgba(0,0,0,0.72) 68%, rgba(0,0,0,0.55) 74%, rgba(0,0,0,0.38) 80%,
-      rgba(0,0,0,0.22) 86%, rgba(0,0,0,0.10) 92%, rgba(0,0,0,0.03) 96%, transparent 100%);
-    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-    -webkit-mask-size: 100% 250vh; mask-size: 100% 250vh;
-    will-change: -webkit-mask-position, mask-position;
-  }
-  .home .site { background: transparent; width: 100%; }
-  .home .site .hero { min-height: auto; }
-  .home .home-site { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 24px;
-    background: linear-gradient(160deg, #fff6f2 0%, #fff8f0 100%); }
-  .home.revealing .home-site { will-change: transform; backface-visibility: hidden; }
   .add-inner {
     position: relative;
     max-width: 940px; margin: 18px auto;
@@ -1046,8 +840,8 @@
   @media (prefers-reduced-motion: reduce) {
     /* kill the always-running loops: floating hearts, shimmer, confetti, note sway, hint bob.
        These are the only continuous animations, so this is what protects weak devices/battery. */
-    .shimmer, .hearts span, .confetti span, .success .big,
-    .wnote, .scroll-hint, .wall-banner-hearts { animation: none !important; }
+    .shimmer, .hearts span,
+    .wnote, .wall-banner-hearts { animation: none !important; }
     .stage { transition: none; }
   }
 
@@ -1067,13 +861,6 @@
     transition: transform 0.7s cubic-bezier(0.6, 0, 0.85, 0.2), opacity 0.7s ease;
   }
   .blossom.shrink { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-  /* site revealed through a growing soft heart */
-  .site.heart-reveal {
-    position: fixed; inset: 0; z-index: 7;
-    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-    -webkit-mask-position: center; mask-position: center;
-    -webkit-mask-size: 0% 0%; mask-size: 0% 0%;
-  }
   /* the board gets the same soft-heart reveal when we bloom straight into it */
   .wall.heart-reveal {
     z-index: 7;
@@ -1243,20 +1030,7 @@
         <button class="key del" data-key="del" aria-label="Delete">⌫</button>
       </div>
     </div>
-
-    <div class="success" id="success">
-      <div class="confetti" id="confetti"></div>
-      <div class="card">
-        <div class="big">💝</div>
-        <div class="mono">
-          <span class="letter">M</span><span class="h">♡</span><span class="letter">V</span>
-        </div>
-      </div>
-    </div>
   </div>
-
-  <!-- ✨ The real site lives here — starter content, we'll shape it together. -->
-  <main class="site" id="site"></main>
 
   <!-- 🌸 Bloom transition screen — petals recreated in pure CSS (no image assets). -->
   <div class="bloom" id="bloom"></div>
@@ -1272,12 +1046,10 @@
   <!-- ✎ Drawing screen -->
   <div class="draw" id="draw"></div>
 
-  <!-- 🏠 Merged site + board (scrolls from letter into the wall) -->
-  <div class="home" id="home"></div>
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"pg+pS2on8Z2ULgvBkKMayA==","iv":"eezXsueKWfC3Zr12","ct":"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","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"sr+wpHhIgBWTZHa0dO86mQ==","iv":"rOaeBvCeObcXgUBN","ct":"G/p3Q19J7lZfH/1pbbmuEnmieBHr59pk9eMOO4jvA+YVEc7Ft7NndhKsy2xdJgEq8KDei0ptmp0iOzvx3RGb1ZXdgUsYayK4j57RSK1xe/wnURG7BlPCbCVBlG+aFmtYaPnaEGv9fcCOo4qQhGy1NtqQhZCaM2RFsg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1289,14 +1061,11 @@
   var dotsEl = document.getElementById("dots");
   var dots = dotsEl.querySelectorAll(".dot");
   var padEl = document.getElementById("pad");
-  var successEl = document.getElementById("success");
   var lockEl = document.getElementById("lock");
-  var siteEl = document.getElementById("site");
   var bloomEl = document.getElementById("bloom");
   var wallEl = document.getElementById("wall");
   var addEl = document.getElementById("add");
   var drawEl = document.getElementById("draw");
-  var homeEl = document.getElementById("home");
   var panelEl = document.querySelector(".panel");
   var monoEl = panelEl ? panelEl.querySelector(".mono") : null;
   var backdropEl = document.getElementById("backdrop");
@@ -1408,7 +1177,6 @@
         var data = JSON.parse(new TextDecoder().decode(buf));
         SUPABASE_URL = data.url;           // creds only exist after a correct unlock
         SUPABASE_KEY = data.key;
-        siteEl.innerHTML = data.site;       // inject the (previously encrypted) letter + board
         return true;
       })
       .catch(function () { return false; }); // wrong code → auth tag fails → decrypt throws
@@ -1460,21 +1228,6 @@
     heartsEl.appendChild(s);
   }
 
-  // celebration rain (built once, on success)
-  function celebrate() {
-    var box = document.getElementById("confetti");
-    if (box.childElementCount) return;
-    var cc = ["🌸", "✨", "💕", "🩷", "💗", "🎉"];
-    for (var i = 0; i < 22; i++) {
-      var s = document.createElement("span");
-      s.textContent = cc[i % cc.length];
-      s.style.left = Math.round(Math.random() * 96) + "%";
-      s.style.fontSize = (18 + Math.round(Math.random() * 22)) + "px";
-      s.style.animation = "rain " + (2.6 + Math.random() * 2.4).toFixed(1) + "s ease-in " +
-                          (Math.random() * 1.4).toFixed(1) + "s infinite";
-      box.appendChild(s);
-    }
-  }
 
   renderDots();
 
@@ -1495,14 +1248,6 @@
   function wallIsBuilt() { return !!wallEl.querySelector(".wall-inner"); }
   function bTimer(fn, ms) { bloomTimers.push(setTimeout(fn, ms)); }
   function clearBloomTimers() { bloomTimers.forEach(clearTimeout); bloomTimers = []; }
-  function resetSite() {
-    clearBloomTimers();
-    siteEl.classList.remove("heart-reveal");
-    siteEl.style.transition = "";
-    siteEl.style.webkitMaskImage = siteEl.style.maskImage = "";
-    siteEl.style.webkitMaskSize = siteEl.style.maskSize = "";
-  }
-
   // ---------- screen switching (used by the reveal + the debug bar) ----------
   // Point <html> at the skin whose paint matches the screen being shown (see "ROOT SKINS" in the CSS).
   // iOS renders the bottom safe-area zone from the root background, so a mismatch here is exactly what
@@ -1512,42 +1257,23 @@
 
   function showLock() {
     rootSkin("");
-    resetSite();
+    clearBloomTimers();
     backdropEl.style.display = "";
-    successEl.classList.remove("show");
-    siteEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
     lockEl.style.display = "";
     lockEl.classList.remove("dismiss");
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
     if (panelEl) panelEl.classList.remove("fade");
     if (monoEl) monoEl.classList.remove("together");
     entered = ""; status = "idle"; renderDots();
     document.body.style.overflow = "hidden";
     markDebug("lock");
   }
-  function showCelebration() {
-    rootSkin("");
-    resetSite();
-    backdropEl.style.display = "";
-    siteEl.classList.remove("show");
-    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    lockEl.style.display = "";
-    lockEl.classList.remove("dismiss");
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
-    entered = CORRECT_CODE; status = "success"; renderDots();
-    celebrate();
-    successEl.classList.add("show");
-    document.body.style.overflow = "hidden";
-    markDebug("celebrate");
-  }
   function showBloom() {
     rootSkin("");
-    resetSite();
+    clearBloomTimers();
     backdropEl.style.display = "";
-    successEl.classList.remove("show");
-    siteEl.classList.remove("show");
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
     lockEl.style.display = "none";
     renderBloom();                 // rebuild markup so the animation restarts
     bloomEl.classList.add("show");
@@ -1621,36 +1347,14 @@
     }                                          // we just revealed; that would blink the notes)
     requestAnimationFrame(grow);
   }
-  function showSite() {
-    rootSkin("rt-warm");
-    clearBloomTimers();
-    successEl.classList.remove("show");
-    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
-    siteEl.classList.remove("heart-reveal");
-    siteEl.style.transition = "";
-    siteEl.style.webkitMaskImage = siteEl.style.maskImage = "";
-    siteEl.style.webkitMaskSize = siteEl.style.maskSize = "";
-    siteEl.classList.add("show");
-    lockEl.classList.add("dismiss");
-    lockEl.style.display = "none";
-    backdropEl.style.display = "none";
-    document.body.style.overflow = "auto";
-    markDebug("site");
-    initNotes();
-    loadNotes();
-  }
-
   // 📝 the note board. opts.keepRendered = the board is already built and on screen (the bloom just
   // revealed it), so skip the rebuild — re-running renderWall() there blinks every note and restarts
   // the sway animations for no reason.
   function showWall(opts) {
     clearBloomTimers();
     editingNote = null;
-    successEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
-    siteEl.classList.remove("show");
+    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
     // clear any leftover heart-reveal mask from the bloom→wall transition
@@ -2470,13 +2174,11 @@
   function showSettings() {
     rootSkin("rt-board");
     clearBloomTimers();
-    successEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
     wallEl.classList.remove("show"); wallEl.innerHTML = "";
     addEl.classList.remove("show"); addEl.innerHTML = "";
     drawEl.classList.remove("show"); drawEl.innerHTML = "";
-    homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
-    siteEl.classList.remove("show");
+   
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
     renderSettings();
@@ -2562,10 +2264,8 @@
   function showAdd() {
     rootSkin("rt-board");
     clearBloomTimers();
-    successEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
-    siteEl.classList.remove("show");
+    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
     renderAdd();
@@ -2808,11 +2508,9 @@
   function showDraw() {
     rootSkin("rt-board");
     clearBloomTimers();
-    successEl.classList.remove("show");
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
     wallEl.classList.remove("show"); wallEl.innerHTML = "";
-    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; } homeEl.classList.remove("show"); homeEl.innerHTML = ""; homeActive = false;
-    siteEl.classList.remove("show");
+    addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
     renderDraw();
@@ -2889,195 +2587,12 @@
     document.getElementById("drawBack").onclick = function () { showAdd(); };
   }
 
-  // ---------- home (site) that transitions onto the board on a small scroll/swipe ----------
-  var homeActive = false, navState = "home", navBusy = false;
-
-  function showHome() {
-    rootSkin("rt-warm");
-    clearBloomTimers();
-    successEl.classList.remove("show");
-    bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    wallEl.classList.remove("show"); wallEl.innerHTML = ""; addEl.classList.remove("show"); addEl.innerHTML = ""; drawEl.classList.remove("show"); drawEl.innerHTML = ""; if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
-    siteEl.classList.remove("show");
-    lockEl.style.display = "none";
-    backdropEl.style.display = "none";
-    renderHome();
-    homeEl.style.transition = ""; homeEl.style.transform = "";
-    homeEl.classList.add("show");
-    document.body.style.overflow = "hidden";
-    navState = "home"; navBusy = false; homeActive = true;
-    markDebug("home");
-  }
-
-  function renderHome() {
-    // the site (hero + letter) is the resting state; a tiny scroll transitions to the board
-    var heroEl = siteEl.querySelector(".hero"), letterEl = siteEl.querySelector(".letter");
-    var topHTML = (heroEl ? heroEl.outerHTML : "<section class='hero'><h1>Welcome, my love</h1></section>") + (letterEl ? letterEl.outerHTML : "");
-    homeEl.innerHTML = '<div class="site home-site">' + topHTML + "</div>";
-  }
-
-  // a small scroll/swipe just TRIGGERS a full self-playing slide between site and board
-  // A single "reveal amount" v (0 = home fully shown, 1 = fully dissolved/board shown) drives both:
-  //   • the mask position — the soft transparent band sweeps from the bottom up the screen;
-  //   • the content translate — the page swipes up like a real scroll.
-  // vFrom/vTo let us play it forward (0→1, to board) or backward (1→0, back home).
-  var navRaf = 0; // id of the in-flight transition frame, so we never stack two loops
-  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function animMask(vFrom, vTo, done) {
-    var t0 = null, dur = 760;
-    var inner = homeEl.querySelector(".home-site") || homeEl;
-    function apply(v) {
-      // slide the 250vh mask up: at v=0 the opaque plateau (0-45% = 0-112vh) fully covers the
-      // 100vh viewport (solid, no peek); as v→1 the smoothstep fade sweeps in from the bottom and
-      // up until fully dissolved (y=-250vh puts the viewport past the transparent end).
-      var y = (-250 * v).toFixed(1) + "vh";
-      homeEl.style.webkitMaskPosition = "0 " + y;
-      homeEl.style.maskPosition = "0 " + y;
-      inner.style.transform = "translate3d(0," + (-110 * v).toFixed(2) + "vh,0)"; // swipe up
-    }
-    function finish() {
-      inner.style.transform = "";
-      homeEl.style.webkitMaskImage = ""; homeEl.style.maskImage = "";
-      homeEl.style.webkitMaskPosition = ""; homeEl.style.maskPosition = "";
-      if (done) done();
-    }
-    if (navRaf) { cancelAnimationFrame(navRaf); navRaf = 0; } // never run two at once
-    if (reduceMotion) { apply(vTo); finish(); return; }        // no motion → snap to end state
-    apply(vFrom);
-    function step(ts) {
-      if (t0 == null) t0 = ts;
-      var p = Math.min(1, (ts - t0) / dur);
-      var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; // ease-in-out
-      apply(vFrom + (vTo - vFrom) * e);
-      if (p < 1) { navRaf = requestAnimationFrame(step); }
-      else { navRaf = 0; finish(); }
-    }
-    navRaf = requestAnimationFrame(step);
-  }
-  function navToBoard() {
-    if (navBusy || navState !== "home") return;
-    navBusy = true; navState = "animating";
-    backdropEl.style.display = "";                 // board's living backdrop
-    wallEl.classList.add("show");                  // show FIRST so the board has real dimensions...
-    void wallEl.offsetWidth;                        // ...force layout...
-    renderWall();                                   // ...then render, so notes size/place exactly like the Wall tab
-    homeEl.classList.add("revealing");
-    animMask(0, 1, function () {  // transparent band sweeps bottom→up + content swipes up, revealing board
-      homeEl.classList.remove("show", "revealing");
-      navState = "board"; navBusy = false;
-    });
-  }
-  function navToHome() {
-    if (navBusy || navState !== "board") return;
-    navBusy = true; navState = "animating";
-    homeEl.classList.add("show", "revealing");
-    animMask(1, 0, function () {  // band recedes back down + content swipes down as the site fills in
-      wallEl.classList.remove("show"); wallEl.innerHTML = "";
-      backdropEl.style.display = "none"; // home is flat cream, no living backdrop
-      homeEl.classList.remove("revealing");
-      navState = "home"; navBusy = false;
-    });
-  }
-
-  window.addEventListener("wheel", function (e) {
-    if (!homeActive) return;
-    if (navState === "home" && e.deltaY > 6) { e.preventDefault(); navToBoard(); }
-    else if (navState === "board" && e.deltaY < -6) { e.preventDefault(); navToHome(); }
-  }, { passive: false });
-  var navTouchY = null;
-  window.addEventListener("touchstart", function (e) { if (homeActive) navTouchY = e.touches[0].clientY; }, { passive: true });
-  window.addEventListener("touchmove", function (e) {
-    if (!homeActive || navTouchY == null) return;
-    var dy = navTouchY - e.touches[0].clientY; // >0 = swipe up
-    if (navState === "home" && dy > 34) { navTouchY = null; navToBoard(); }
-    else if (navState === "board" && dy < -34 && !e.target.closest(".wnote")) { navTouchY = null; navToHome(); }
-  }, { passive: true });
-
   // ---------- notes board (Supabase) ----------
   // In the published build these two are blanked and get filled by
   // decryptPayload() on a correct unlock (build.js handles that).
   var SUPABASE_URL = "";
   var SUPABASE_KEY = "";
-  var NOTE_COLORS = ["#fff59d", "#ffd1dc", "#bfe0ff", "#c8f0c8", "#ffe0b3", "#e6d4ff"]; // sticky-note pastels
-  var PIN_COLORS = ["#d63b3b", "#3b74d6", "#e0a021", "#3bb06a", "#c33bd6"];             // pushpins
-  var notesInited = false;
-
   function notesEndpoint() { return SUPABASE_URL + "/rest/v1/notes"; }
-  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
-  function fmtDate(iso) {
-    try { return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
-    catch (e) { return ""; }
-  }
-
-  function renderNotes(list) {
-    var grid = document.getElementById("notesGrid");
-    var statusEl = document.getElementById("notesStatus");
-    if (!grid) return;
-    grid.innerHTML = "";
-    if (!list || !list.length) {
-      if (statusEl) { statusEl.style.display = ""; statusEl.textContent = "no notes yet — be the first to leave one 💕"; }
-      return;
-    }
-    if (statusEl) statusEl.style.display = "none";
-    list.forEach(function (n, i) {
-      var el = document.createElement("div");
-      el.className = "note";
-      el.style.background = n.color || NOTE_COLORS[i % NOTE_COLORS.length];
-      el.style.setProperty("--tilt", (((i * 53) % 9) - 4) + "deg");   // stable per-note lean, -4..4°
-      el.style.setProperty("--pin", PIN_COLORS[i % PIN_COLORS.length]);
-      var who = n.author ? '<span class="who">' + esc(n.author) + "</span>" : '<span class="who">&nbsp;</span>';
-      el.innerHTML = '<div class="body">' + esc(n.body) + "</div>" +
-                     '<div class="meta">' + who + "<span>" + fmtDate(n.created_at) + "</span></div>";
-      grid.appendChild(el);
-    });
-  }
-
-  function loadNotes() {
-    var grid = document.getElementById("notesGrid");
-    var statusEl = document.getElementById("notesStatus");
-    if (!grid) return;
-    if (statusEl) { statusEl.style.display = ""; statusEl.textContent = "loading our notes…"; }
-    fetch(notesEndpoint() + "?select=*&order=created_at.desc", {
-      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
-    })
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-      .then(renderNotes)
-      .catch(function (e) {
-        if (statusEl) { statusEl.style.display = ""; statusEl.textContent = "couldn't load our notes right now 😢"; }
-        console.error("[notes] load failed", e);
-      });
-  }
-
-  // attach the "pin a note" handler once the board is in the DOM (dev: at load; prod: after unlock)
-  function initNotes() {
-    if (notesInited) return;
-    var form = document.getElementById("noteForm");
-    if (!form) return;
-    notesInited = true;
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var bodyEl = document.getElementById("noteBody");
-      var authorEl = document.getElementById("noteAuthor");
-      var body = bodyEl.value.trim();
-      if (!body) return;
-      var author = authorEl.value.trim();
-      var color = NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)];
-      var btn = form.querySelector("button");
-      btn.disabled = true;
-      fetch(notesEndpoint(), {
-        method: "POST",
-        headers: {
-          apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY,
-          "Content-Type": "application/json", Prefer: "return=representation"
-        },
-        body: JSON.stringify({ body: body, author: author || null, color: color })
-      })
-        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-        .then(function () { bodyEl.value = ""; loadNotes(); })
-        .catch(function (e) { console.error("[notes] post failed", e); alert("Couldn't pin that note — try again in a sec 💗"); })
-        .then(function () { btn.disabled = false; });
-    });
-  }
 
   // ---------- which month the board is showing ----------
   // The board shows THIS month by default, so on the 1st it starts clean — but nothing is deleted or
@@ -3314,13 +2829,10 @@
       if (!b) return;
       var s = b.getAttribute("data-screen");
       if (s === "lock") showLock();
-      else if (s === "celebrate") showCelebration();
       else if (s === "bloom") showBloom();
-      else if (s === "site") showSite();
       else if (s === "wall") { showWall(); loadWallNotes(); }
       else if (s === "add") showAdd();
       else if (s === "draw") showDraw();
-      else if (s === "home") showHome();
     });
   }
 
