@@ -784,11 +784,15 @@
   }
   .lt-row:hover { background: #fff6fa; }
   .lt-row.sealed { border-color: rgba(216,105,138,0.6); background: linear-gradient(135deg, #fff4f8, #ffe9f1); }
+  /* the wax seal. Drawn, not an emoji: a sealed letter gets an envelope, an opened one a heart. */
   .lt-wax {
     flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; font-size: 15px; color: #fff;
+    justify-content: center; color: #fff;
     background: linear-gradient(135deg, #ffa6c9, #d8698a); box-shadow: 0 3px 8px rgba(216,105,138,0.35);
   }
+  .lt-wax svg { width: 16px; height: 16px; display: block; }
+  .lt-wax.open { background: rgba(255,255,255,0.9); color: #e290ad; box-shadow: 0 0 0 1.5px rgba(226,144,173,0.5); }
+  .lt-wax.open svg { width: 13px; height: 13px; }
   .lt-row-mid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .lt-from { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 19px; color: #cc6488; }
   .lt-prev { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12.5px; color: #9a7683;
@@ -803,14 +807,29 @@
   .lt-body { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 17px; line-height: 1.85; color: #6a4a54; }
   .lt-body p { margin: 0 0 15px; }
   .lt-sign { margin-top: 18px; text-align: right; font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 24px; color: #a05a72; }
-  .lt-fromrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-  .lt-fromlabel { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #b07890; }
+  /* the closing line of the letter: signature on the left, send on the right */
+  .lt-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .lt-fromlabel { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 21px; color: #a05a72; margin-right: 2px; }
+  .lt-who {
+    padding: 8px 13px; border-radius: 12px; cursor: pointer; background: #fff;
+    border: 1.5px solid rgba(216,105,138,0.3); color: #a05a72;
+    font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 20px; line-height: 1.1;
+  }
+  .lt-who.sel { background: linear-gradient(135deg, #ffd9e6, #ffc2d6); border-color: #e290ad; color: #8c3f5c; }
+  .lt-send {
+    margin-left: auto; padding: 10px 20px; border: none; border-radius: 13px; cursor: pointer; color: #fff;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 16px;
+    background: linear-gradient(135deg, #ffa6c9, #d8698a); box-shadow: 0 7px 16px rgba(216,105,138,0.32);
+  }
+  .lt-send[disabled] { opacity: 0.55; }
   .lt-titlein, .lt-write {
     width: 100%; box-sizing: border-box; border: 1.5px solid rgba(216,105,138,0.28); border-radius: 13px;
     background: #fffdfc; outline: none; color: #6a4a54;
     font-family: "Bradley Hand","Segoe Print",cursive;
   }
   .lt-titlein { padding: 10px 13px; font-size: 15px; margin-bottom: 10px; }
+  /* the writing view opens straight onto the title field, so it has to start below the ← */
+  .lt-writing .lt-titlein { margin-top: 34px; }
   .lt-write { padding: 13px 15px; font-size: 17px; line-height: 1.8; min-height: 46vh; resize: vertical; }
   .lt-titlein:focus, .lt-write:focus { border-color: #ff9dc2; }
   .lt-count { margin-top: 7px; text-align: right; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11.5px; color: #b892a1; }
@@ -1100,7 +1119,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"bpjxPB3TRg53FZdCj1WeEQ==","iv":"LJT2yFtm7SNkHmM+","ct":"F6+hOEg4IBvWHYOsxAVYvdqlo58EYSOBmOd63Bl6kHYqjUBWAdfENRwUpWcsrICPUzxTk1ifRvKFCAhLODtfEo/orwCWLtM7kvfqe7sZpvMKu3e8MAjJf07uxmnmGTN2qUaQYPjpDScIACelPem4do+6ltYuKJp0kg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"h+Px2Pdr9dgECdMkOrE7aw==","iv":"6vqTIs83VF7StvZw","ct":"wDWMuZz4C8FZodXRT9Vtve02OkH6raLK2tbbNQYs1zxbpCon3WkdUWsuJ2wctuTjeji7RjwhHJmCQL0VGG8OAnH9mo3LvDErZkDUnOMIsUB3RsSCD7QMR1SJDQxrtHVPawkx1dlxZTz4tivoqVhQTV5MxBnW+dW/Jg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1565,11 +1584,6 @@
       method: "PATCH", headers: wallHeaders(true), body: JSON.stringify({ opened_at: when })
     }).catch(function (e) { console.error("[letters] seal update failed", e); });
   }
-  function deleteLetter(letter) {
-    LETTERS = LETTERS.filter(function (l) { return l.id !== letter.id; });
-    return fetch(lettersEndpoint() + "?id=eq." + letter.id, { method: "DELETE", headers: wallHeaders(false) })
-      .catch(function (e) { console.error("[letters] delete failed", e); });
-  }
   // A letter is "for me" if the other one wrote it. Until this phone says which of us it is (in settings),
   // nothing is treated as unread — better than guessing wrong and hiding a seal.
   function lettersForMe() {
@@ -1880,6 +1894,13 @@
       '<circle cx="12" cy="14" r="1.15" fill="currentColor" stroke="none"/>' +
       '<circle cx="15.6" cy="14" r="1.15" fill="currentColor" stroke="none"/>' +
       '<circle cx="8.4" cy="17.4" r="1.15" fill="currentColor" stroke="none"/>' +
+      "</svg>";
+  }
+
+  // The app's own heart shape, drawn — the same one that's on the curtain and in the icon.
+  function heartIcon() {
+    return '<svg viewBox="-5.4 -5.4 10.8 10.8" fill="currentColor" aria-hidden="true">' +
+      '<path d="M0 4 C-4.5 0 -4 -4.5 -1.4 -4.5 C-0.2 -4.5 0 -3 0 -2.3 C0 -3 0.2 -4.5 1.4 -4.5 C4 -4.5 4.5 0 0 4 Z"/>' +
       "</svg>";
   }
 
@@ -2329,7 +2350,7 @@
       var sealed = !l.opened_at && pushWho && l.author !== pushWho;
       var preview = l.body.replace(/\s+/g, " ").trim().slice(0, 72);
       return '<button class="lt-row' + (sealed ? " sealed" : "") + '" data-i="' + i + '">' +
-        '<span class="lt-wax">' + (sealed ? "✉" : "♡") + "</span>" +
+        '<span class="lt-wax' + (sealed ? "" : " open") + '">' + (sealed ? envelopeIcon() : heartIcon()) + "</span>" +
         '<span class="lt-row-mid">' +
           '<span class="lt-from">' + escW(l.title || ("from " + l.author)) + "</span>" +
           '<span class="lt-prev">' + (sealed ? "sealed — for you" : escW(preview) + (l.body.length > 72 ? "…" : "")) + "</span>" +
@@ -2341,12 +2362,12 @@
     lettersEl.innerHTML =
       '<div class="add-inner">' +
         '<button class="add-back" id="ltBack" title="to the board">←</button>' +
-        '<div class="add-title">✉ our letters</div>' +
+        '<div class="add-title">our letters</div>' +
         '<p class="lt-sub">' + (LETTERS.length
           ? (mine ? mine + (mine === 1 ? " letter is" : " letters are") + " waiting for you ♡" : "everything here has been read ♡")
           : "no letters yet — write the first one ♡") + "</p>" +
         '<div class="lt-stack">' + rows + "</div>" +
-        '<div class="add-actions"><button class="add-btn primary" id="ltNew">write a letter ✍</button></div>' +
+        '<div class="add-actions"><button class="add-btn primary" id="ltNew">write a letter</button></div>' +
       "</div>";
 
     lettersEl.onclick = function (e) {
@@ -2381,37 +2402,31 @@
         "</div>" +
         '<div class="lt-body">' + paras + "</div>" +
         '<div class="lt-sign">— ' + escW(l.author) + "</div>" +
-        '<div class="add-actions">' +
-          '<button class="add-btn ghost" id="ltDel">put it away 🗑</button>' +
-          '<button class="add-btn primary" id="ltDone">close it ♡</button>' +
-        "</div>" +
+        '<div class="add-actions"><button class="add-btn primary" id="ltDone">close</button></div>' +
       "</div>";
 
     lettersEl.onclick = function (e) {
       var b = e.target.closest("button");
       if (!b) return;
-      if (b.id === "ltDel") {
-        deleteLetter(l);
-        letterView.mode = "stack"; letterView.letter = null; renderLetters(); return;
-      }
       if (b.id === "ltBack" || b.id === "ltDone") { letterView.mode = "stack"; letterView.letter = null; renderLetters(); }
     };
   }
 
   function renderLetterWrite() {
+    // Shaped like a letter: title, then the message, then who it's from at the END where a signature goes —
+    // with send beside it, because signing it and sending it are the same gesture.
     lettersEl.innerHTML =
-      '<div class="add-inner lt-paper">' +
+      '<div class="add-inner lt-paper lt-writing">' +
         '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
-        '<div class="add-title">✍ a letter</div>' +
-        '<div class="lt-fromrow">' +
-          '<span class="lt-fromlabel">from</span>' +
-          '<button class="set-btn' + (letterView.author === EM ? " sel" : "") + '" data-who="' + escW(EM) + '">em yêu (M)</button>' +
-          '<button class="set-btn' + (letterView.author === ANH ? " sel" : "") + '" data-who="' + escW(ANH) + '">anh yêu (V)</button>' +
-        "</div>" +
-        '<input class="lt-titlein" id="ltTitle" maxlength="120" placeholder="a title, if you want one" value="' + escW(letterView.title) + '">' +
-        '<textarea class="lt-write" id="ltBody" placeholder="dear you…" spellcheck="false">' + escW(letterView.draft) + "</textarea>" +
+        '<input class="lt-titlein" id="ltTitle" maxlength="120" placeholder="a title..." value="' + escW(letterView.title) + '">' +
+        '<textarea class="lt-write" id="ltBody" placeholder="a message..." spellcheck="false">' + escW(letterView.draft) + "</textarea>" +
         '<div class="lt-count" id="ltCount"></div>' +
-        '<div class="add-actions"><button class="add-btn primary" id="ltSend">seal it and send ✉</button></div>' +
+        '<div class="lt-foot">' +
+          '<span class="lt-fromlabel">from</span>' +
+          '<button class="lt-who' + (letterView.author === EM ? " sel" : "") + '" data-who="' + escW(EM) + '">em yêu</button>' +
+          '<button class="lt-who' + (letterView.author === ANH ? " sel" : "") + '" data-who="' + escW(ANH) + '">anh yêu</button>' +
+          '<button class="lt-send" id="ltSend">send</button>' +
+        "</div>" +
         '<div class="set-msg" id="ltMsg"></div>' +
       "</div>";
 
