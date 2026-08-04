@@ -8,6 +8,9 @@ create table if not exists public.letters (
   body       text not null check (char_length(body) between 1 and 20000),
   author     text not null check (author in ('em yêu', 'anh yêu')),
   title      text check (char_length(title) <= 120),
+  -- author is whose name is ON the letter (the writer chooses it); sent_by is which phone it came from,
+  -- and that is what decides whether a letter is sealed "for you"
+  sent_by    text check (sent_by is null or sent_by in ('em yêu', 'anh yêu')),
   created_at timestamptz not null default now(),
   opened_at  timestamptz                       -- null = still sealed
 );

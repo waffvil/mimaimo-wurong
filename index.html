@@ -1133,7 +1133,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"LqNmQ+qb8wOw28kqgbcmIA==","iv":"pIeeqviqdAnNLPOd","ct":"11tYoe6WDujADztHUalHj93/ykMRxihs64nLkjSkfqed2000LznyLdzBM1KFHzPZAA3fsNM+RkARDxdnKceQBhtmtRValEw7AqulYfYFbtnV5ODL5Fp8Rro8BX16c9o/kKIJMR1CzbqcujqueEkeCDTVaaszST08JQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"cEPzFRIZc8G7rcGxOpukhQ==","iv":"CTgBxG4GhOBgFlVY","ct":"18HrJreTXLXd9bPI3jL5oG6wH4ioCXnEuP3QrTCdZ0VAYhdseN0nZF65vvk/uBfYb4n2cE63W3/pvPjvvbwftJAUWW+C0cEFsTIDhgb6BJB7LB5SHm+My5NxHYnqHUZwn3fae6/5YJ0t72zDQ414IN0JiVtL2ha62w==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1574,8 +1574,11 @@
       .then(function (rows) { LETTERS = rows || []; })
       .catch(function (e) { console.error("[letters] load failed", e); });
   }
+  // `author` is whose name goes ON the letter — the writer's choice. `sent_by` is which phone it actually
+  // came from, which is what the seal depends on: a letter is for you if you didn't send it, regardless of
+  // whose name is signed at the bottom.
   function sendLetter(body, author, title) {
-    var row = { body: body, author: author, title: (title || "").trim() || null };
+    var row = { body: body, author: author, title: (title || "").trim() || null, sent_by: pushWho || null };
     return fetch(lettersEndpoint(), {
       method: "POST",
       headers: (function () { var h = wallHeaders(true); h.Prefer = "return=representation"; return h; })(),
@@ -1598,11 +1601,14 @@
       method: "PATCH", headers: wallHeaders(true), body: JSON.stringify({ opened_at: when })
     }).catch(function (e) { console.error("[letters] seal update failed", e); });
   }
-  // A letter is "for me" if the other one wrote it. Until this phone says which of us it is (in settings),
-  // nothing is treated as unread — better than guessing wrong and hiding a seal.
+  // Who a letter came FROM, for the app's purposes: the phone that sent it. Letters written before that was
+  // recorded fall back to the signed name, which was the only thing there was.
+  function letterFrom(l) { return l.sent_by || l.author; }
+  // A letter is "for me" if I didn't send it. Until this phone says which of us it is (in settings), nothing
+  // is treated as unread — better than guessing wrong and hiding a seal.
   function lettersForMe() {
     if (!pushWho) return [];
-    return LETTERS.filter(function (l) { return l.author !== pushWho && !l.opened_at; });
+    return LETTERS.filter(function (l) { return letterFrom(l) !== pushWho && !l.opened_at; });
   }
   function letterDate(iso) {
     var d = iso ? new Date(iso) : null;
@@ -2371,7 +2377,7 @@
 
     var mine = lettersForMe().length;
     var rows = LETTERS.map(function (l, i) {
-      var sealed = !l.opened_at && pushWho && l.author !== pushWho;
+      var sealed = !l.opened_at && pushWho && letterFrom(l) !== pushWho;
       var preview = l.body.replace(/\s+/g, " ").trim().slice(0, 72);
       return '<button class="lt-row' + (sealed ? " sealed" : "") + '" data-i="' + i + '">' +
         '<span class="lt-wax' + (sealed ? "" : " open") + '">' + (sealed ? envelopeIcon() : heartIcon()) + "</span>" +
@@ -2446,7 +2452,7 @@
         '<textarea class="lt-write" id="ltBody" placeholder="a message..." spellcheck="false">' + escW(letterView.draft) + "</textarea>" +
         '<div class="lt-count" id="ltCount"></div>' +
         '<div class="lt-foot">' +
-          '<span class="lt-fromlabel">from</span>' +
+          '<span class="lt-fromlabel" title="whose name goes on the letter">from</span>' +
           '<button class="lt-who' + (letterView.author === EM ? " sel" : "") + '" data-who="' + escW(EM) + '">em yêu</button>' +
           '<button class="lt-who' + (letterView.author === ANH ? " sel" : "") + '" data-who="' + escW(ANH) + '">anh yêu</button>' +
           '<button class="lt-send" id="ltSend">send</button>' +
