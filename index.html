@@ -827,52 +827,66 @@
      than UI type, and no length limit anywhere in the chain. The stack lists them; sealed ones say only
      that they exist and who they're for. */
   .letters .add-inner { max-width: 620px; }
-  .lt-sub { margin: 0 0 14px; text-align: center; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13.5px; color: #a5808d; }
-  /* THE STACK. Every row is a small sheet of the same paper the letter itself is written on, tilted a little
-     and taped down — a pile of letters rather than a list of list items. It carries the HEADER only: the
-     title, who it went from and to, and the date. Never a line of what's inside; that is the letter's to
-     tell. The old row had a pink pill and a circled heart glued to the front of it, which looked like a
-     notification and nothing like paper. Sealed and opened say themselves now, in the same language the
-     letter uses: still taped shut, or with its corner folded back. */
-  .lt-stack { display: flex; flex-direction: column; gap: 14px; }
+  /* the header sits on one line — arrow, then the name, the way your mock has it — instead of a centred
+     title with the arrow floating over it */
+  .lt-top { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .letters .lt-top .add-back { position: static; flex: 0 0 auto; }
+  .lt-toptitle { font-family: "Parisienne", cursive; font-size: 32px; color: #cc6488; line-height: 1.2; }
+  .lt-sub { margin: 0 0 18px; text-align: center; font-family: "Caveat", cursive; font-weight: 500;
+    font-size: 17px; color: #b98da0; }
+
+  /* THE INBOX — your mock, wired to the real letters. Every row is a little ENVELOPE: the paper the writer
+     chose, a quiet flap line across the top, a washi-tape stamp on the right in that letter's tape, and a
+     drop of red wax only while it is still sealed. It carries the header only — title, who it went from and
+     to, the date. Never a line of what's inside; that is the letter's to tell. */
+  .lt-stack { display: flex; flex-direction: column; gap: 15px; }
   .lt-row {
-    position: relative; display: block; width: 100%; cursor: pointer; text-align: left;
-    padding: 16px 74px 14px 17px;      /* room at the right for the date, at the corner for the fold */
-    border: none; border-radius: 3px; background: var(--lp, #fffdf6);
-    box-shadow: 0 6px 15px rgba(190,130,150,0.17), 0 1px 3px rgba(190,130,150,0.15);
-    --fold: 22px;
+    position: relative; display: block; width: 100%; height: 78px; padding: 0; cursor: pointer;
+    text-align: left; overflow: hidden; border-radius: 9px;
+    border: 1px solid var(--le, #f7dbe6);
+    background: var(--lpg, linear-gradient(168deg,#fffdf3,#fff6e2));
+    box-shadow: 0 4px 11px rgba(190,140,155,0.14);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
   }
-  /* the pile leans: alternating so no two neighbours line up */
+  /* the pile leans: alternating, so no two neighbours line up. The hover lift has to repeat the rotation —
+     a bare translateY would replace it and snap the row straight. */
   .lt-row:nth-child(odd)  { transform: rotate(-0.5deg); }
-  .lt-row:nth-child(even) { transform: rotate(0.42deg); }
-  .lt-row:hover { background: #fffefa; }
-  /* a strip of washi tape holding each one down, hanging over the top edge like the letter's own */
-  .lt-r-tape {
-    position: absolute; top: -7px; left: 20px; width: 52px; height: 17px; transform: rotate(-3.5deg);
-    background: repeating-linear-gradient(135deg, var(--lta, rgba(255,255,255,0.92)) 0 6px, var(--ltb, rgba(255,206,222,0.9)) 6px 12px);
-    box-shadow: 0 2px 4px rgba(190,130,150,0.18);
+  .lt-row:nth-child(even) { transform: rotate(0.4deg); }
+  .lt-row:nth-child(odd):hover  { transform: rotate(-0.5deg) translateY(-3px); }
+  .lt-row:nth-child(even):hover { transform: rotate(0.4deg) translateY(-3px); }
+  .lt-row:hover { box-shadow: 0 10px 20px rgba(190,130,155,0.24); }
+  /* the flap: one quiet line across the top, not a filled triangle */
+  .lt-r-flap {
+    position: absolute; top: 0; left: 0; right: 0; height: 34px;
+    border-bottom: 1px solid rgba(232,160,188,0.3);
+    -webkit-clip-path: polygon(0 0, 100% 0, 50% 100%); clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: rgba(255,224,236,0.4);
   }
-  /* SEALED: taped across the corner, still shut. OPENED: that corner folded back, exactly as on the letter. */
+  /* the stamp, in the letter's own tape — with its sticker on it if it was given one */
+  .lt-r-stamp {
+    position: absolute; top: 50%; right: 14px; margin-top: -21px; width: 42px; height: 42px; z-index: 3;
+    display: flex; align-items: center; justify-content: center; font-size: 15px; color: #c9527d;
+    background: repeating-linear-gradient(135deg, var(--lta, rgba(255,255,255,0.92)) 0 7px, var(--ltb, rgba(255,206,222,0.9)) 7px 14px);
+    border: 2.5px solid #fffdf6; border-radius: 2px; transform: rotate(4deg);
+    box-shadow: 0 2px 6px rgba(190,140,155,0.28);
+  }
+  .lt-r-stamp svg { width: 26px; height: 26px; display: block; }
+  /* SEALED: a drop of wax, and the title in the darker ink. Nothing else says it — no badge, no words. */
   .lt-r-seal {
-    position: absolute; right: -9px; bottom: 11px; width: 54px; height: 15px; transform: rotate(-45deg);
-    background: repeating-linear-gradient(135deg, var(--lta, rgba(255,255,255,0.92)) 0 6px, var(--ltb, rgba(255,178,205,0.92)) 6px 12px);
-    box-shadow: 0 2px 4px rgba(190,130,150,0.2);
+    position: absolute; top: 12px; right: 62px; width: 12px; height: 12px; z-index: 4; border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #f2799e, #cf4a74 72%);
+    box-shadow: 0 2px 6px rgba(190,80,120,0.45);
   }
-  .lt-row.sealed { background: #fffefb; box-shadow: 0 7px 17px rgba(216,105,138,0.2), 0 1px 3px rgba(190,130,150,0.16); }
-  .lt-r-fold {
-    position: absolute; right: 0; bottom: 0; width: var(--fold); height: var(--fold);
-    background:
-      linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(198,146,162,0.45) calc(50% - 1px) 50%, transparent 50%),
-      linear-gradient(135deg, #f1e2cd 0 50%, transparent 50%);
-    filter: drop-shadow(-1px -1px 2px rgba(178,124,142,0.3));
+  .lt-r-slip {
+    position: absolute; left: 18px; right: 72px; top: 50%; z-index: 2; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 2px;
   }
-  .lt-r-title { display: block; font-family: "Parisienne", cursive; font-size: 23px; line-height: 1.25;
-    color: #cc6488; overflow-wrap: anywhere; }
-  .lt-r-who { display: block; margin-top: 2px; font-family: "Caveat", cursive; font-weight: 500;
-    font-size: 14.5px; color: #a5808d; }
-  .lt-r-who i { font-style: normal; color: #ddaec0; padding: 0 3px; }
-  .lt-r-date { position: absolute; top: 15px; right: 15px;
-    font-family: "Caveat", cursive; font-size: 12.5px; color: #c2a0ad; }
+  .lt-r-title { font-family: "Gochi Hand", cursive; font-size: 20px; line-height: 1.25; color: #a9647f;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lt-row.sealed .lt-r-title { color: #c9527d; }
+  .lt-r-meta { font-family: "Gochi Hand", cursive; font-size: 13px; color: #a3768a;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lt-r-meta i { font-style: normal; color: #d5a3b6; padding: 0 2px; }
 
   /* ---------- the letter itself ----------
      Your template: ruled paper on a slight tilt, folded corners, washi tape top and bottom, a Parisienne
@@ -1331,7 +1345,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"At2WuEuEgYJVMsLlkn/Vkg==","iv":"jaQR938Lm2Pgkz60","ct":"0eN4VRihd0W3f3n3PZH0K0BfoN830CnQL0JIs84Wo+1H/URxBZHvtS6PSe78sAO2oVscUR/EWn2lStHz2L9rWHvg5pN7UYBSav//hRxzRHAugDlk7QTZuqVzL3izdJv3HHsAeUR4DwGV6a7UWrkB+yxa3SGpo2DKIg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"tajzmNm+Q0lFYTVFmVbedQ==","iv":"SHegaGqt6Dx3AA81","ct":"l1YFlPOsYbnZ1DFzqnrFCkaz81WhAwZ1xOPihNx4BQT0flpwCs51wVh7TYeILJ5lKRjLodt9QKswTS9BTeGe+xlToLDT0SmDAbpCA+sUpTByS5UY6JsvA4028QrQnD5p2ZS8FFCSoagu1pc8uSGnIkC75cuVstJUmQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1818,12 +1832,13 @@
   // Three small fixed catalogues: the paper it's written on, the washi tape holding it down, and one sticker.
   // The choice is stored on the row as a tiny JSON blob of INDICES, not colours — so restyling the app later
   // restyles every letter already sent, instead of leaving old ones wearing dead hex codes.
+  // bg/rule are the sheet you write on; env/edge are the same paper folded into an envelope for the inbox.
   var LT_PAPER = [
-    { n: "cream", bg: "#fffdf6", rule: "rgba(206,168,180,0.16)" },
-    { n: "blush", bg: "#fff5f7", rule: "rgba(214,150,175,0.20)" },
-    { n: "mint",  bg: "#f4fbf6", rule: "rgba(140,190,165,0.22)" },
-    { n: "sky",   bg: "#f5f9ff", rule: "rgba(150,175,215,0.20)" },
-    { n: "lilac", bg: "#f9f6ff", rule: "rgba(170,158,208,0.20)" }
+    { n: "cream", bg: "#fffdf6", rule: "rgba(206,168,180,0.16)", env: "linear-gradient(168deg,#fffdf3,#fff6e2)", edge: "#f3e6c8" },
+    { n: "blush", bg: "#fff5f7", rule: "rgba(214,150,175,0.20)", env: "linear-gradient(168deg,#fff6f9,#ffe9f1)", edge: "#f7dbe6" },
+    { n: "mint",  bg: "#f4fbf6", rule: "rgba(140,190,165,0.22)", env: "linear-gradient(168deg,#f5fbf6,#e7f6ec)", edge: "#d7ead9" },
+    { n: "sky",   bg: "#f5f9ff", rule: "rgba(150,175,215,0.20)", env: "linear-gradient(168deg,#f6faff,#e6f0fd)", edge: "#d7e4f4" },
+    { n: "lilac", bg: "#f9f6ff", rule: "rgba(170,158,208,0.20)", env: "linear-gradient(168deg,#f8f4ff,#efe7fc)", edge: "#e4dbf7" }
   ];
   var LT_TAPE = [
     { n: "pink",  a: "rgba(255,255,255,0.92)", b: "rgba(255,206,222,0.90)" },
@@ -1870,7 +1885,7 @@
   /** The four custom properties every dressed element reads (see --lp/--lr/--lta/--ltb in the CSS). */
   function ltStyleVars(st) {
     var p = LT_PAPER[st.p], t = LT_TAPE[st.t];
-    return stW({ "--lp": p.bg, "--lr": p.rule, "--lta": t.a, "--ltb": t.b });
+    return stW({ "--lp": p.bg, "--lr": p.rule, "--lpg": p.env, "--le": p.edge, "--lta": t.a, "--ltb": t.b });
   }
   /** null when everything is default, so a plain letter stores nothing at all. */
   function ltStyleJSON(st) {
@@ -1919,6 +1934,14 @@
     var d = iso ? new Date(iso) : null;
     if (!d || isNaN(d)) return "";
     return d.getDate() + " " + MONTHS_LONG[d.getMonth()] + " " + d.getFullYear();
+  }
+  /** The envelope's version: short, because it shares one 13px line with who it went from and to. */
+  function letterDateShort(iso) {
+    var d = iso ? new Date(iso) : null;
+    if (!d || isNaN(d)) return "";
+    var now = new Date();
+    return d.getDate() + " " + MONTHS_SHORT[d.getMonth()] +
+      (d.getFullYear() === now.getFullYear() ? "" : " " + d.getFullYear());
   }
 
   // ---------- push notifications ("she left you a note ♡") ----------
@@ -2750,20 +2773,28 @@
       // other one is. Without that we only know the signature, so we only claim the signature.
       var to = l.sent_by === EM ? ANH : l.sent_by === ANH ? EM : "";
       var who = escW(l.author) + (to ? ' <i>→</i> ' + escW(to) : "");
+      var lst = letterStyle(l);
+      // the stamp wears the letter's sticker if it was given one; otherwise a small mark, so no two
+      // neighbouring envelopes carry the same one
+      var mark = lst.s ? ltStickerSVG(lst.s, 26) : ["♡", "❀", "✧"][i % 3];
       return '<button class="lt-row' + (sealed ? " sealed" : "") + '" data-i="' + i + '"' +
-        ' style="' + ltStyleVars(letterStyle(l)) + '">' +
-        '<span class="lt-r-tape"></span>' +
-        (sealed ? '<span class="lt-r-seal"></span>' : '<span class="lt-r-fold"></span>') +
-        '<span class="lt-r-date">' + escW(letterDate(l.created_at)) + "</span>" +
-        '<span class="lt-r-title">' + escW(l.title || "a letter") + "</span>" +
-        '<span class="lt-r-who">' + who + "</span>" +
+        ' style="' + ltStyleVars(lst) + '">' +
+        '<span class="lt-r-flap"></span>' +
+        '<span class="lt-r-stamp">' + mark + "</span>" +
+        (sealed ? '<span class="lt-r-seal"></span>' : "") +
+        '<span class="lt-r-slip">' +
+          '<span class="lt-r-title">' + escW(l.title || "a letter") + "</span>" +
+          '<span class="lt-r-meta">' + who + " <i>·</i> " + escW(letterDateShort(l.created_at)) + "</span>" +
+        "</span>" +
       "</button>";
     }).join("");
 
     lettersEl.innerHTML =
       '<div class="add-inner">' +
-        '<button class="add-back" id="ltBack" title="to the board">←</button>' +
-        '<div class="add-title">our letters</div>' +
+        '<div class="lt-top">' +
+          '<button class="add-back" id="ltBack" title="to the board">←</button>' +
+          '<span class="lt-toptitle">our letters</span>' +
+        "</div>" +
         '<p class="lt-sub">' + (LETTERS.length
           ? (mine ? mine + (mine === 1 ? " letter is" : " letters are") + " waiting for you ♡" : "everything here has been read ♡")
           : "no letters yet — write the first one ♡") + "</p>" +
