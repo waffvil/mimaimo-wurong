@@ -169,9 +169,10 @@
   .mono {
     display: flex; align-items: center; justify-content: center;
     width: 100%; margin-bottom: 34px;
-    /* ONE knob for the whole lockup: the letters, the heart and every gap are em-based off this, so the
-       celebration card just restates it smaller and nothing else has to be kept in step. */
-    font-size: 84px;
+    /* ONE knob for the whole lockup: the letters, the heart and every gap are em-based off this.
+       110px because Gochi's letters are narrower than the fallback these numbers were first measured
+       against — at 84px an M is only 58px wide, so the monogram had quietly shrunk. */
+    font-size: 110px;
     /* No optical nudge any more. It existed to counter the cursive V's ink spilling right of its advance
        box; Gochi is an upright marker whose ink sits inside its box, so the same shift would just push the
        monogram visibly off-centre. */
@@ -188,7 +189,7 @@
      since both letters travel the same 1.28em inward. */
   /* 0.42em keeps the heart the same fraction of the letters it always was (it was 20px against 48px);
      at 0.36 it read small and lonely between letters this size. */
-  .mono .h { font-size: 0.42em; color: #e58aa4; margin: 0 0.36em; transform: translateY(-0.03em); }
+  .mono .h { font-size: 0.42em; color: #e58aa4; margin: 0 0.9em; transform: translateY(-0.03em); }
   /* The heart on the lock screen is a switch: tap it, it fills and glows, and the next correct passcode
      opens the settings instead of the board. Unlabelled on purpose — it's meant to be ours, not signposted.
      The tap target is an invisible skirt rather than padding, because padding on a flex item would shift
@@ -210,13 +211,14 @@
   /* on unlock, the M and V draw together and the heart swells —
      0.75s ease-in-out to match the passcode "checking" pulse timing */
   .mono .letter, .mono .h { transition: transform 0.75s ease-in-out; }
-  /* Travel just far enough to tuck each letter against the heart: the gap at rest is 0.42em of margin plus
-     side bearings (~0.42em all in), so ~0.58em closes it and leaves a little overlap for the heart — which
-     swells to 1.5x and sits on top — to hide the join. This is em-based off .mono, so it holds at both the
-     lock's 84px and the celebration card's 40px. It was 1.28em, tuned when the letters were 48px; left
-     alone at 84px it hurled them 107px inward and they ended up overlapping each other by 79px. */
-  .mono.together > .letter:first-child { transform: translateX(0.58em); }
-  .mono.together > .letter:last-child  { transform: translateX(-0.58em); }
+  /* How far each letter travels inward on unlock. The letters end up
+       (2 x heart-margin + heart-width - 2 x travel) apart,
+     so this must stay close to the heart's margin (0.9em of the heart = ~0.38em of .mono): a shade more
+     tucks them under the swelling heart, much more and they pass THROUGH it into each other.
+     0.58em did exactly that — measured, the M and V ended 37.7px inside one another and read as one blob,
+     because these numbers were first tuned against a wider fallback font than Gochi actually is. */
+  .mono.together > .letter:first-child { transform: translateX(0.44em); }
+  .mono.together > .letter:last-child  { transform: translateX(-0.44em); }
   .mono.together .h { transform: translateY(-2px) scale(1.5); position: relative; z-index: 3; }
 
 
@@ -1049,7 +1051,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"sr+wpHhIgBWTZHa0dO86mQ==","iv":"rOaeBvCeObcXgUBN","ct":"G/p3Q19J7lZfH/1pbbmuEnmieBHr59pk9eMOO4jvA+YVEc7Ft7NndhKsy2xdJgEq8KDei0ptmp0iOzvx3RGb1ZXdgUsYayK4j57RSK1xe/wnURG7BlPCbCVBlG+aFmtYaPnaEGv9fcCOo4qQhGy1NtqQhZCaM2RFsg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"13l/lbByXu0LjBN4HrmuSQ==","iv":"NWjKf16+5AxU+Rvd","ct":"3baZ2CxoYtrIl48mgyWMWVT8BTaO1CWFxzYfBIyBMKrdYwSwsL5A3PZg2whjFP3LmgaDCkkaHlFozdbeqfN387a2RU8ZIEttiBkG6BggEbkGRscP2jTWsjK3kMKv1iJ9DuLP6wGjCHHhNnIDcX04SUU5OEUa/hb1cg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
