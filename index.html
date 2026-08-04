@@ -211,14 +211,15 @@
   /* on unlock, the M and V draw together and the heart swells —
      0.75s ease-in-out to match the passcode "checking" pulse timing */
   .mono .letter, .mono .h { transition: transform 0.75s ease-in-out; }
-  /* How far each letter travels inward on unlock. The letters end up
-       (2 x heart-margin + heart-width - 2 x travel) apart,
-     so this must stay close to the heart's margin (0.9em of the heart = ~0.38em of .mono): a shade more
-     tucks them under the swelling heart, much more and they pass THROUGH it into each other.
-     0.58em did exactly that — measured, the M and V ended 37.7px inside one another and read as one blob,
-     because these numbers were first tuned against a wider fallback font than Gochi actually is. */
-  .mono.together > .letter:first-child { transform: translateX(0.44em); }
-  .mono.together > .letter:last-child  { transform: translateX(-0.44em); }
+  /* How far each letter travels inward on unlock — and it has to stop OUTSIDE the heart, not under it.
+     The ♡ is an outline glyph, so there is nothing to hide behind: overlap it and you see its stroke cross
+     the letter's stroke, which reads as a tangle rather than a monogram. It also SWELLS to 1.5x here, which
+     pushes its edges ~11px past its own box at this size, so the travel has to leave room for that too.
+       gap at rest 41.6px  -  swell 11.3px  -  a few px of daylight  ->  ~26px  =  0.24em of .mono
+     Measured at 0.44em the letters ended 18px INSIDE the swollen heart; at 0.58em, 37.7px inside each
+     other. Both were tuned against a wider fallback font than Gochi actually is. */
+  .mono.together > .letter:first-child { transform: translateX(0.24em); }
+  .mono.together > .letter:last-child  { transform: translateX(-0.24em); }
   .mono.together .h { transform: translateY(-2px) scale(1.5); position: relative; z-index: 3; }
 
 
@@ -1051,7 +1052,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"13l/lbByXu0LjBN4HrmuSQ==","iv":"NWjKf16+5AxU+Rvd","ct":"3baZ2CxoYtrIl48mgyWMWVT8BTaO1CWFxzYfBIyBMKrdYwSwsL5A3PZg2whjFP3LmgaDCkkaHlFozdbeqfN387a2RU8ZIEttiBkG6BggEbkGRscP2jTWsjK3kMKv1iJ9DuLP6wGjCHHhNnIDcX04SUU5OEUa/hb1cg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"W2V2FSCyXcQgGV8SB1TbpQ==","iv":"A4+nPCx/I/moj0y0","ct":"kRL0O1SqdONExVJPQGcKkANA7U9quj9F4Q5zAJ7JaQKAXED6F7VlhhPushrQB0bDutePQj0d+GSk5H12PnMfGWGNzl5IsErV+zb9gFSmZE5mYfsmt93i73D/ihgPEAd2q2l4iO9d8WpFKEmJk4lmte1uAvAk2HmVOA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
