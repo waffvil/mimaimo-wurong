@@ -843,8 +843,8 @@
   .lt-row {
     position: relative; display: block; width: 100%; height: 78px; padding: 0; cursor: pointer;
     text-align: left; overflow: hidden; border-radius: 9px;
-    border: 1px solid var(--le, #f7dbe6);
-    background: var(--lpg, linear-gradient(168deg,#fffdf3,#fff6e2));
+    border: 1px solid var(--lce, #f7dbe6);
+    background: var(--lc, linear-gradient(168deg,#fffdf3,#fff6e2));
     box-shadow: 0 4px 11px rgba(190,140,155,0.14);
     transition: transform 0.22s ease, box-shadow 0.22s ease;
   }
@@ -866,7 +866,7 @@
   .lt-r-stamp {
     position: absolute; top: 50%; right: 14px; margin-top: -21px; width: 42px; height: 42px; z-index: 3;
     display: flex; align-items: center; justify-content: center; font-size: 15px; color: #c9527d;
-    background: repeating-linear-gradient(135deg, var(--lta, rgba(255,255,255,0.92)) 0 7px, var(--ltb, rgba(255,206,222,0.9)) 7px 14px);
+    background: repeating-linear-gradient(135deg, var(--lsa, rgba(255,255,255,0.92)) 0 7px, var(--lsb, rgba(255,206,222,0.9)) 7px 14px);
     border: 2.5px solid #fffdf6; border-radius: 2px; transform: rotate(4deg);
     box-shadow: 0 2px 6px rgba(190,140,155,0.28);
   }
@@ -1044,6 +1044,24 @@
   .lt-chip.on::after { content: ""; position: absolute; inset: 4px; border-radius: 50%;
     box-shadow: 0 0 0 2.5px #e2789f; }
   .lt-chip svg { width: 26px; height: 26px; display: block; }
+  .lt-cglyph { font-size: 19px; color: #cc6488; line-height: 1; }
+  /* ---------- dressing it: the step between writing and sending ----------
+     A real preview, not an impression of one: the envelope is the inbox's own markup and the sheet is the
+     one she will read, both clipped to the top so the choice is visible without scrolling past a letter. */
+  .lt-dress .lt-preview { margin: 2px 0 6px; }
+  .lt-pv-env { padding: 0 2px 14px; }
+  .lt-pv-env .lt-row { transform: rotate(-0.5deg); }
+  .lt-pv-sheet { position: relative; max-height: 250px; overflow: hidden; }
+  .lt-pv-sheet .lt-letter { animation: none; margin-top: 12px; }
+  .lt-pv-sheet::after {   /* the sheet runs out of view rather than stopping with a hard edge */
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 74px; z-index: 6;
+    background: linear-gradient(180deg, rgba(255,252,246,0) 0%, rgba(255,252,246,0.92) 72%, rgba(255,252,246,1) 100%);
+    pointer-events: none;
+  }
+  .lt-dress .lt-custom { margin-top: 14px; }
+  .lt-dfoot { margin-top: 16px; }
+  .lt-dfoot .lt-send { width: 100%; padding: 15px; border-radius: 999px; font-size: 19px;
+    font-family: "Gochi Hand", cursive; }
   .lt-chip.none i { background: #fffdf6; display: flex; align-items: center; justify-content: center; }
   .lt-chip.none i::after { content: ""; width: 18px; height: 1.5px; background: #d9aebe; transform: rotate(-45deg); }
   /* the sticker, as it sits on the letter: top right under the date, tilted, with its own little shadow */
@@ -1345,7 +1363,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"tajzmNm+Q0lFYTVFmVbedQ==","iv":"SHegaGqt6Dx3AA81","ct":"l1YFlPOsYbnZ1DFzqnrFCkaz81WhAwZ1xOPihNx4BQT0flpwCs51wVh7TYeILJ5lKRjLodt9QKswTS9BTeGe+xlToLDT0SmDAbpCA+sUpTByS5UY6JsvA4028QrQnD5p2ZS8FFCSoagu1pc8uSGnIkC75cuVstJUmQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"HkgCoJh9dCmimEN+7mS2Ow==","iv":"cnwyW78oci4atMo1","ct":"y+Ox0mB9xEv9sIBTQmj/vSU+G2yF82YmE27fHYcurAzZ+JiUKKq57Ov1dwHUahz0uOst9grvtCGVXOrOlX7B5e0aYUw1apaEyvBoN80QpOhg6TD384BMDqul38/p+aNvs4s1yEnoXZ9u0mwj2RIYIzTvgTR/pfEjOg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1847,6 +1865,26 @@
     { n: "sky",   a: "rgba(255,255,255,0.92)", b: "rgba(203,226,252,0.92)" },
     { n: "lilac", a: "rgba(255,255,255,0.92)", b: "rgba(222,212,250,0.92)" }
   ];
+  // The OUTER CASING — the envelope the letter arrives in. Index 0 means "whatever the paper is", which is
+  // the old behaviour and still the nicest default: the envelope and the sheet inside it match.
+  var LT_CASE = [
+    null,
+    { n: "rose",   env: "linear-gradient(168deg,#fff2f6,#ffdfea)", edge: "#f6cddc" },
+    { n: "butter", env: "linear-gradient(168deg,#fffbeb,#ffefc9)", edge: "#f0dcae" },
+    { n: "sage",   env: "linear-gradient(168deg,#f4faf5,#e2f1e6)", edge: "#cfe4d3" },
+    { n: "ocean",  env: "linear-gradient(168deg,#f3f9ff,#dfebfb)", edge: "#cbdcef" },
+    { n: "violet", env: "linear-gradient(168deg,#f7f4ff,#e9e1fb)", edge: "#ddd2f3" },
+    { n: "kraft",  env: "linear-gradient(168deg,#fbf1e2,#f2e2c9)", edge: "#e2cca9" }
+  ];
+  // The little marks that top and tail the letter. Glyphs, not emoji — the same characters the letter has
+  // always used, in sets you can pick between (the last one is none at all).
+  var LT_ORN = [
+    { n: "hearts",  chip: "♡", top: "‧₊˚ ୨♡୧ ˚₊‧", tail: ["❀", "♡", "✧", "♡", "❀"] },
+    { n: "stars",   chip: "✧", top: "⋆˚｡⋆ ✧ ⋆｡˚⋆", tail: ["✧", "⋆", "✦", "⋆", "✧"] },
+    { n: "flowers", chip: "❀", top: "˚₊· ❀ ·₊˚",   tail: ["✿", "❀", "✿", "❀", "✿"] },
+    { n: "moons",   chip: "☾", top: "⋆ ☾ ⋆ ☽ ⋆",   tail: ["☾", "✧", "♡", "✧", "☽"] },
+    { n: "none",    chip: "",  top: "",             tail: [] }
+  ];
   // Drawn, not emoji — same rule as the rail icons: they have to look like they belong to the paper.
   function ltStickerSVG(i, px) {
     var w = px || 40;
@@ -1880,18 +1918,32 @@
     if (raw) { try { o = JSON.parse(raw); } catch (e) { o = null; } }
     o = o || {};
     var clamp = function (v, max) { v = parseInt(v, 10); return v >= 0 && v <= max ? v : 0; };
-    return { p: clamp(o.p, LT_PAPER.length - 1), t: clamp(o.t, LT_TAPE.length - 1), s: clamp(o.s, 4) };
+    return {
+      p: clamp(o.p, LT_PAPER.length - 1),   // the sheet
+      t: clamp(o.t, LT_TAPE.length - 1),    // the washi tape on it
+      s: clamp(o.s, 4),                     // the sticker (0 = none)
+      e: clamp(o.e, LT_CASE.length - 1),    // the envelope it arrives in (0 = match the paper)
+      m: clamp(o.m, LT_TAPE.length),        // the stamp's tape (0 = match the letter's tape)
+      o: clamp(o.o, LT_ORN.length - 1)      // which little marks top and tail it
+    };
   }
   /** The four custom properties every dressed element reads (see --lp/--lr/--lta/--ltb in the CSS). */
   function ltStyleVars(st) {
     var p = LT_PAPER[st.p], t = LT_TAPE[st.t];
-    return stW({ "--lp": p.bg, "--lr": p.rule, "--lpg": p.env, "--le": p.edge, "--lta": t.a, "--ltb": t.b });
+    var c = LT_CASE[st.e] || p;            // 0 falls back to the paper's own face
+    var m = st.m ? LT_TAPE[st.m - 1] : t;  // 0 falls back to the letter's own tape
+    return stW({
+      "--lp": p.bg, "--lr": p.rule, "--lta": t.a, "--ltb": t.b,
+      "--lc": c.env, "--lce": c.edge, "--lsa": m.a, "--lsb": m.b
+    });
   }
   /** null when everything is default, so a plain letter stores nothing at all. */
   function ltStyleJSON(st) {
-    if (!st || (!st.p && !st.t && !st.s)) return null;
-    return JSON.stringify({ p: st.p | 0, t: st.t | 0, s: st.s | 0 });
+    if (!st || (!st.p && !st.t && !st.s && !st.e && !st.m && !st.o)) return null;
+    return JSON.stringify({ p: st.p | 0, t: st.t | 0, s: st.s | 0, e: st.e | 0, m: st.m | 0, o: st.o | 0 });
   }
+  /** A fresh, undressed letter. */
+  function ltStyleNew() { return { p: 0, t: 0, s: 0, e: 0, m: 0, o: 0 }; }
 
   // `author` is whose name goes ON the letter — the writer's choice. `sent_by` is which phone it actually
   // came from, which is what the seal depends on: a letter is for you if you didn't send it, regardless of
@@ -2738,7 +2790,7 @@
 
   // ✉ LETTERS — one screen, three views: the stack, reading one, writing one.
   var lettersEl = document.getElementById("letters");
-  var letterView = { mode: "stack", letter: null, draft: "", title: "", author: null, style: { p: 0, t: 0, s: 0 } };
+  var letterView = { mode: "stack", letter: null, draft: "", title: "", author: null, style: null };
 
   function showLetters(mode) {
     showChrome(true);
@@ -2752,7 +2804,7 @@
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
     letterView = { mode: mode || "stack", letter: null, draft: "", title: "", author: pushWho || EM,
-      style: { p: 0, t: 0, s: 0 } };
+      style: ltStyleNew() };
     lettersEl.classList.add("show");
     document.body.style.overflow = "auto";
     markDebug("letters");
@@ -2765,6 +2817,7 @@
   function renderLetters() {
     if (letterView.mode === "read") return renderLetterRead();
     if (letterView.mode === "write") return renderLetterWrite();
+    if (letterView.mode === "dress") return renderLetterDress();
 
     var mine = lettersForMe().length;
     var rows = LETTERS.map(function (l, i) {
@@ -2841,7 +2894,7 @@
         (lst.s ? '<span class="lt-sticker">' + ltStickerSVG(lst.s) + "</span>" : "") +
         '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
         '<div class="lt-l-head">' +
-          '<div class="lt-l-flourish">‧₊˚ ୨♡୧ ˚₊‧</div>' +
+          (LT_ORN[lst.o].top ? '<div class="lt-l-flourish">' + LT_ORN[lst.o].top + "</div>" : "") +
           '<div class="lt-l-title">' + escW(l.title || "a letter for you") + "</div>" +
           '<div class="lt-l-date">' + escW(letterDate(l.created_at)) + "</div>" +
         "</div>" +
@@ -2852,7 +2905,9 @@
           '<span class="line"></span>' +
           '<span class="lt-l-name">' + escW(l.author) + "</span>" +
         "</div>" +
-        '<div class="lt-l-tail"><span>❀</span><span>♡</span><span>✧</span><span>♡</span><span>❀</span></div>' +
+        (LT_ORN[lst.o].tail.length
+          ? '<div class="lt-l-tail">' + LT_ORN[lst.o].tail.map(function (g) { return "<span>" + g + "</span>"; }).join("") + "</div>"
+          : "") +
       "</div>" +
       '<button class="lt-close" id="ltDone">close ♡</button>';
 
@@ -2864,48 +2919,22 @@
   }
 
   function renderLetterWrite() {
-    // Shaped like a letter: title, then the message, then who it's from at the END where a signature goes —
-    // with send beside it, because signing it and sending it are the same gesture.
+    // Shaped like a letter: title, then the message, then who it's from at the END where a signature goes.
+    // Writing it and dressing it are two different jobs, so they are two steps — you finish the words, THEN
+    // choose what it arrives in. Sending happens on that second step, at the end of the whole gesture.
     var st = letterView.style;
-    // Every swatch is a real chip of the thing it picks — the paper chips ARE that paper, the tape chips are
-    // that tape's stripe — so nothing needs a name written under it.
-    function chips(group, n, ink) {
-      var out = "";
-      for (var i = 0; i < n; i++) {
-        out += '<button class="lt-chip' + (st[group] === i ? " on" : "") + (ink(i) ? "" : " none") + '"' +
-          ' data-g="' + group + '" data-v="' + i + '" type="button">' +
-          (/^</.test(ink(i)) ? ink(i) : '<i style="' + ink(i) + '"></i>') + "</button>";
-      }
-      return out;
-    }
-    var picker =
-      '<div class="lt-custom" id="ltCustom">' +
-        '<div class="lt-crow"><span class="lt-clabel">paper</span>' +
-          chips("p", LT_PAPER.length, function (i) {
-            return "background:" + LT_PAPER[i].bg + ";box-shadow:0 1px 3px rgba(190,130,150,0.28),inset 0 0 0 1px rgba(0,0,0,0.05)";
-          }) + "</div>" +
-        '<div class="lt-crow"><span class="lt-clabel">tape</span>' +
-          chips("t", LT_TAPE.length, function (i) {
-            return "background:repeating-linear-gradient(135deg," + LT_TAPE[i].a + " 0 5px," + LT_TAPE[i].b + " 5px 10px)";
-          }) + "</div>" +
-        '<div class="lt-crow"><span class="lt-clabel">sticker</span>' +
-          chips("s", 5, function (i) { return i ? ltStickerSVG(i, 26) : ""; }) + "</div>" +
-      "</div>";
-
     lettersEl.innerHTML =
       '<div class="add-inner lt-paper lt-writing" style="' + ltStyleVars(st) + '">' +
         '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
         '<input class="lt-titlein" id="ltTitle" maxlength="120" placeholder="a title..." value="' + escW(letterView.title) + '">' +
         '<textarea class="lt-write" id="ltBody" placeholder="a message..." spellcheck="false">' + escW(letterView.draft) + "</textarea>" +
         '<div class="lt-count" id="ltCount"></div>' +
-        picker +
         '<div class="lt-foot">' +
           '<span class="lt-fromlabel">from</span>' +
           '<input class="lt-fromin" id="ltFrom" maxlength="40" placeholder="your name" ' +
             'autocomplete="off" spellcheck="false" value="' + escW(letterView.author || "") + '">' +
-          '<button class="lt-send" id="ltSend">send</button>' +
+          '<button class="lt-send" id="ltDress">next ♡</button>' +
         "</div>" +
-        '<div class="set-msg" id="ltMsg"></div>' +
       "</div>";
 
     var body = document.getElementById("ltBody");
@@ -2923,35 +2952,124 @@
     tally();
     body.focus();
 
-    var sheet = lettersEl.querySelector(".lt-writing");
+    lettersEl.onclick = function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      if (b.id === "ltBack") { letterView.mode = "stack"; renderLetters(); return; }
+      if (b.id === "ltDress") {
+        if (!body.value.trim()) { body.focus(); return; }   // nothing to dress yet
+        letterView.draft = body.value;
+        letterView.title = title.value;
+        letterView.author = from.value;
+        letterView.mode = "dress"; renderLetters();
+      }
+    };
+  }
+
+  // 🎀 DRESSING IT. The letter is written; this is choosing what it arrives in — the envelope, the stamp on
+  // it, the paper inside, the tape, the sticker, the little marks that top and tail it. Everything is
+  // previewed for real: the envelope above is the same markup the inbox draws, and the sheet below is the
+  // same markup she will read, so there is no "and then it looks different when it sends".
+  function renderLetterDress() {
+    var st = letterView.style;
+    var signed = (letterView.author || "").trim() || pushWho || EM;
+
+    // Every swatch is a real chip of the thing it picks — the paper chips ARE that paper, the tape chips are
+    // that tape's stripe — so nothing needs a name written under it.
+    function chips(group, n, ink) {
+      var out = "";
+      for (var i = 0; i < n; i++) {
+        var k = ink(i);
+        out += '<button class="lt-chip' + (st[group] === i ? " on" : "") + (k ? "" : " none") + '"' +
+          ' data-g="' + group + '" data-v="' + i + '" type="button">' +
+          (/^</.test(k) ? k : '<i style="' + k + '"></i>') + "</button>";
+      }
+      return out;
+    }
+    var picker =
+      '<div class="lt-custom" id="ltCustom">' +
+        '<div class="lt-crow"><span class="lt-clabel">envelope</span>' +
+          chips("e", LT_CASE.length, function (i) {
+            var c = LT_CASE[i] || LT_PAPER[st.p];
+            return "background:" + c.env + ";box-shadow:0 1px 3px rgba(190,130,150,0.28),inset 0 0 0 1px " + c.edge;
+          }) + "</div>" +
+        '<div class="lt-crow"><span class="lt-clabel">stamp</span>' +
+          chips("m", LT_TAPE.length + 1, function (i) {
+            var t = i ? LT_TAPE[i - 1] : LT_TAPE[st.t];
+            return "border-radius:3px;background:repeating-linear-gradient(135deg," + t.a + " 0 5px," + t.b + " 5px 10px)";
+          }) + "</div>" +
+        '<div class="lt-crow"><span class="lt-clabel">paper</span>' +
+          chips("p", LT_PAPER.length, function (i) {
+            return "background:" + LT_PAPER[i].bg + ";box-shadow:0 1px 3px rgba(190,130,150,0.28),inset 0 0 0 1px rgba(0,0,0,0.05)";
+          }) + "</div>" +
+        '<div class="lt-crow"><span class="lt-clabel">tape</span>' +
+          chips("t", LT_TAPE.length, function (i) {
+            return "background:repeating-linear-gradient(135deg," + LT_TAPE[i].a + " 0 5px," + LT_TAPE[i].b + " 5px 10px)";
+          }) + "</div>" +
+        '<div class="lt-crow"><span class="lt-clabel">sticker</span>' +
+          chips("s", 5, function (i) { return i ? ltStickerSVG(i, 26) : ""; }) + "</div>" +
+        '<div class="lt-crow"><span class="lt-clabel">marks</span>' +
+          chips("o", LT_ORN.length, function (i) {
+            return LT_ORN[i].chip ? '<span class="lt-cglyph">' + LT_ORN[i].chip + "</span>" : "";
+          }) + "</div>" +
+      "</div>";
+
+    lettersEl.innerHTML =
+      '<div class="add-inner lt-dress">' +
+        '<div class="lt-top">' +
+          '<button class="add-back" id="ltBack" title="back to the writing">←</button>' +
+          '<span class="lt-toptitle">how it arrives</span>' +
+        "</div>" +
+        '<p class="lt-sub">choose what it comes in ♡</p>' +
+        '<div class="lt-preview" id="ltPrev" style="' + ltStyleVars(st) + '">' +
+          ltPreviewHTML(st, signed) +
+        "</div>" +
+        picker +
+        '<div class="lt-dfoot">' +
+          '<button class="lt-send" id="ltSend">send ♡</button>' +
+        "</div>" +
+        '<div class="set-msg" id="ltMsg"></div>' +
+      "</div>";
+
+    var prev = document.getElementById("ltPrev");
     var custom = document.getElementById("ltCustom");
     custom.addEventListener("click", function (e) {
       var c = e.target.closest(".lt-chip");
       if (!c) return;
       var g = c.getAttribute("data-g");
       st[g] = parseInt(c.getAttribute("data-v"), 10);
-      // repaint in place: re-rendering the screen here would drop the caret and the keyboard with it
       [].forEach.call(custom.querySelectorAll('.lt-chip[data-g="' + g + '"]'), function (o) {
         o.classList.toggle("on", parseInt(o.getAttribute("data-v"), 10) === st[g]);
       });
-      sheet.setAttribute("style", ltStyleVars(st));
+      // the four colour dimensions are custom properties, so they repaint without touching the DOM; the
+      // sticker and the marks change actual markup, so those redraw the preview.
+      prev.setAttribute("style", ltStyleVars(st));
+      if (g === "s" || g === "o" || g === "p") prev.innerHTML = ltPreviewHTML(st, signed);
+      // "same as the paper/tape" chips have to restyle themselves when the thing they follow changes
+      if (g === "p" || g === "t") renderChipFollowers();
     });
+    function renderChipFollowers() {
+      var e0 = custom.querySelector('.lt-chip[data-g="e"][data-v="0"] i');
+      if (e0) e0.setAttribute("style", "background:" + LT_PAPER[st.p].env +
+        ";box-shadow:0 1px 3px rgba(190,130,150,0.28),inset 0 0 0 1px " + LT_PAPER[st.p].edge);
+      var m0 = custom.querySelector('.lt-chip[data-g="m"][data-v="0"] i');
+      if (m0) m0.setAttribute("style", "border-radius:3px;background:repeating-linear-gradient(135deg," +
+        LT_TAPE[st.t].a + " 0 5px," + LT_TAPE[st.t].b + " 5px 10px)");
+    }
 
     lettersEl.onclick = function (e) {
       var b = e.target.closest("button");
       if (!b) return;
-      if (b.id === "ltBack") { letterView.mode = "stack"; renderLetters(); return; }
+      if (b.id === "ltBack") { letterView.mode = "write"; renderLetters(); return; }
       if (b.id === "ltSend") {
-        var text = body.value.trim();
         var msg = document.getElementById("ltMsg");
-        if (!text) { body.focus(); return; }
-        // whatever they signed it with; falls back to this phone's own name if they left it blank
-        var signed = (from.value || "").trim() || pushWho || EM;
+        var text = (letterView.draft || "").trim();
+        if (!text) { letterView.mode = "write"; renderLetters(); return; }
         b.disabled = true; msg.textContent = "sealing…"; msg.classList.remove("bad");
         sendLetter(text, signed, letterView.title, st)
           .then(function () {
             msg.textContent = "sent ♡";
-            letterView.draft = ""; letterView.title = "";
+            letterView.draft = ""; letterView.title = ""; letterView.style = ltStyleNew();
             setTimeout(function () { letterView.mode = "stack"; renderLetters(); }, 700);
           })
           .catch(function (err) {
@@ -2961,6 +3079,39 @@
           });
       }
     };
+  }
+
+  /** The envelope as the inbox draws it, and the top of the sheet as she will read it. */
+  function ltPreviewHTML(st, signed) {
+    var mark = st.s ? ltStickerSVG(st.s, 26) : "♡";
+    var orn = LT_ORN[st.o];
+    var title = escW((letterView.title || "").trim() || "a letter");
+    var first = (letterView.draft || "").split(/\n\s*\n/)[0] || "";
+    return '<div class="lt-pv-env">' +
+        '<span class="lt-row" style="pointer-events:none">' +
+          '<span class="lt-r-flap"></span>' +
+          '<span class="lt-r-stamp">' + mark + "</span>" +
+          '<span class="lt-r-seal"></span>' +
+          '<span class="lt-r-slip">' +
+            '<span class="lt-r-title">' + title + "</span>" +
+            '<span class="lt-r-meta">' + escW(signed) + " <i>·</i> " + escW(letterDateShort(new Date().toISOString())) + "</span>" +
+          "</span>" +
+        "</span>" +
+      "</div>" +
+      '<div class="lt-pv-sheet">' +
+        '<div class="add-inner lt-letter' + (st.s ? " has-sticker" : "") + '">' +
+          '<span class="lt-fold-br"></span>' +
+          '<span class="lt-tape-t"></span>' +
+          (st.s ? '<span class="lt-sticker">' + ltStickerSVG(st.s) + "</span>" : "") +
+          '<div class="lt-l-head">' +
+            (orn.top ? '<div class="lt-l-flourish">' + orn.top + "</div>" : "") +
+            '<div class="lt-l-title">' + title + "</div>" +
+            '<div class="lt-l-date">' + escW(letterDate(new Date().toISOString())) + "</div>" +
+          "</div>" +
+          '<div class="lt-rule"><span class="line"></span><span>♡</span><span class="line"></span></div>' +
+          '<div class="lt-l-body"><p>' + escW(first.slice(0, 180)) + "</p></div>" +
+        "</div>" +
+      "</div>";
   }
 
   // ⚙ The secret settings. Reached only by arming the heart on the lock screen and then unlocking, so it
