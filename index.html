@@ -865,22 +865,24 @@
     transform: rotate(-0.5deg);
     animation: letterIn 0.6s cubic-bezier(0.34,1.4,0.64,1) both;
     background-color: #fffdf6;
-    background-image: repeating-linear-gradient(180deg, transparent 0 27px, rgba(206,168,180,0.16) 27px 28px);
     box-shadow: 0 12px 28px rgba(190,130,150,0.2), 0 2px 5px rgba(190,130,150,0.14);
   }
-  /* the paper's own folded corners */
-  .lt-fold-tl, .lt-fold-br { position: absolute; }
-  .lt-fold-tl { top: 0; left: 0; width: 46px; height: 46px;
-    background: linear-gradient(135deg, rgba(255,232,240,0.9) 48%, transparent 52%); }
-  .lt-fold-br { bottom: 0; right: 0; width: 34px; height: 34px;
-    background: linear-gradient(315deg, rgba(255,240,224,0.95) 48%, transparent 52%);
-    box-shadow: -2px -2px 4px rgba(190,140,150,0.12); }
+  /* ONE folded corner, bottom right. The ruling used to live on this element, but its 40px top padding and
+     the variable-height heading above the text meant the rules fell wherever they fell — straight through
+     the middle of the words. It belongs to the ruled text now (see .lt-l-body). */
+  .lt-fold-br { position: absolute; bottom: 0; right: 0; width: 30px; height: 30px;
+    /* a crisp 45° flap — the back of the sheet turned up, with a hairline crease. No blur: a soft-edged
+       triangle reads as a shadow on the paper rather than a fold in it. */
+    background:
+      linear-gradient(315deg, transparent 0 calc(50% - 1px), rgba(202,150,166,0.6) calc(50% - 1px) 50%, transparent 50%),
+      linear-gradient(315deg, #eddcc6 0 50%, transparent 50%); }
   /* washi tape holding it down */
   .lt-tape-t, .lt-tape-b { position: absolute; }
   .lt-tape-t { top: -12px; left: 50%; margin-left: -48px; width: 96px; height: 26px; transform: rotate(-2.5deg);
     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.9) 0 7px, rgba(255,206,222,0.88) 7px 14px);
     box-shadow: 0 2px 5px rgba(190,130,150,0.2); }
-  .lt-tape-b { bottom: -10px; right: 18px; width: 62px; height: 21px; transform: rotate(4deg);
+  /* on the LEFT now — at bottom right it sat straight on top of the folded corner and hid it */
+  .lt-tape-b { bottom: -10px; left: 22px; width: 62px; height: 21px; transform: rotate(4deg);
     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.9) 0 7px, rgba(255,240,200,0.88) 7px 14px);
     box-shadow: 0 2px 5px rgba(190,130,150,0.16); }
   .lt-letter .add-back { top: 14px; left: 14px; z-index: 3; }
@@ -894,10 +896,21 @@
     background: repeating-linear-gradient(90deg, #ecc3d1 0 5px, transparent 5px 10px); }
   /* the letter */
   .lt-l-greet { font-family: "Gochi Hand", cursive; font-size: 19px; color: #c0668a; margin-bottom: 12px; }
+  /* THE RULED PART. The rules are drawn by the text block itself, so the first one is always 27px below the
+     top of the first line rather than 27px below the top of the sheet — that offset is what put a line
+     through the middle of the words. background-origin: content-box keeps it true even if this ever gains
+     padding. */
+  .lt-l-body {
+    background-image: repeating-linear-gradient(180deg, transparent 0 27px, rgba(206,168,180,0.16) 27px 28px);
+    background-origin: content-box;
+  }
   .lt-l-body p {
-    margin: 0 0 15px; font-family: "Caveat", cursive; font-weight: 500;
+    /* the gap between paragraphs is a whole line, not 15px: anything off the 28px rhythm drifts every
+       paragraph a little further off the rules until they run through the text again. */
+    margin: 0 0 28px; font-family: "Caveat", cursive; font-weight: 500;
     font-size: 19px; line-height: 28px; color: #7b5361; text-wrap: pretty;
   }
+  .lt-l-body p:last-child { margin-bottom: 0; }
   .lt-l-sign { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; margin-top: 22px; }
   .lt-l-sign .line { width: 88px; height: 1px;
     background: repeating-linear-gradient(90deg, #e0a8bd 0 6px, transparent 6px 11px); }
@@ -953,6 +966,9 @@
     font-family: "Caveat", cursive; font-weight: 500; font-size: 19px; line-height: 28px;
     background-color: #fffdf6;
     background-image: repeating-linear-gradient(180deg, transparent 0 27px, rgba(206,168,180,0.16) 27px 28px);
+    /* content-box, so the tiling starts where the TEXT starts and not 13px of padding above it — otherwise
+       every rule sits halfway up a line of your own handwriting. */
+    background-origin: content-box;
     color: #7b5361;
   }
   .lt-titlein:focus, .lt-write:focus { border-color: #ff9dc2; }
@@ -1251,7 +1267,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"ZVrL1k17Jj48T3Gn8GwtVw==","iv":"7rHvmcsn6GnwhMGH","ct":"N8iXCN3MtLero9bnEaKoiVnedULdjoM44b/tMZnh7ovapGwfdp/jLGfcXtxGb56cNu9nE/EJ9xkpvZG4+kU0VzCKNbHMDz/2RZNsT6ygyrmFgdRufWnNF8R1MlPEEdwRh3dXncLXZX9nUnqamYLxzfqUImFC7/q8eA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"ofFWeBcqBzdDvqPjYx8TLA==","iv":"I4Baugfsnhj0BFXx","ct":"0zJyP+I2FclpMmVuiQVlA3Claozf5lKcA/3QavYV4wXqehnAudMpPS+f777S/FiOHzP11wap2JCfC/LC1Amw0q0VsMzwZRHaADpbN985/uQZAPFczK2hE7w+4EzaI31AnnvOxJaBLV1zkF9a1cFG1hyU7c272xd6cQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2655,7 +2671,7 @@
 
     lettersEl.innerHTML =
       '<div class="add-inner lt-letter">' +
-        '<span class="lt-fold-tl"></span><span class="lt-fold-br"></span>' +
+        '<span class="lt-fold-br"></span>' +
         '<span class="lt-tape-t"></span><span class="lt-tape-b"></span>' +
         '<button class="add-back" id="ltBack" title="back to the letters">←</button>' +
         '<div class="lt-l-head">' +
