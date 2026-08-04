@@ -1251,7 +1251,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"KNdXULVCyQrPASMQWBY0gg==","iv":"YuYaGuHDvlG/Pm+5","ct":"oeTEed7A0hzmggcx5xDX8KN+VPHEK2MiWGY7mtrD4u4rIv+Zd6iO9HFx2TLNMOBxES6bNRY2A5QPEDNjCl4V5VQDSwZ7Q+EyF9iQ/NojtRivSbEzUp+xthngIouwgFaZP9taFDhjSx3XWIPR7PVyQiRNLm8e1sSXeg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"jANK1TjTFrZVTDhNmE72Fw==","iv":"/I7m39ngkRi3iaQT","ct":"LxfdCteIxY1drSZa11momj9QUM3DRnPGQv/gB/5c4opLi1kY8Cg6Xm5bmvaj8XRNVcx0v+5lyddaITFlOKqcu+j3MGlW+UALsZqzmvpln5v0HIGx2nAs3VBOFUJRjh4U7fYJ0X35PMa3Us9tCWthX4qHOWZOsoxE+g==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1473,10 +1473,10 @@
     markDebug("lock");
   }
   function showBloom() {
-    // The curtain comes up WITH the blossom, not with the board. It used to ride the heart reveal, so it
-    // only existed once the board did — which read as the curtain arriving late no matter how fast it
-    // painted. It's the room the blossom opens in: up and drifting from the moment the passcode lands.
-    showChrome(true);
+    // Out of sight for the blossom, but PAINTED behind it the whole time — showChrome(false) no longer
+    // un-renders anything, it just drops the opacity (see warmChrome). So the curtain is fully rasterised,
+    // its hearts are already geometry, and the reveal has nothing left to build.
+    showChrome(false);
     chromeMask(null);
     rootSkin("");
     clearBloomTimers();
@@ -1513,9 +1513,12 @@
   // expensive part — building ~N note DOM trees, laying them out, decoding the paper/heart tile images and
   // loading the cursive webfonts — into the blossom's idle seconds instead of the frame right before the
   // reveal, which is what made the reveal stutter and the notes appear to pop in late.
-  // The curtain is NOT part of the reveal any more — it is already up over the blossom, and the heart opens
-  // the board underneath it. chromeMask() survives for the one thing that still needs it: clearing a mask
-  // left over from an older path (and it is what showWall/showBloom call with null).
+  // The curtain is NOT masked by the reveal any more, and THAT was the delay all along. The heart grows from
+  // the centre of the screen, so it only reaches the top edge near the end of its 1300ms — masking the
+  // curtain in step meant the curtain could not finish arriving until the heart got up there, however fast
+  // it painted. It is simply switched on when the reveal begins (already rasterised behind the blossom, so
+  // that costs nothing) and the heart opens the board underneath it. chromeMask() survives for one job:
+  // clearing a mask left over from an older path.
   function chromeMask(size) {
     if (!chromeEl) return;
     if (size == null) {
@@ -1532,8 +1535,10 @@
   }
 
   function prewarmWall() {
-    showChrome(true);
-    chromeMask(null);                                // already up over the blossom — never masked shut
+    // the curtain stays out of sight for the blossom — but it is painted (opacity, not display), so this
+    // prewarm covers it too and the reveal only has to switch it on.
+    showChrome(false);
+    chromeMask(null);
     if (wallEl.classList.contains("show")) return;   // already up (or already prewarmed)
     wallEl.classList.add("show", "heart-reveal");
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
@@ -1563,8 +1568,9 @@
     }
     wallEl.classList.add("heart-reveal");
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
-    showChrome(true); chromeMask(null);
-    if (chromeEl) chromeEl.classList.remove("heart-reveal");
+    // the curtain, switched on for the first frame of the reveal. Nothing is built or decoded here — it has
+    // been painted behind the blossom for three seconds; this only changes its opacity.
+    chromeMask(null); showChrome(true);
     var t0 = null, dur = 1300, to = 650;
     function grow(ts) {
       if (t0 == null) t0 = ts;
