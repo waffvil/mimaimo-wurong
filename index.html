@@ -1251,7 +1251,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"jANK1TjTFrZVTDhNmE72Fw==","iv":"/I7m39ngkRi3iaQT","ct":"LxfdCteIxY1drSZa11momj9QUM3DRnPGQv/gB/5c4opLi1kY8Cg6Xm5bmvaj8XRNVcx0v+5lyddaITFlOKqcu+j3MGlW+UALsZqzmvpln5v0HIGx2nAs3VBOFUJRjh4U7fYJ0X35PMa3Us9tCWthX4qHOWZOsoxE+g==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"ZVrL1k17Jj48T3Gn8GwtVw==","iv":"7rHvmcsn6GnwhMGH","ct":"N8iXCN3MtLero9bnEaKoiVnedULdjoM44b/tMZnh7ovapGwfdp/jLGfcXtxGb56cNu9nE/EJ9xkpvZG4+kU0VzCKNbHMDz/2RZNsT6ygyrmFgdRufWnNF8R1MlPEEdwRh3dXncLXZX9nUnqamYLxzfqUImFC7/q8eA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1568,9 +1568,11 @@
     }
     wallEl.classList.add("heart-reveal");
     wallEl.style.webkitMaskImage = wallEl.style.maskImage = HEART_MASK;
-    // the curtain, switched on for the first frame of the reveal. Nothing is built or decoded here — it has
-    // been painted behind the blossom for three seconds; this only changes its opacity.
-    chromeMask(null); showChrome(true);
+    // The curtain fades in ON THE REVEAL'S OWN CLOCK rather than being switched on at its first frame:
+    // switching it on made it a separate event you could catch arriving a moment before the board came up.
+    // Its opacity is driven below, off the same eased progress as the heart, so the two are one motion.
+    // (Still nothing to build here — it has been painted behind the blossom for three seconds.)
+    chromeMask(null);
     var t0 = null, dur = 1300, to = 650;
     function grow(ts) {
       if (t0 == null) t0 = ts;
@@ -1578,6 +1580,9 @@
       var e = 1 - Math.pow(1 - p, 3);          // ease-out
       var sz = (to * e).toFixed(1) + "%";
       wallEl.style.webkitMaskSize = wallEl.style.maskSize = sz + " " + sz;
+      // full by the time the heart is half open, so the curtain is settled while the board is still
+      // arriving — it should feel like the room coming up, not like a thing sliding in after it.
+      if (chromeEl) chromeEl.style.opacity = Math.max(0.004, Math.min(1, e / 0.5)).toFixed(3);
       if (p < 1) requestAnimationFrame(grow);
       else showWall({ keepRendered: true });    // heart filled the screen → settle (don't rebuild the DOM
     }                                          // we just revealed; that would blink the notes)
@@ -2148,6 +2153,9 @@
       if (st) { st.textContent = t.short; st.classList.toggle("today", !!t.special); }
     }
     chromeEl.classList.add("show");
+    // drop any opacity the reveal was driving by hand — an inline value would out-rank .chrome-hide and
+    // leave the curtain stuck visible on the next screen that wants it gone.
+    chromeEl.style.opacity = "";
     chromeEl.classList.toggle("chrome-hide", !on);
   }
 
