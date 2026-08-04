@@ -6,7 +6,8 @@
 create table if not exists public.letters (
   id         uuid primary key default gen_random_uuid(),
   body       text not null check (char_length(body) between 1 and 20000),
-  author     text not null check (author in ('em yêu', 'anh yêu')),
+  -- how the writer signed it: free text, their choice (a name, a nickname, anything)
+  author     text not null check (char_length(author) between 1 and 40),
   title      text check (char_length(title) <= 120),
   -- author is whose name is ON the letter (the writer chooses it); sent_by is which phone it came from,
   -- and that is what decides whether a letter is sealed "for you"
