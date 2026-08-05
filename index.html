@@ -317,35 +317,6 @@
   .key.del:active { background: rgba(255,196,214,0.55); }
   .spacer { width: clamp(62px,19vw,76px); height: clamp(62px,19vw,76px); }
 
-  /* ---------- the passcode gate ----------
-     Above everything, including the note modal (z20) it is usually asked from. It reuses the lock screen's
-     own .dots and .key, so it is the same gesture in the same hand — not a new dialog to learn. */
-  .pc-ask {
-    position: fixed; inset: 0; z-index: 40; display: none;
-    align-items: center; justify-content: center; padding: 24px;
-    background: rgba(120,70,90,0.34); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
-  }
-  .pc-ask.open { display: flex; animation: pcIn 0.22s ease both; }
-  @keyframes pcIn { 0% { opacity: 0; } 100% { opacity: 1; } }
-  .pc-card {
-    display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 340px;
-    padding: 22px 20px 16px; border-radius: 26px; background: #fffaf1;
-    border: 2px dashed rgba(232,168,192,0.6); box-shadow: 0 18px 44px rgba(150,90,115,0.34);
-  }
-  .pc-title { font-family: "Gochi Hand", cursive; font-size: 30px; color: #cc6488; line-height: 1; }
-  .pc-sub { margin: 5px 0 16px; font-family: "Caveat", cursive; font-weight: 500; font-size: 16px; color: #ad8493; }
-  .pc-ask .dots { margin-bottom: 20px; }
-  .pc-ask .pad { gap: 13px; }
-  .pc-ask .key { width: 62px; height: 62px; font-size: 28px; }
-  .pc-ask .spacer { width: 62px; height: 62px; }
-  .pc-cancel { margin-top: 14px; padding: 9px 18px; border: none; background: none; cursor: pointer;
-    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px; color: #b0808f; }
-  .pc-card.wrong { animation: pcShake 0.42s ease; }
-  @keyframes pcShake {
-    0%,100% { transform: translateX(0); } 20% { transform: translateX(-9px); }
-    45% { transform: translateX(8px); } 70% { transform: translateX(-5px); }
-  }
-
   /* ---------- tidying up (in the settings) ----------
      Removing things has no icon anywhere. A bin glyph is the one thing in here that looks bought rather
      than drawn, so this asks in words instead — "remove" turns into "remove this? yes / no" in the same
@@ -1424,42 +1395,13 @@
   <!-- ✉ letters — long-form, written and read as letters -->
   <div class="add letters" id="letters"></div>
 
-  <!-- 🔒 the passcode gate. Deleting is the one thing in here that can't be undone, so it asks for the
-       passcode first — and it checks it by DECRYPTING the payload again (see askPasscode), which means the
-       code itself is nowhere in this file to be read. -->
-  <div class="pc-ask" id="pcAsk">
-    <div class="pc-card">
-      <div class="pc-title">passcode</div>
-      <div class="pc-sub" id="pcSub">to delete this</div>
-      <div class="dots" id="pcDots">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      </div>
-      <div class="pad" id="pcPad">
-        <button class="key" data-key="1">1</button>
-        <button class="key" data-key="2">2</button>
-        <button class="key" data-key="3">3</button>
-        <button class="key" data-key="4">4</button>
-        <button class="key" data-key="5">5</button>
-        <button class="key" data-key="6">6</button>
-        <button class="key" data-key="7">7</button>
-        <button class="key" data-key="8">8</button>
-        <button class="key" data-key="9">9</button>
-        <span class="spacer"></span>
-        <button class="key" data-key="0">0</button>
-        <button class="key del" data-key="del" aria-label="Delete">⌫</button>
-      </div>
-      <button class="pc-cancel" id="pcCancel">never mind</button>
-    </div>
-  </div>
-
   <!-- ✎ Drawing screen -->
   <div class="draw" id="draw"></div>
 
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"/Fm3bhkjjZ89EW+yi6CfKg==","iv":"0wANVMHnB/R1UxR3","ct":"0tapNC6ZJgV59nWqGdbpHlFOSGtGv2y76TVK+CvqGUqpMKvbuHxgn04smFwANtAvxsDT6fyx9CZ9V9sg/agxi84SoSyB3bRv2FoaxYiCGMxvfH81mB/4mAWS6AwCwqOYvwXV4a1RQjg3UQCKsigBXGjmcZQWfmYvnQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"ewOYI3ura1vKPpAAKsfqZw==","iv":"1U6RCOgQPI26N1ax","ct":"JBSr/0lvgdKeT6D1hQuiQKi55ly7RVu15AO17ECoWqJ0eKnXmJ/M552jUFYUCNKKU6LWcAeFli2i/qo8c/OQ80rOLTiA/vv4kauQmgR2Z4/SOn7sj9isW1Wy2nrUAd5/5zSk3/t1JzRHSXIV33epwQZwMqK/sk2bEQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1591,61 +1533,6 @@
       })
       .catch(function () { return false; }); // wrong code → auth tag fails → decrypt throws
   }
-
-  // ---------- the passcode gate ----------
-  // Deleting is the only irreversible thing in the app, so it asks for the passcode. There is nothing to
-  // compare against — the code is not in this file, by design — so it is checked the same way the lock
-  // screen checks it: try to DECRYPT the payload with it. Right code, it decrypts; wrong code, the AES-GCM
-  // auth tag fails. That also means a wrong guess costs a full PBKDF2 derivation (310k rounds), which is
-  // exactly the brute-force cost we want here.
-  var pcAskEl = document.getElementById("pcAsk");
-  var pcSubEl = document.getElementById("pcSub");
-  var pcDotsEl = document.getElementById("pcDots");
-  var pcPending = null, pcTyped = "", pcBusy = false;
-  function pcPaint() {
-    var dots = pcDotsEl.querySelectorAll(".dot");
-    for (var i = 0; i < dots.length; i++) dots[i].classList.toggle("filled", i < pcTyped.length);
-  }
-  function pcClose(ok) {
-    var done = pcPending; pcPending = null; pcTyped = ""; pcBusy = false;
-    pcDotsEl.classList.remove("checking"); pcPaint();
-    pcAskEl.classList.remove("open");
-    if (done) done(ok);
-  }
-  /** Resolves true only if the right passcode was typed. `what` finishes the sentence "to delete …". */
-  function askPasscode(what) {
-    return new Promise(function (resolve) {
-      if (pcPending) return resolve(false);        // one at a time
-      pcPending = resolve; pcTyped = ""; pcPaint();
-      pcSubEl.textContent = "to delete " + (what || "this");
-      pcAskEl.classList.add("open");
-    });
-  }
-  document.getElementById("pcPad").addEventListener("click", function (e) {
-    var b = e.target.closest("[data-key]");
-    if (!b || pcBusy) return;
-    var k = b.getAttribute("data-key");
-    if (k === "del") { pcTyped = pcTyped.slice(0, -1); pcPaint(); return; }
-    if (pcTyped.length >= 6) return;
-    pcTyped += k; pcPaint();
-    if (pcTyped.length < 6) return;
-    pcBusy = true; pcDotsEl.classList.add("checking");
-    // Same two paths as the lock screen's check(): decrypt in the published build, plaintext compare in the
-    // dev source (which has no ENC_PAYLOAD at all, so decrypting there would reject every code — including
-    // the right one, which would have made deleting impossible in the preview).
-    var verify = window.ENC_PAYLOAD ? decryptPayload(pcTyped)
-      : Promise.resolve(pcTyped === CORRECT_CODE);
-    verify.then(function (ok) {
-      pcDotsEl.classList.remove("checking");
-      if (ok) return pcClose(true);
-      // wrong: shake, clear, stay open — deleting is deliberate, so it doesn't hand you back to the letter
-      var card = pcAskEl.querySelector(".pc-card");
-      card.classList.remove("wrong"); void card.offsetWidth; card.classList.add("wrong");
-      pcTyped = ""; pcPaint(); pcBusy = false;
-    });
-  });
-  document.getElementById("pcCancel").addEventListener("click", function () { pcClose(false); });
-  pcAskEl.addEventListener("click", function (e) { if (e.target === pcAskEl) pcClose(false); });
 
   // keypad clicks
   padEl.addEventListener("click", function (e) {
@@ -3300,7 +3187,6 @@
    
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
-    setTidy = false;      // removing is locked again on every visit
     renderSettings();
     // Neither list may have been fetched this session (the settings can be reached without opening the
     // letters, and the notes arrive with the board) — fetch what's missing and list it as it lands.
@@ -3315,15 +3201,13 @@
     markDebug("settings");
   }
 
-  // Unlocked per visit, never remembered: leaving the settings locks removing again.
-  var setTidy = false;
   /** One row: what it is, when it was, and the word "remove" — which becomes "remove this? yes / no". */
   function tidyRow(kind, i, title, meta) {
     return '<div class="tidy-row" data-k="' + kind + '" data-i="' + i + '">' +
       '<span class="tidy-t">' + escW(title) + "</span>" +
       '<span class="tidy-m">' + escW(meta) + "</span>" +
       '<button class="tidy-x" data-tidy="ask">remove</button>' +
-      '<span class="tidy-ask">remove this?' +
+      '<span class="tidy-ask">are you sure?' +
         '<button class="tidy-yes" data-tidy="yes">yes</button>' +
         '<button class="tidy-no" data-tidy="no">no</button>' +
       "</span>" +
@@ -3375,10 +3259,8 @@
 
         '<div class="set-sec">' +
           '<div class="set-h">tidying up</div>' +
-          '<p class="set-p">take a letter or a note off the wall for good. this is the only thing in here ' +
-            'that can\'t be undone, so it asks for the passcode first.</p>' +
-          (setTidy ? tidyLists()
-            : '<div class="set-row"><button class="set-btn" id="setTidyOn">unlock removing</button></div>') +
+          '<p class="set-p">take a letter or a note off the wall for good. it asks before it does.</p>' +
+          tidyLists() +
         "</div>" +
 
         '<div class="set-sec">' +
@@ -3407,10 +3289,6 @@
       if (!b) return;
       if (b.id === "setBack" || b.id === "setDone") { showWall(); return; }
 
-      if (b.id === "setTidyOn") {
-        askPasscode("things in here").then(function (ok) { if (ok) { setTidy = true; renderSettings(); } });
-        return;
-      }
       var act = b.getAttribute("data-tidy");
       if (act) {
         var row = b.closest(".tidy-row");
