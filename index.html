@@ -317,6 +317,45 @@
   .key.del:active { background: rgba(255,196,214,0.55); }
   .spacer { width: clamp(62px,19vw,76px); height: clamp(62px,19vw,76px); }
 
+  /* ---------- the passcode gate ----------
+     Above everything, including the note modal (z20) it is usually asked from. It reuses the lock screen's
+     own .dots and .key, so it is the same gesture in the same hand — not a new dialog to learn. */
+  .pc-ask {
+    position: fixed; inset: 0; z-index: 40; display: none;
+    align-items: center; justify-content: center; padding: 24px;
+    background: rgba(120,70,90,0.34); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  }
+  .pc-ask.open { display: flex; animation: pcIn 0.22s ease both; }
+  @keyframes pcIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+  .pc-card {
+    display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 340px;
+    padding: 22px 20px 16px; border-radius: 26px; background: #fffaf1;
+    border: 2px dashed rgba(232,168,192,0.6); box-shadow: 0 18px 44px rgba(150,90,115,0.34);
+  }
+  .pc-title { font-family: "Gochi Hand", cursive; font-size: 30px; color: #cc6488; line-height: 1; }
+  .pc-sub { margin: 5px 0 16px; font-family: "Caveat", cursive; font-weight: 500; font-size: 16px; color: #ad8493; }
+  .pc-ask .dots { margin-bottom: 20px; }
+  .pc-ask .pad { gap: 13px; }
+  .pc-ask .key { width: 62px; height: 62px; font-size: 28px; }
+  .pc-ask .spacer { width: 62px; height: 62px; }
+  .pc-cancel { margin-top: 14px; padding: 9px 18px; border: none; background: none; cursor: pointer;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 14px; color: #b0808f; }
+  .pc-card.wrong { animation: pcShake 0.42s ease; }
+  @keyframes pcShake {
+    0%,100% { transform: translateX(0); } 20% { transform: translateX(-9px); }
+    45% { transform: translateX(8px); } 70% { transform: translateX(-5px); }
+  }
+
+  /* delete, where a letter is read: quiet, beside the close button, never the thing your thumb finds first */
+  .lt-readfoot { display: flex; align-items: center; gap: 10px; }
+  .lt-readfoot .lt-close { margin: 26px 0 0; }
+  .lt-trash {
+    flex: 0 0 auto; margin: 26px 0 0; width: 54px; height: 54px; border-radius: 999px; cursor: pointer;
+    border: 1.5px solid rgba(216,105,138,0.32); background: rgba(255,255,255,0.7); color: #c07d8e;
+    font-size: 19px; line-height: 1;
+  }
+  .lt-trash:active { transform: scale(0.94); }
+
   /* ---------- lock fade-out ---------- */
   .stage { transition: opacity 0.9s ease; }
   .stage.dismiss { opacity: 0; pointer-events: none; }
@@ -1369,13 +1408,42 @@
   <!-- ✉ letters — long-form, written and read as letters -->
   <div class="add letters" id="letters"></div>
 
+  <!-- 🔒 the passcode gate. Deleting is the one thing in here that can't be undone, so it asks for the
+       passcode first — and it checks it by DECRYPTING the payload again (see askPasscode), which means the
+       code itself is nowhere in this file to be read. -->
+  <div class="pc-ask" id="pcAsk">
+    <div class="pc-card">
+      <div class="pc-title">passcode</div>
+      <div class="pc-sub" id="pcSub">to delete this</div>
+      <div class="dots" id="pcDots">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <div class="pad" id="pcPad">
+        <button class="key" data-key="1">1</button>
+        <button class="key" data-key="2">2</button>
+        <button class="key" data-key="3">3</button>
+        <button class="key" data-key="4">4</button>
+        <button class="key" data-key="5">5</button>
+        <button class="key" data-key="6">6</button>
+        <button class="key" data-key="7">7</button>
+        <button class="key" data-key="8">8</button>
+        <button class="key" data-key="9">9</button>
+        <span class="spacer"></span>
+        <button class="key" data-key="0">0</button>
+        <button class="key del" data-key="del" aria-label="Delete">⌫</button>
+      </div>
+      <button class="pc-cancel" id="pcCancel">never mind</button>
+    </div>
+  </div>
+
   <!-- ✎ Drawing screen -->
   <div class="draw" id="draw"></div>
 
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"wiak0a7DhlgLsD11Oj44RQ==","iv":"RTd4o9kxt+5fHiOi","ct":"BGL5CDKzhnvumUWn5uPpSwsNQhtoG4ckraPRUa2mgZCoB7dYBhxlFH7cr6+1yR9GcQeXuohol3mVFxpzEGV4uWeCle14vrynqBc2ERQGVB3cGGCXCdtmIHVPVosMCBlflaZ6cOiebNgLzcNSnewJyUhHMfYBE1YI/Q==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"qv909IcvEywb757q/w+nMA==","iv":"jcDF2hIin+gt2BaL","ct":"0Srm+w+3hGxAb8YVfD+GrVm3KSLINT4weFFKDJN69D+aofRwJZaWnCn5NRkLXAFXfPatNBqHhtnZI2OCE4KQgpktsrDEj26C3pEM8PRrd2/9LR6yNKrt6+YUqCbV6DqR3NywpA3/AAbeXQss9ikxvemTQitZkInnFg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1507,6 +1575,61 @@
       })
       .catch(function () { return false; }); // wrong code → auth tag fails → decrypt throws
   }
+
+  // ---------- the passcode gate ----------
+  // Deleting is the only irreversible thing in the app, so it asks for the passcode. There is nothing to
+  // compare against — the code is not in this file, by design — so it is checked the same way the lock
+  // screen checks it: try to DECRYPT the payload with it. Right code, it decrypts; wrong code, the AES-GCM
+  // auth tag fails. That also means a wrong guess costs a full PBKDF2 derivation (310k rounds), which is
+  // exactly the brute-force cost we want here.
+  var pcAskEl = document.getElementById("pcAsk");
+  var pcSubEl = document.getElementById("pcSub");
+  var pcDotsEl = document.getElementById("pcDots");
+  var pcPending = null, pcTyped = "", pcBusy = false;
+  function pcPaint() {
+    var dots = pcDotsEl.querySelectorAll(".dot");
+    for (var i = 0; i < dots.length; i++) dots[i].classList.toggle("filled", i < pcTyped.length);
+  }
+  function pcClose(ok) {
+    var done = pcPending; pcPending = null; pcTyped = ""; pcBusy = false;
+    pcDotsEl.classList.remove("checking"); pcPaint();
+    pcAskEl.classList.remove("open");
+    if (done) done(ok);
+  }
+  /** Resolves true only if the right passcode was typed. `what` finishes the sentence "to delete …". */
+  function askPasscode(what) {
+    return new Promise(function (resolve) {
+      if (pcPending) return resolve(false);        // one at a time
+      pcPending = resolve; pcTyped = ""; pcPaint();
+      pcSubEl.textContent = "to delete " + (what || "this");
+      pcAskEl.classList.add("open");
+    });
+  }
+  document.getElementById("pcPad").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-key]");
+    if (!b || pcBusy) return;
+    var k = b.getAttribute("data-key");
+    if (k === "del") { pcTyped = pcTyped.slice(0, -1); pcPaint(); return; }
+    if (pcTyped.length >= 6) return;
+    pcTyped += k; pcPaint();
+    if (pcTyped.length < 6) return;
+    pcBusy = true; pcDotsEl.classList.add("checking");
+    // Same two paths as the lock screen's check(): decrypt in the published build, plaintext compare in the
+    // dev source (which has no ENC_PAYLOAD at all, so decrypting there would reject every code — including
+    // the right one, which would have made deleting impossible in the preview).
+    var verify = window.ENC_PAYLOAD ? decryptPayload(pcTyped)
+      : Promise.resolve(pcTyped === CORRECT_CODE);
+    verify.then(function (ok) {
+      pcDotsEl.classList.remove("checking");
+      if (ok) return pcClose(true);
+      // wrong: shake, clear, stay open — deleting is deliberate, so it doesn't hand you back to the letter
+      var card = pcAskEl.querySelector(".pc-card");
+      card.classList.remove("wrong"); void card.offsetWidth; card.classList.add("wrong");
+      pcTyped = ""; pcPaint(); pcBusy = false;
+    });
+  });
+  document.getElementById("pcCancel").addEventListener("click", function () { pcClose(false); });
+  pcAskEl.addEventListener("click", function (e) { if (e.target === pcAskEl) pcClose(false); });
 
   // keypad clicks
   padEl.addEventListener("click", function (e) {
@@ -1984,6 +2107,14 @@
     return fetch(lettersEndpoint() + "?id=eq." + letter.id, {
       method: "PATCH", headers: wallHeaders(true), body: JSON.stringify({ opened_at: when })
     }).catch(function (e) { console.error("[letters] seal update failed", e); });
+  }
+  /** Gone for good — the row, the local copy and the letter itself. Gated by the passcode at the call site. */
+  function deleteLetter(l) {
+    var i = LETTERS.indexOf(l);
+    if (i >= 0) LETTERS.splice(i, 1);
+    if (!l.id) return Promise.resolve();
+    return fetch(lettersEndpoint() + "?id=eq." + l.id, { method: "DELETE", headers: wallHeaders(false) })
+      .catch(function (e) { console.error("[letters] delete failed", e); });
   }
   // Who a letter came FROM, for the app's purposes: the phone that sent it. Letters written before that was
   // recorded fall back to the signed name, which was the only thing there was.
@@ -2716,7 +2847,10 @@
           if (a === "close") closeModal();
           else if (a === "move") { closeModal(); unlockNote(idx); }
           else if (a === "edit") { closeModal(); editNote(idx); }
-          else if (a === "delete") { closeModal(); deleteNote(idx); }
+          else if (a === "delete") {
+            // the note stays open behind the gate: cancel and you are back where you were, nothing lost
+            askPasscode("this note").then(function (ok) { if (ok) { closeModal(); deleteNote(idx); } });
+          }
           return;
         }
         if (e.target === modal) closeModal(); // tap backdrop to close
@@ -2826,6 +2960,16 @@
     loadLetters().then(function () { if (lettersEl.classList.contains("show")) renderLetters(); });
   }
 
+  // iOS WebKit can leave a stale composited tile behind when a subtree that used filter/clip-path is thrown
+  // away — going back from a letter left its washi tape still painted over the inbox card. Taking the screen
+  // out of the layout for one tick discards those tiles. It happens in the same frame, so nothing flickers.
+  function ltFlush() {
+    if (!lettersEl) return;
+    lettersEl.style.display = "none";
+    void lettersEl.offsetHeight;
+    lettersEl.style.display = "";
+  }
+
   function renderLetters() {
     if (letterView.mode === "read") return renderLetterRead();
     if (letterView.mode === "write") return renderLetterWrite();
@@ -2921,12 +3065,24 @@
           ? '<div class="lt-l-tail">' + LT_ORN[lst.o].tail.map(function (g) { return "<span>" + g + "</span>"; }).join("") + "</div>"
           : "") +
       "</div>" +
-      '<button class="lt-close" id="ltDone">close ♡</button>';
+      '<div class="lt-readfoot">' +
+        '<button class="lt-close" id="ltDone">close ♡</button>' +
+        '<button class="lt-trash" id="ltDel" title="delete this letter" aria-label="delete this letter">🗑</button>' +
+      "</div>";
 
     lettersEl.onclick = function (e) {
       var b = e.target.closest("button");
       if (!b) return;
-      if (b.id === "ltBack" || b.id === "ltDone") { letterView.mode = "stack"; letterView.letter = null; renderLetters(); }
+      if (b.id === "ltBack" || b.id === "ltDone") {
+        letterView.mode = "stack"; letterView.letter = null; renderLetters(); ltFlush(); return;
+      }
+      if (b.id === "ltDel") {
+        askPasscode("this letter").then(function (ok) {
+          if (!ok) return;
+          deleteLetter(l);
+          letterView.mode = "stack"; letterView.letter = null; renderLetters(); ltFlush();
+        });
+      }
     };
   }
 
@@ -3082,7 +3238,7 @@
           .then(function () {
             msg.textContent = "sent ♡";
             letterView.draft = ""; letterView.title = ""; letterView.style = ltStyleNew();
-            setTimeout(function () { letterView.mode = "stack"; renderLetters(); }, 700);
+            setTimeout(function () { letterView.mode = "stack"; renderLetters(); ltFlush(); }, 700);
           })
           .catch(function (err) {
             b.disabled = false;
