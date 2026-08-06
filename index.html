@@ -321,26 +321,40 @@
      Removing things has no icon anywhere. A bin glyph is the one thing in here that looks bought rather
      than drawn, so this asks in words instead — "remove" turns into "remove this? yes / no" in the same
      hand as everything else. */
-  .tidy-list { margin-top: 4px; }
-  .tidy-row { display: flex; align-items: baseline; gap: 8px; padding: 9px 1px;
-    border-bottom: 1px dashed rgba(228,168,190,0.5); }
-  .tidy-row:last-child { border-bottom: none; }
-  .tidy-t { flex: 1 1 auto; min-width: 0; font-family: "Caveat", cursive; font-weight: 500; font-size: 17px;
-    color: #8a5a6b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .tidy-m { flex: 0 0 auto; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11.5px; color: #b892a1; }
+  .tidy-tabs { display: flex; gap: 8px; margin: 2px 0 4px; }
+  .tidy-tab { flex: 1 1 0; padding: 11px 8px; border-radius: 14px; cursor: pointer;
+    border: 1.5px solid rgba(216,105,138,0.32); background: #fff; color: #a05a72;
+    font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 20px; }
+  .tidy-tab.on { background: linear-gradient(135deg, #ffd9e6, #ffc2d6); border-color: #e290ad; color: #8c3f5c; }
+  .tidy-n { display: block; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11px; color: #c08fa2; }
+  .tidy-tab.on .tidy-n { color: #a84c6c; }
+  /* the same month grid the board's calendar uses, just narrower */
+  .tidy-cal { margin: 12px 0 10px; }
+  .tidy-cal .cal-year { margin-bottom: 9px; }
+  .tidy-cal .cal-m { padding: 7px 2px 6px; font-size: 13px; }
+  .tidy-cal .cal-m .n { font-size: 9.5px; }
+  .tidy-grid { display: grid; gap: 12px; }
+  .tidy-grid.notes { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); justify-items: center; }
+  .tidy-grid.letters { grid-template-columns: 1fr; }
+  .tidy-card { display: flex; flex-direction: column; gap: 6px; }
+  /* the creator's miniature: the real note at 300px, scaled, with room above for the tape it hangs from */
+  .tidy-mini { position: relative; overflow: hidden; }
+  .tidy-shrink { position: absolute; top: 9px; left: 0; width: 300px; height: 300px; transform-origin: top left; }
+  .tidy-env { pointer-events: none; }
+  .tidy-foot { display: flex; align-items: baseline; gap: 8px; }
+  .tidy-m { flex: 1 1 auto; min-width: 0; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11.5px;
+    color: #b892a1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tidy-x, .tidy-yes, .tidy-no {
     flex: 0 0 auto; border: none; background: none; cursor: pointer; padding: 4px 2px;
     font-family: "Bradley Hand","Segoe Print",cursive; font-size: 13px; color: #c07d8e;
   }
   .tidy-ask { flex: 0 0 auto; display: none; align-items: baseline; gap: 6px;
     font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12.5px; color: #a5808d; }
-  .tidy-row.asking .tidy-ask { display: flex; }
-  .tidy-row.asking .tidy-x { display: none; }
-  .tidy-row.asking .tidy-m { display: none; }
+  .tidy-card.asking .tidy-ask { display: flex; }
+  .tidy-card.asking .tidy-x { display: none; }
+  .tidy-card.asking .tidy-m { display: none; }
   .tidy-yes { color: #c2566f; text-decoration: underline; }
   .tidy-no { color: #9d8390; text-decoration: underline; }
-  .tidy-sub { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12.5px; color: #a5808d;
-    margin: 12px 0 2px; }
   .tidy-none { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 12.5px; color: #b892a1; padding: 6px 0; }
 
   /* ---------- lock fade-out ---------- */
@@ -1401,7 +1415,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"ewOYI3ura1vKPpAAKsfqZw==","iv":"1U6RCOgQPI26N1ax","ct":"JBSr/0lvgdKeT6D1hQuiQKi55ly7RVu15AO17ECoWqJ0eKnXmJ/M552jUFYUCNKKU6LWcAeFli2i/qo8c/OQ80rOLTiA/vv4kauQmgR2Z4/SOn7sj9isW1Wy2nrUAd5/5zSk3/t1JzRHSXIV33epwQZwMqK/sk2bEQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"XjpQ4LIIXsY8zzZJHoLADg==","iv":"8O184i5vUAajgDVP","ct":"AuJWwZ7B5klEnBud7TquFXLXAbz90A+D16rZ39dw67BFfjlJjVhNtIdw9o1RJT0B4poJWu50KWat6oKxYBNM0KFU8fGRXlhd4T0rhyzMZRy9E6GJYfHvcbX2jh4xui8e4b4AiW5WDLY/ZJQjphs6DknLIPKantJSpg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -3201,31 +3215,95 @@
     markDebug("settings");
   }
 
-  /** One row: what it is, when it was, and the word "remove" — which becomes "remove this? yes / no". */
-  function tidyRow(kind, i, title, meta) {
-    return '<div class="tidy-row" data-k="' + kind + '" data-i="' + i + '">' +
-      '<span class="tidy-t">' + escW(title) + "</span>" +
-      '<span class="tidy-m">' + escW(meta) + "</span>" +
-      '<button class="tidy-x" data-tidy="ask">remove</button>' +
-      '<span class="tidy-ask">are you sure?' +
-        '<button class="tidy-yes" data-tidy="yes">yes</button>' +
-        '<button class="tidy-no" data-tidy="no">no</button>' +
+  // ---------- tidying up ----------
+  // Letters and notes, each behind its own heading, each opening onto the SAME month grid the board's
+  // calendar uses — one flat list of everything ever written was longer than the screen and told you
+  // nothing. And nothing here is described in words when it can simply be shown: a note is previewed as
+  // the note (the creator's own miniature trick — real markup at 300px, scaled down), a letter as the
+  // envelope it arrives in.
+  var tidy = { kind: "", y: new Date().getFullYear(), m: -1 };
+
+  var TIDY_MINI = 132;              // the preview box; 2 per row even on the narrowest phone
+  /** The creator's miniature, reused: the REAL note at 300px, scaled into a fixed box. */
+  function tidyMiniNote(n) {
+    var k = TIDY_MINI / 300;
+    return '<div class="tidy-mini" style="width:' + TIDY_MINI + 'px;height:' + (TIDY_MINI + 9) + 'px">' +
+      '<div class="tidy-shrink" style="transform:scale(' + k.toFixed(4) + ')">' +
+        noteInner(resolveNoteStyle(n), n.body, n.author, 300, noteDate(n.created_at)) +
+      "</div></div>";
+  }
+  /** A letter previewed as what it actually arrives as — the inbox envelope, in its own paper and tape. */
+  function tidyMiniLetter(l) {
+    var st = letterStyle(l);
+    var mark = st.s ? ltStickerSVG(st.s, 26) : "♡";
+    return '<span class="lt-row tidy-env" style="' + ltStyleVars(st) + '">' +
+      '<span class="lt-r-flap"></span>' +
+      '<span class="lt-r-stamp">' + mark + "</span>" +
+      '<span class="lt-r-slip">' +
+        '<span class="lt-r-title">' + escW(l.title || "a letter") + "</span>" +
+        '<span class="lt-r-meta">' + escW(letterFrom(l)) + " <i>·</i> " + escW(letterDateShort(l.created_at)) + "</span>" +
       "</span>" +
+    "</span>";
+  }
+  function tidyCard(kind, i, inner, meta) {
+    return '<div class="tidy-card" data-k="' + kind + '" data-i="' + i + '">' +
+      inner +
+      '<div class="tidy-foot">' +
+        '<span class="tidy-m">' + escW(meta) + "</span>" +
+        '<button class="tidy-x" data-tidy="ask">remove</button>' +
+        '<span class="tidy-ask">are you sure?' +
+          '<button class="tidy-yes" data-tidy="yes">yes</button>' +
+          '<button class="tidy-no" data-tidy="no">no</button>' +
+        "</span>" +
+      "</div>" +
     "</div>";
   }
   function tidyLists() {
-    var ls = LETTERS.map(function (l, i) {
-      return tidyRow("l", i, l.title || "a letter", letterFrom(l) + " · " + letterDateShort(l.created_at));
-    }).join("");
-    // newest first (the board keeps them oldest-first), but the index is the real one into WALL_NOTES
-    var ns = WALL_NOTES.map(function (n, i) { return { n: n, i: i }; }).reverse().map(function (o) {
-      var first = (o.n.body || "").replace(/\s+/g, " ").trim();
-      return tidyRow("n", o.i, first.slice(0, 42) || "a drawing", (o.n.author || "") + " · " + noteDate(o.n.created_at));
-    }).join("");
-    return '<div class="tidy-list">' +
-      '<div class="tidy-sub">letters</div>' + (ls || '<div class="tidy-none">none yet</div>') +
-      '<div class="tidy-sub">notes</div>' + (ns || '<div class="tidy-none">none yet</div>') +
+    function tab(kind, label, n) {
+      return '<button class="tidy-tab' + (tidy.kind === kind ? " on" : "") + '" data-tab="' + kind + '">' +
+        label + '<span class="tidy-n">' + n + "</span></button>";
+    }
+    var out = '<div class="tidy-tabs">' + tab("l", "letters", LETTERS.length) + tab("n", "notes", WALL_NOTES.length) + "</div>";
+    if (!tidy.kind) return out;
+
+    var list = tidy.kind === "l" ? LETTERS : WALL_NOTES;
+    var counts = monthCounts(list), now = new Date();
+    var years = {}; years[now.getFullYear()] = 1;
+    Object.keys(counts).forEach(function (k) { years[+k.split("-")[0]] = 1; });
+    var yList = Object.keys(years).map(Number).sort(function (a, b) { return a - b; });
+    var yi = yList.indexOf(tidy.y);
+    if (yi < 0) { tidy.y = yList[yList.length - 1]; yi = yList.length - 1; }
+
+    var cells = "";
+    for (var m = 0; m < 12; m++) {
+      var c = counts[tidy.y + "-" + m] || 0;
+      cells += '<button class="cal-m' + (tidy.m === m ? " sel" : "") + (c ? "" : " empty") + '"' +
+        ' data-tm="' + m + '"' + (c ? "" : " disabled") + ">" + MONTHS_SHORT[m] +
+        '<span class="n">' + (c || "—") + "</span></button>";
+    }
+    out += '<div class="tidy-cal">' +
+      '<div class="cal-year">' +
+        '<button class="cal-arrow" data-ty="-1"' + (yi <= 0 ? " disabled" : "") + ">‹</button>" +
+        "<span>" + tidy.y + "</span>" +
+        '<button class="cal-arrow" data-ty="1"' + (yi >= yList.length - 1 ? " disabled" : "") + ">›</button>" +
+      "</div>" +
+      '<div class="cal-grid">' + cells + "</div>" +
     "</div>";
+
+    if (tidy.m < 0) return out + '<div class="tidy-none">pick a month ♡</div>';
+    // newest first, but every card carries its REAL index into the array it came from
+    var items = list.map(function (it, i) { return { it: it, i: i }; }).filter(function (o) {
+      var ym = noteYM(o.it);
+      return ym.y === tidy.y && ym.m === tidy.m;
+    }).reverse();
+    if (!items.length) return out + '<div class="tidy-none">nothing in ' + MONTHS_SHORT[tidy.m] + " ♡</div>";
+    out += '<div class="tidy-grid ' + (tidy.kind === "n" ? "notes" : "letters") + '">' +
+      items.map(function (o) {
+        return tidy.kind === "l"
+          ? tidyCard("l", o.i, tidyMiniLetter(o.it), letterFrom(o.it) + " · " + letterDateShort(o.it.created_at))
+          : tidyCard("n", o.i, tidyMiniNote(o.it), (o.it.author || "") + " · " + noteDate(o.it.created_at));
+      }).join("") + "</div>";
+    return out;
   }
 
   function renderSettings() {
@@ -3289,9 +3367,18 @@
       if (!b) return;
       if (b.id === "setBack" || b.id === "setDone") { showWall(); return; }
 
+      var tab = b.getAttribute("data-tab");
+      if (tab) {
+        tidy.kind = tidy.kind === tab ? "" : tab;   // tapping the open one closes it again
+        tidy.m = -1;
+        renderSettings(); return;
+      }
+      if (b.hasAttribute("data-ty")) { tidy.y += +b.getAttribute("data-ty"); tidy.m = -1; renderSettings(); return; }
+      if (b.hasAttribute("data-tm")) { tidy.m = +b.getAttribute("data-tm"); renderSettings(); return; }
+
       var act = b.getAttribute("data-tidy");
       if (act) {
-        var row = b.closest(".tidy-row");
+        var row = b.closest(".tidy-card");
         if (act === "ask") { row.classList.add("asking"); return; }
         if (act === "no") { row.classList.remove("asking"); return; }
         var kind = row.getAttribute("data-k"), i = +row.getAttribute("data-i");
