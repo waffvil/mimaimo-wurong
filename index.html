@@ -1264,40 +1264,6 @@
     letter-spacing: 2px; text-transform: uppercase; color: #c07d95;
   }
 
-  /* TEMPORARY — see the veil element in the markup */
-  .veil {
-    position: fixed; inset: 0; z-index: 100000;   /* above the app, the modals and the dev bar */
-    background: #fff; display: flex; align-items: center; justify-content: center;
-    padding: 24px; text-align: center; cursor: default;
-    -webkit-tap-highlight-color: transparent; user-select: none;
-    transition: opacity 0.5s ease;
-  }
-  .veil.lifting { opacity: 0; pointer-events: none; }
-  .veil-mid { max-width: 260px; }
-  .veil p {
-    margin: 0; color: #8a8a8a; font-size: 15px; line-height: 1.6;
-    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-  }
-  /* the setup steps: quiet enough that the page still reads as "nothing here yet", clear enough to follow */
-  .veil-setup { margin-top: 34px; font-family: -apple-system, "Segoe UI", system-ui, sans-serif; }
-  .veil-h {
-    font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; color: #b8b8b8;
-    padding-bottom: 9px; border-bottom: 1px solid #ececec; margin-bottom: 12px;
-  }
-  /* list-style-position: inside puts the marker in the line box, so text-align centres the NUMBER with its
-     step rather than leaving the numbers hanging in a left-hand gutter. */
-  .veil-setup ol {
-    margin: 0; padding: 0; list-style-position: inside; text-align: center;
-    color: #8a8a8a; font-size: 14px; line-height: 1.9;
-  }
-  .veil-setup ol b { color: #6d6d6d; font-weight: 600; }
-  .veil-set { margin-top: 30px !important; font-size: 13px !important; color: #a8a8a8 !important; }
-  /* the one warm thing on the page, in the same marker hand as the app itself */
-  .veil-love {
-    margin: 30px 0 0 !important; font-family: "Gochi Hand", cursive !important;
-    font-size: 19px !important; line-height: 1.5 !important; color: #c48fa4 !important;
-  }
-
   /* 🔧 DEBUG BAR — dev only */
   .debugbar {
     position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%);
@@ -1332,30 +1298,6 @@
 </style>
 </head>
 <body>
-  <!-- ======================= TEMPORARY: the "not ready" veil =======================
-       Hides the whole app from anyone who opens the link before it's a gift. Deliberately plain: a white
-       screen and one line, nothing to poke at, nothing that hints there is more behind it.
-       The only way in is ten taps in quick succession. No URL flag and nothing remembered, so every launch
-       starts here — including from the Home Screen icon.
-       TO REMOVE LATER: delete this element, the .veil block in the stylesheet, and the veil script at the
-       very bottom of the page. Nothing else references it. -->
-  <div class="veil" id="veil">
-    <div class="veil-mid">
-      <p>your gift is not ready yet</p>
-      <div class="veil-setup" id="veilSetup">
-        <div class="veil-h">set up</div>
-        <ol>
-          <li>tap the <b>⋯</b> icon</li>
-          <li>share</li>
-          <li>scroll down</li>
-          <li>add to home screen</li>
-        </ol>
-      </div>
-      <p class="veil-set" id="veilSet" hidden>all set — it's on your home screen ♡</p>
-      <p class="veil-love">I love you my princess ♡</p>
-    </div>
-  </div>
-
   <!-- persistent living backdrop (gradient base on <body>) — shows behind every screen -->
   <div class="backdrop" id="backdrop">
     <div class="shimmer"></div>
@@ -1415,7 +1357,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"XjpQ4LIIXsY8zzZJHoLADg==","iv":"8O184i5vUAajgDVP","ct":"AuJWwZ7B5klEnBud7TquFXLXAbz90A+D16rZ39dw67BFfjlJjVhNtIdw9o1RJT0B4poJWu50KWat6oKxYBNM0KFU8fGRXlhd4T0rhyzMZRy9E6GJYfHvcbX2jh4xui8e4b4AiW5WDLY/ZJQjphs6DknLIPKantJSpg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"qyzLF7ryH/5nnvRQAmFKWQ==","iv":"YQqHIKIh9TMj1BRx","ct":"Lz+dhiPthh+GzvCYOBLNC/j9+U/PDSAAGh9p99CujMClM7d3dJ1JERQvbuoXLKviGks+OEMqYUKDYsFpucypexs/mNusSKXD9nm/LH0Ofw232sVdXGdRWb6i38fTd0Uqt871U955WohVRWaLJiv5mdCFmPAEZC0Dpw==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -4010,35 +3952,5 @@ if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
   });
 }
 </script>
-  <!-- ======================= TEMPORARY: the veil's only door ======================= -->
-  <script>
-  (function () {
-    var veil = document.getElementById("veil");
-    if (!veil) return;
-    // Ten taps to get in. The 2.5s is the most that may pass BETWEEN consecutive taps, rather than a window
-    // for all ten: at ten taps inside a single 2.5s window you'd need four a second through touch latency,
-    // which fails more often than it works. A rolling gap still means ten deliberate taps in a row and
-    // nothing accumulates from the odd stray one.
-    // Already installed? Then the steps are noise — she followed them, or never needed them.
-    var installed = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches)
-      || navigator.standalone === true;
-    if (installed) {
-      var setup = document.getElementById("veilSetup");
-      var set = document.getElementById("veilSet");
-      if (setup) setup.hidden = true;
-      if (set) set.hidden = false;
-    }
-
-    var taps = 0, last = 0;
-    veil.addEventListener("click", function () {
-      var now = Date.now();
-      taps = (now - last > 2500) ? 1 : taps + 1;
-      last = now;
-      if (taps < 10) return;
-      veil.classList.add("lifting");
-      setTimeout(function () { if (veil.parentNode) veil.parentNode.removeChild(veil); }, 520);
-    });
-  })();
-  </script>
 </body>
 </html>
