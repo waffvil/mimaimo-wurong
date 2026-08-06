@@ -1,11 +1,12 @@
 // M+V — "she left you a note" push.
 //
-// Two callers:
-//   · the after-insert trigger on public.notes (see the push_notifications_setup migration) — a real note
+// Three callers:
+//   · the after-insert trigger on public.notes   (push_notifications_setup) — a real note
+//   · the after-insert trigger on public.letters (letters_notify)           — a real letter
 //   · the app's "send a test ping" button — {test:true, who}, fixed text, so one phone can be tested alone
-// There was briefly a third — a "say something" mode that pushed arbitrary text from the browser. It is
+// There was briefly a fourth — a "say something" mode that pushed arbitrary text from the browser. It is
 // gone deliberately: a button that fires a notification per tap invites accidental spam and burns quota
-// for nothing. A push now only ever happens because a note was actually written.
+// for nothing. A push now only ever happens because a note or a letter was actually written.
 // verify_jwt is OFF because a Postgres trigger has no user JWT to send; each caller proves itself with its
 // own credential instead (x-mv-hook / x-mv-key), both checked below against public.app_secrets.
 //
@@ -67,6 +68,7 @@ Deno.serve(async (req) => {
 
   const payloadIn = await req.json().catch(() => ({}));
   const isTest = payloadIn.test === true;
+  const isLetter = payloadIn.kind === "letter";
 
   // Two callers, two credentials. The note hook is the database, which holds the hook secret. The test
   // ping is the app itself, which holds only the publishable key — the same key that can already read and
@@ -86,12 +88,17 @@ Deno.serve(async (req) => {
 
   const author: string | null = payloadIn.author ?? null;
   const noteBody: string = String(payloadIn.body ?? "");
+  const sentBy: string | null = payloadIn.sent_by ?? null;
+  const title: string = String(payloadIn.title ?? "").trim();
 
   const known = (w: unknown) => w === "em yêu" || w === "anh yêu";
   const other = (w: string) => (w === "em yêu" ? "anh yêu" : "em yêu");
-  // A test ping goes to whoever asked for it (you're testing your OWN phone); a note goes to the other
-  // person. No author on a note row shouldn't happen — tell both, better than silence.
+  // A test ping goes to whoever asked for it (you're testing your OWN phone). A note goes to the other
+  // person, worked out from who wrote it. A LETTER is worked out from sent_by — the phone it came from —
+  // never from `author`, which on a letter is a free-text signature the writer chose and may be anything
+  // at all. Unknown either way: tell both, which is better than silence.
   const target = isTest ? (known(payloadIn.who) ? payloadIn.who : null)
+    : isLetter ? (known(sentBy) ? other(sentBy as string) : null)
     : known(author) ? other(author as string) : null;
   if (isTest && !target) {
     return new Response(JSON.stringify({ sent: 0, note: "who?" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
@@ -109,11 +116,20 @@ Deno.serve(async (req) => {
     privateKey: secrets.vapid_private,
     subject: secrets.vapid_subject,
   };
+  // A letter's own words are never in the notification — it is long, it is private, and half of the gift is
+  // opening it. The card says one arrived, from whom, and what it's called.
   const notification = JSON.stringify(isTest
     ? {
       title: "test ping ♡",
       body: "if you can see this, notifications work",
       tag: "mv-test",
+      url: "./",
+    }
+    : isLetter
+    ? {
+      title: (author ? author + " sent you a letter" : "a letter for you") + " ♡",
+      body: title || "sealed — open it when you're ready",
+      tag: "mv-letter",       // its own tag, so a letter never collapses into the notes line
       url: "./",
     }
     : {
@@ -145,7 +161,7 @@ Deno.serve(async (req) => {
     }
   }));
 
-  console.log("notify-note", JSON.stringify({ test: isTest, author, target, results }));
+  console.log("notify-note", JSON.stringify({ test: isTest, letter: isLetter, author, target, results }));
   return new Response(JSON.stringify({ sent: results.filter((r) => r.status < 300 && r.status > 0).length, results }),
     { headers: { ...cors, "Content-Type": "application/json" } });
 });

@@ -34,3 +34,47 @@ create policy "letters read"   on public.letters for select to anon, authenticat
 create policy "letters insert" on public.letters for insert to anon, authenticated with check (char_length(body) >= 1);
 create policy "letters update" on public.letters for update to anon, authenticated using (true) with check (true);
 create policy "letters delete" on public.letters for delete to anon, authenticated using (true);
+
+-- ---------------------------------------------------------------------------------------------------
+-- A letter announces itself, the same way a note does. Applied live as migration `letters_notify`.
+-- Chain: letter inserted -> this trigger -> pg_net POST to notify-note (x-mv-hook) -> push to the OTHER
+-- phone. See supabase-push-setup.sql for the tables and secrets it leans on.
+--
+-- Two deliberate differences from the note hook:
+--   · it sends sent_by (the phone it came from), because `author` on a letter is a free-text signature the
+--     writer chose and can be anything at all — it must never decide who the letter is for;
+--   · it sends the TITLE and never the body. A letter is long and private, and opening it is half the gift.
+create or replace function public.notify_new_letter()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, extensions, net
+as $$
+declare
+  hook_secret text;
+  fn_url text;
+begin
+  select value into hook_secret from public.app_secrets where key = 'notify_hook_secret';
+  select value into fn_url      from public.app_secrets where key = 'notify_fn_url';
+  if hook_secret is null or fn_url is null then
+    return new;
+  end if;
+
+  perform net.http_post(
+    url     := fn_url,
+    body    := jsonb_build_object('kind', 'letter', 'id', new.id, 'author', new.author,
+                                  'title', new.title, 'sent_by', new.sent_by),
+    headers := jsonb_build_object('Content-Type', 'application/json', 'x-mv-hook', hook_secret),
+    timeout_milliseconds := 5000
+  );
+  return new;
+-- a push problem must never stop a letter from being sent
+exception when others then
+  return new;
+end;
+$$;
+
+drop trigger if exists letters_notify_insert on public.letters;
+create trigger letters_notify_insert
+  after insert on public.letters
+  for each row execute function public.notify_new_letter();
