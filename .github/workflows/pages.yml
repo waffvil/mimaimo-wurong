@@ -1,0 +1,48 @@
+name: Deploy to Pages
+
+# Why this exists: GitHub's LEGACY Pages builder started failing this repo on launch day — three builds in
+# a row came back "Page build failed" with no reason, each after sitting in the queue for ~12 minutes, while
+# the site kept serving an older commit. This publishes the repo as-is through Actions instead: no Jekyll,
+# no queue, about a minute end to end, and a log to read when something does go wrong.
+#
+# It uploads the CHECKOUT, which is exactly the tracked files — index.src.html, secret.txt and
+# phone-preview.html are git-ignored, so the plaintext passcode and keys cannot reach the artifact.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a run finish rather than cancelling it: a half-deployed site is worse than a slightly stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refuse to publish a build that still holds a secret
+        run: |
+          # build.js already refuses to WRITE such a file; this is the same check at the door, in case an
+          # index.html was ever committed by hand.
+          if grep -q "360809" index.html; then echo "index.html contains the passcode"; exit 1; fi
+          if grep -qE "supabase\.co/rest|sb_publishable_|eyJhbGciOi" index.html; then
+            echo "index.html contains Supabase credentials in the clear"; exit 1
+          fi
+          echo "index.html is clean ✓"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
