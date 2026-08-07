@@ -1056,8 +1056,12 @@
   .lt-writing .lt-titlein { margin: 2px 0 14px 42px; width: calc(100% - 42px); }
   .lt-writing .lt-write { min-height: 42vh; }
   /* the same ruled paper and the same hand the letter is read in, so what you write is what she sees */
+  /* The paper GROWS with the letter (see growWrite) rather than scrolling inside a fixed box: writing into
+     the bottom edge of a little window is nothing like writing on a page. resize is off because a height
+     dragged by hand would be overwritten by the next keystroke anyway; overflow is hidden because there is
+     never anything to scroll — the sheet is always as tall as the words plus a few spare lines. */
   .lt-write {
-    padding: 13px 15px; min-height: 46vh; resize: vertical;
+    padding: 13px 15px; min-height: 46vh; resize: none; overflow: hidden;
     font-family: "Caveat", cursive; font-weight: 500; font-size: 19px; line-height: 28px;
     background-color: var(--lp, #fffdf6);
     background-image: repeating-linear-gradient(180deg, transparent 0 27px, var(--lr, rgba(206,168,180,0.16)) 27px 28px);
@@ -1357,7 +1361,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"fjTWsSpwExefiyIGWc0DMQ==","iv":"dWmIJ6Ytl1NzNzpP","ct":"TsheD+tViAf01yLd/nTTSWN4uMkayuFJgVsnr64uB29E4Qv9sloxfnnIn0vwjrZTon1QqW5a4czb7FOmt012Qvu/zACBR70Jbfv63kSedypIbkWRIBCLqeofyngrBAlFAxIyPEaNKVvJ0lIUDFMVMoTy6Gl/I42+2g==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"PvShnIjxnmigEIRIw1dLKg==","iv":"Yv7T6becXRqSmF/d","ct":"qclZ5FS5G9XThuzKwSEPQrb5SYf29QTP+RdFHKDMAnZJKUVnuCIu8GvBaSI+bga2wZJ2mngQm0hjSV5+GCN+nk1ubh4EEJiTW1ypx25CAoMJz4k5ix+TXt+GEokXnQMoE7NNovA5Qs9GRnvAN3NC7jfNj1y3csyL3A==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2965,10 +2969,18 @@
       var words = t ? t.split(/\s+/).length : 0;
       count.textContent = words ? words + (words === 1 ? " word" : " words") : "";
     }
-    body.addEventListener("input", function () { letterView.draft = body.value; tally(); });
+    // Three spare lines under the last one, always. The ruling repeats every 28px, so this is exactly three
+    // more ruled lines of empty paper — enough that the line you are writing is never the bottom edge.
+    var SPARE_LINES = 3, LINE = 28;
+    function growWrite() {
+      body.style.height = "auto";                      // let it collapse to its content first…
+      body.style.height = (body.scrollHeight + SPARE_LINES * LINE) + "px";
+    }
+    body.addEventListener("input", function () { letterView.draft = body.value; tally(); growWrite(); });
     title.addEventListener("input", function () { letterView.title = title.value; });
     from.addEventListener("input", function () { letterView.author = from.value; });
     tally();
+    growWrite();
     body.focus();
 
     lettersEl.onclick = function (e) {
