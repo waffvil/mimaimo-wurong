@@ -1108,6 +1108,14 @@
     flex: 1 1 auto; min-height: 96px;   /* takes the room that's left, never shrinks below writable */
   }
   .letters.writing .lt-count, .letters.writing .lt-foot { flex: 0 0 auto; }
+  /* …and while the PAPER itself has focus, it takes the whole card: the heading and the footer step out of
+     the way, so writing is just paper and a word count. They come back the moment you tap out — and this
+     only happens for the message. Focusing the title or the "from" field leaves the layout exactly as it is,
+     because those are one-line fields you want to see the rest of the letter around. */
+  .letters.writing.zen .add-back,
+  .letters.writing.zen .lt-titlein,
+  .letters.writing.zen .lt-foot { display: none; }
+  .letters.writing.zen .lt-write { min-height: 140px; }
   .lt-count { margin-top: 9px; padding: 0 16.5px; text-align: right;
     font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11.5px; color: #b892a1; }
 
@@ -1399,7 +1407,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"rBpozaHZ11Jfw88h1tudjw==","iv":"SVY7vvfnMhtfOuvQ","ct":"vweQ70jDYh2aCXYcYIKibR0HDN6xETmyu6D0vUC2IK8upX+9acphokGJO0lhlk1PbQFvUJ28N1gbzgFqmCpKTf3eKHmSJBJhulXYuuzoXoRgEUyqfQXeYEy+4BlagmR0GVYgqAJ2/Vm1rnrDwzSNSJDVYo/GDt95Vw==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"RQcqzv+yHTuWXSO89zORNA==","iv":"q+2ukofCjj2CK624","ct":"GDXbFxGp31zS09w9g1oXEjpsAY7bIWSglLHCALxTngfmiFDUyku6JcYo+kkUQItR5jakwYvHaYF+jheQxvGPqjFZmHheV16Pk1v3z/KdyO2kI86BsbR5MRfMiwebfR9Q0eUG7P5KLkuEZEoo7m/BwWYHI8rlWxLAcQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2877,7 +2885,7 @@
     if (letterView.mode === "write") return renderLetterWrite();
     if (letterView.mode === "dress") return renderLetterDress();
 
-    lettersEl.classList.remove("writing");
+    lettersEl.classList.remove("writing", "zen");
     var mine = lettersForMe().length;
     var rows = LETTERS.map(function (l, i) {
       var sealed = !l.opened_at && pushWho && letterFrom(l) !== pushWho;
@@ -2931,6 +2939,7 @@
 
   function renderLetterRead() {
     lettersEl.classList.remove("writing");
+    lettersEl.classList.remove("zen");
     var l = letterView.letter;
     if (!l) { letterView.mode = "stack"; return renderLetters(); }
 
@@ -3011,10 +3020,16 @@
       count.textContent = words ? words + (words === 1 ? " word" : " words") : "";
     }
     body.addEventListener("input", function () { letterView.draft = body.value; tally(); });
+    // Only the message does this — see .letters.writing.zen. The title and the "from" field deliberately
+    // leave the layout alone.
+    body.addEventListener("focus", function () { lettersEl.classList.add("zen"); });
+    body.addEventListener("blur", function () { lettersEl.classList.remove("zen"); });
     title.addEventListener("input", function () { letterView.title = title.value; });
     from.addEventListener("input", function () { letterView.author = from.value; });
     tally();
-    body.focus();
+    // Deliberately NOT focused on open: focusing the message is what expands it (see .zen), so auto-focus
+    // would land you in the expanded view before you had touched anything — which is not the view you want
+    // to arrive at. On iOS a programmatic focus doesn't raise the keyboard anyway, so nothing is lost.
 
     lettersEl.onclick = function (e) {
       var b = e.target.closest("button");
@@ -3036,6 +3051,7 @@
   // same markup she will read, so there is no "and then it looks different when it sends".
   function renderLetterDress() {
     lettersEl.classList.remove("writing");
+    lettersEl.classList.remove("zen");
     var st = letterView.style;
     var signed = (letterView.author || "").trim() || pushWho || EM;
 
@@ -4002,7 +4018,13 @@
     var vv = window.visualViewport;
     if (!vv) return;
     function sync() {
-      var covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      // The keyboard's height is innerHeight - visualViewport.height, full stop. Subtracting offsetTop was
+      // WRONG: that is how far iOS has shifted the visual viewport, not part of the keyboard — and when it
+      // shifts by the keyboard's own height (which it does after you tap out and back into a field) the two
+      // cancelled and this reported ZERO with the keyboard still up. The screen then grew back to full
+      // height underneath it, the paper took the lot, and the from/next row ended up behind the keys.
+      var covered = window.innerHeight - vv.height;
+      if (covered < 60) covered = 0;        // a sliver is a toolbar or rounding, not a keyboard
       document.documentElement.style.setProperty("--kb", Math.round(covered) + "px");
     }
     vv.addEventListener("resize", sync);
