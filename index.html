@@ -1357,7 +1357,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"qyzLF7ryH/5nnvRQAmFKWQ==","iv":"YQqHIKIh9TMj1BRx","ct":"Lz+dhiPthh+GzvCYOBLNC/j9+U/PDSAAGh9p99CujMClM7d3dJ1JERQvbuoXLKviGks+OEMqYUKDYsFpucypexs/mNusSKXD9nm/LH0Ofw232sVdXGdRWb6i38fTd0Uqt871U955WohVRWaLJiv5mdCFmPAEZC0Dpw==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"fjTWsSpwExefiyIGWc0DMQ==","iv":"dWmIJ6Ytl1NzNzpP","ct":"TsheD+tViAf01yLd/nTTSWN4uMkayuFJgVsnr64uB29E4Qv9sloxfnnIn0vwjrZTon1QqW5a4czb7FOmt012Qvu/zACBR70Jbfv63kSedypIbkWRIBCLqeofyngrBAlFAxIyPEaNKVvJ0lIUDFMVMoTy6Gl/I42+2g==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2059,7 +2059,11 @@
       p256dh: keys.p256dh, auth: keys.auth, who: who,
       label: (pushInstalled() ? "home screen" : "browser") + " · " + (navigator.platform || "")
     };
-    var q = "?endpoint=eq." + encodeURIComponent(row.endpoint);
+    // Clear this DEVICE's old rows, not just this endpoint's. iOS mints a new endpoint every time the app
+    // is reinstalled or the subscription is recreated, so deleting by endpoint alone never matched anything
+    // and the rows piled up — one phone ended up registered four times, and every note was pushed to it
+    // four times over. Scoped to who + label, so a second device (a laptop browser, say) survives.
+    var q = "?who=eq." + encodeURIComponent(who) + "&label=eq." + encodeURIComponent(row.label);
     return fetch(subsEndpoint() + q, { method: "DELETE", headers: wallHeaders(false) })
       .then(function () {
         return fetch(subsEndpoint(), {
