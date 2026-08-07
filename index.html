@@ -1380,7 +1380,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"xLRiMb1RIVI9T8Z0kKbmtw==","iv":"l5sA7vMopvUiJX7I","ct":"qWjZvMtfargLIRR0CX9kd7DuyzlJBMYg0WgqI+VKeLMkKOpKtQkJWndnExWTWgHIui+W8bq3MkZvIksA3g+ElyZF99T621AGOw1S2wKAFr3M9VdVJbU5aFA51Bm+y1uyJANrnNXIOKexB9Zmy3iLLEQmUQiAxSDGKw==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"X45ITDiwK4Smn9I6hOt+CA==","iv":"Tls3xVBqXoV312O1","ct":"GEjYcYfhP6wO9iIiqkOwGDHMc2hM3nGtVyMVAEDz/6tVArGdYUWsWW/SYyy6XN1rZbAexITF0GZnizV1eN3XZ5HvH/qT4B6oOYOrRkM9L+G1wlHnFUBM14ddl5KyN9TxtOkYLiPayuj3w05xtkq1bZa7qfhWq7fpRA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2990,11 +2990,53 @@
     }
     // As long as the letter, always: the box is set to exactly the height of its own content, so there is
     // never anything to scroll inside it and never a line hidden below its edge.
+    // The scroll position is saved and put back around the measurement. Collapsing to `auto` makes the page
+    // briefly short, the browser clamps the scroll to the new bottom, and it never comes back on its own —
+    // which is what kept dragging the view back up the page on every keystroke.
     function growWrite() {
+      var keep = lettersEl.scrollTop;
       body.style.height = "auto";          // collapse to the content first, or it can only ever grow
       body.style.height = body.scrollHeight + "px";
+      lettersEl.scrollTop = keep;
     }
-    body.addEventListener("input", function () { letterView.draft = body.value; tally(); growWrite(); });
+
+    // WHERE THE CARET IS, in pixels down the paper. A textarea gives no way to ask, so this measures a
+    // hidden copy of the same element holding only the text up to the caret: same width, same font, same
+    // wrapping, so its height is where the caret line sits. (A clone rather than a div — the box metrics
+    // then match by construction instead of by a list of copied properties.)
+    var ghost = null;
+    function caretTop() {
+      if (!ghost) {
+        ghost = body.cloneNode(false);
+        ghost.removeAttribute("id");
+        ghost.setAttribute("aria-hidden", "true");
+        ghost.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;height:auto;" +
+          "min-height:0;max-height:none;overflow:hidden";
+        body.parentNode.appendChild(ghost);
+      }
+      ghost.style.width = body.getBoundingClientRect().width + "px";
+      // the zero-width space keeps a trailing newline from being ignored, so the caret on a fresh empty
+      // line reads as being on that line rather than on the one above it
+      ghost.value = body.value.slice(0, body.selectionStart) + "\u200b";
+      return ghost.scrollHeight;
+    }
+    // Keep the line being typed on inside a comfortable band — never under the keyboard, never jammed
+    // against the top. Measured in viewport coordinates, so the keyboard (--kb) and the curtain are both
+    // accounted for without knowing anything about the layout above.
+    function followCaret() {
+      var kb = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--kb")) || 0;
+      var y = body.getBoundingClientRect().top + caretTop();
+      var air = 3 * 28;                                   // three lines of room below the line you're on
+      var floor = window.innerHeight - kb - air;
+      var ceil = 96;
+      if (y > floor) lettersEl.scrollTop += y - floor;
+      else if (y < ceil) lettersEl.scrollTop -= ceil - y;
+    }
+    body.addEventListener("input", function () {
+      letterView.draft = body.value; tally(); growWrite(); followCaret();
+    });
+    // moving the caret with the arrow keys or by tapping should bring it into view too
+    body.addEventListener("keyup", function (e) { if (e.key && e.key.indexOf("Arrow") === 0) followCaret(); });
     title.addEventListener("input", function () { letterView.title = title.value; });
     from.addEventListener("input", function () { letterView.author = from.value; });
     tally();
