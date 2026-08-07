@@ -1026,7 +1026,10 @@
   .lt-body p { margin: 0 0 15px; }
   .lt-sign { margin-top: 22px; text-align: right; font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 24px; color: #a05a72; }
   /* the closing line of the letter: signature on the left, send on the right */
-  .lt-foot { display: flex; align-items: baseline; gap: 9px; margin-top: 18px; padding-top: 4px; }
+  /* THE LEFT EDGE. The message's box is flush with the card, but its writing starts 16.5px further in —
+     1.5px of border plus 15px of padding. So "from ___" and the word count are inset by exactly that,
+     and the signature sits on the same line the letter is written on rather than 16px to the left of it. */
+  .lt-foot { display: flex; align-items: baseline; gap: 9px; margin-top: 18px; padding: 4px 16.5px 0; }
   .lt-fromlabel { font-family: "Snell Roundhand","Segoe Script",cursive; font-size: 21px; color: #a05a72; margin-right: 2px; }
   /* "from ____" reads as the closing line of the letter, so the field sits inline with the word and is
      signed in the same script the letter is signed in. Free text: sign it however you like. */
@@ -1053,6 +1056,10 @@
   /* The title sits BESIDE the ← rather than below it: pushing it down left an empty band across the top of
      the page. Indented past the arrow (which occupies the first 34px of the content box) and narrowed to
      match, so the two read as one line. */
+  /* The title clears the ← and so is indented past it by design — it is a header sitting beside the arrow,
+     not part of the letter's own left edge. (Measured: its text starts 41px in from the writing's edge.
+     Lining the two up would mean pushing the title below the arrow, which is the empty band at the top of
+     the page we deliberately removed.) */
   .lt-writing .lt-titlein { margin: 2px 0 14px 42px; width: calc(100% - 42px); }
   .lt-writing .lt-write { min-height: 42vh; }
   /* the same ruled paper and the same hand the letter is read in, so what you write is what she sees */
@@ -1071,7 +1078,8 @@
     color: #7b5361;
   }
   .lt-titlein:focus, .lt-write:focus { border-color: #ff9dc2; }
-  .lt-count { margin-top: 9px; text-align: right; font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11.5px; color: #b892a1; }
+  .lt-count { margin-top: 9px; padding: 0 16.5px; text-align: right;
+    font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11.5px; color: #b892a1; }
 
   /* ---------- dressing the letter ----------
      Paper, tape and a sticker — the same three choices whether you are writing it, reading it, or looking at
@@ -1361,7 +1369,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"PvShnIjxnmigEIRIw1dLKg==","iv":"Yv7T6becXRqSmF/d","ct":"qclZ5FS5G9XThuzKwSEPQrb5SYf29QTP+RdFHKDMAnZJKUVnuCIu8GvBaSI+bga2wZJ2mngQm0hjSV5+GCN+nk1ubh4EEJiTW1ypx25CAoMJz4k5ix+TXt+GEokXnQMoE7NNovA5Qs9GRnvAN3NC7jfNj1y3csyL3A==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"PXVPZe4CnUo1tQcNDRISaA==","iv":"fgEq/bCBV/t7TuMv","ct":"449dGwf50f9ms2oMUEPKhr3N9/mJTvWyQ24tdUA6Tr7CkVnbZKtpz3APbIoUBg1Yc/cRF9KKVgGthP3ZVz0Tn5rdY/kOzM5qojw1PFUW8VRkXEDq6leiregSNwtB05YTYtoUG98yVhm/8heIDZQB5KfHCjxAPJbbHQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
