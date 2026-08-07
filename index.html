@@ -741,8 +741,11 @@
     /* Clear the notch at the top and the home indicator at the bottom. 26px alone put the back arrow and
        the title right up against the Dynamic Island — the safe-area inset is ~59px on these phones, and
        env() is 0 on a desktop so this is the same 26px there. */
+    /* --kb is however much of the screen the keyboard is covering (see the visualViewport block in the
+       script). iOS does NOT shrink the page when the keyboard opens, so without this everything below the
+       field you're typing in — the word count, "from", the send button — sits underneath it, unreachable. */
     padding: calc(26px + max(env(safe-area-inset-top), var(--sat, 0px))) 18px
-             calc(70px + max(env(safe-area-inset-bottom), var(--sab, 0px)));
+             calc(70px + max(env(safe-area-inset-bottom), var(--sab, 0px)) + var(--kb, 0px));
     color: #74505c;
     background-color: #fffaf1;
     background-image:
@@ -1191,7 +1194,7 @@
        which is too small to write in; trimming the two gutters and the miniature's reserved strip to
        just what it actually overlaps buys ~40px of width and puts the type back to ~16px. */
     .add { padding: calc(26px + max(env(safe-area-inset-top), var(--sat, 0px))) 14px
-                    calc(70px + max(env(safe-area-inset-bottom), var(--sab, 0px))); }
+                    calc(70px + max(env(safe-area-inset-bottom), var(--sab, 0px)) + var(--kb, 0px)); }
     /* the letters tab wears the curtain, so its paper starts below it rather than under it */
     .letters { padding-top: calc(max(58px, env(safe-area-inset-top), var(--sat, 0px)) + 26px); }
     .add-inner { padding: 18px 18px 22px; }
@@ -1368,7 +1371,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"e7+cTd/acknJwGV2abUuNw==","iv":"y1hxaAK9SPKbH++H","ct":"P7ceArB0IGFC4XtTD8ytqOhGrmUezi1kNhxKNYlhxg0XrdxtohlvxqcNOZUc9zcK7E+eDJKMjj0nruaM9F/15P/V8OKUJgFaZVmL5qYw5UCqNbDdocD1rFMxQv57iD+GTpuMZNGFFFI+yib2HvSnQmpjU7V6t/DFZA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"CwQ4/YTybDrM/8a8/jOrdg==","iv":"XD1YLZ05X+XazdxH","ct":"K+o91WkCcevcl8cuPAprsrhLp3CAI+5gOZihV5GiIxSqTViyl53Vov6Uv33xglvSMAK7Z4oQYmix95QVpifCu9H61ei4PliG1G1DRkxlTDPJL+6At7uiQs+10oKBdSbmAzxk4ncG3gMrQqqyAbK1nrfi7+JGtWT5cQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -3957,6 +3960,24 @@
   }
 
   
+  // ---------- the keyboard ----------
+  // On iOS the keyboard slides OVER the page: window.innerHeight never changes, so a form's footer ends up
+  // underneath it with no way to scroll to it. visualViewport is the part you can actually see, so the
+  // difference is what the keyboard covers — published as --kb, which the writing screens add to their
+  // bottom padding. Also fires on visualViewport scroll, because iOS shifts the visual viewport up as the
+  // caret moves rather than resizing anything.
+  (function () {
+    var vv = window.visualViewport;
+    if (!vv) return;
+    function sync() {
+      var covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty("--kb", Math.round(covered) + "px");
+    }
+    vv.addEventListener("resize", sync);
+    vv.addEventListener("scroll", sync);
+    sync();
+  })();
+
   warmChrome();    // build AND paint the curtain now, long before any screen needs to show it
 })();
 
