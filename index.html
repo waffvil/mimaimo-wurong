@@ -1070,11 +1070,11 @@
   .lt-writing .lt-titlein { margin: 2px 0 14px 42px; width: calc(100% - 42px); }
   .lt-writing .lt-write { min-height: 42vh; }
   /* the same ruled paper and the same hand the letter is read in, so what you write is what she sees */
-  /* A fixed sheet that scrolls INSIDE itself. (It briefly grew with the letter instead, which made the page
-     scroll and parked the line you were typing on the phone's bottom edge; and it briefly held three ruled
-     lines of empty paper below the text. Neither earned its keep.) */
+  /* The paper simply GETS LONGER as you write (see growWrite): no scrolling inside it, no shrinking to fit
+     the keyboard, nothing hidden while you type — the page scrolls, everything stays where it is and moves
+     down together. resize is off because a hand-set height would be overwritten by the next keystroke. */
   .lt-write {
-    padding: 13px 15px; min-height: 46vh; resize: vertical; overflow: auto;
+    padding: 13px 15px; min-height: 46vh; resize: none; overflow: hidden;
     font-family: "Caveat", cursive; font-weight: 500; font-size: 19px; line-height: 28px;
     background-color: var(--lp, #fffdf6);
     background-image: repeating-linear-gradient(180deg, transparent 0 27px, var(--lr, rgba(206,168,180,0.16)) 27px 28px);
@@ -1089,33 +1089,6 @@
     color: #7b5361;
   }
   .lt-titlein:focus, .lt-write:focus { border-color: #ff9dc2; }
-  /* ---------- writing: the page does not move ----------
-     The screen becomes a fixed column — heading, paper, footer — and the PAPER takes whatever height is
-     left and scrolls inside itself. Nothing else scrolls at all. `bottom: var(--kb)` lifts the whole screen
-     off the keyboard, so the footer stays in the light without the page having to be scrolled to find it
-     (which is what let a scroll wander off mid-sentence). */
-  .letters.writing {
-    bottom: var(--kb, 0px); overflow: hidden; touch-action: none;
-    /* The base .add padding adds --kb at the bottom so a SCROLLING screen can reach its own footer. This
-       screen doesn't scroll — it sits above the keyboard instead — so counting the keyboard twice would
-       push its footer back out of the box and hand the page 42px of scroll to give away. */
-    padding-bottom: 14px;
-  }
-  .letters.writing .lt-writing {
-    display: flex; flex-direction: column; height: 100%; box-sizing: border-box; margin: 0 auto;
-  }
-  .letters.writing .lt-write {
-    flex: 1 1 auto; min-height: 96px;   /* takes the room that's left, never shrinks below writable */
-  }
-  .letters.writing .lt-count, .letters.writing .lt-foot { flex: 0 0 auto; }
-  /* …and while the PAPER itself has focus, it takes the whole card: the heading and the footer step out of
-     the way, so writing is just paper and a word count. They come back the moment you tap out — and this
-     only happens for the message. Focusing the title or the "from" field leaves the layout exactly as it is,
-     because those are one-line fields you want to see the rest of the letter around. */
-  .letters.writing.zen .add-back,
-  .letters.writing.zen .lt-titlein,
-  .letters.writing.zen .lt-foot { display: none; }
-  .letters.writing.zen .lt-write { min-height: 140px; }
   .lt-count { margin-top: 9px; padding: 0 16.5px; text-align: right;
     font-family: "Bradley Hand","Segoe Print",cursive; font-size: 11.5px; color: #b892a1; }
 
@@ -1407,7 +1380,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"RQcqzv+yHTuWXSO89zORNA==","iv":"q+2ukofCjj2CK624","ct":"GDXbFxGp31zS09w9g1oXEjpsAY7bIWSglLHCALxTngfmiFDUyku6JcYo+kkUQItR5jakwYvHaYF+jheQxvGPqjFZmHheV16Pk1v3z/KdyO2kI86BsbR5MRfMiwebfR9Q0eUG7P5KLkuEZEoo7m/BwWYHI8rlWxLAcQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"xLRiMb1RIVI9T8Z0kKbmtw==","iv":"l5sA7vMopvUiJX7I","ct":"qWjZvMtfargLIRR0CX9kd7DuyzlJBMYg0WgqI+VKeLMkKOpKtQkJWndnExWTWgHIui+W8bq3MkZvIksA3g+ElyZF99T621AGOw1S2wKAFr3M9VdVJbU5aFA51Bm+y1uyJANrnNXIOKexB9Zmy3iLLEQmUQiAxSDGKw==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2885,7 +2858,6 @@
     if (letterView.mode === "write") return renderLetterWrite();
     if (letterView.mode === "dress") return renderLetterDress();
 
-    lettersEl.classList.remove("writing", "zen");
     var mine = lettersForMe().length;
     var rows = LETTERS.map(function (l, i) {
       var sealed = !l.opened_at && pushWho && letterFrom(l) !== pushWho;
@@ -2938,8 +2910,6 @@
   }
 
   function renderLetterRead() {
-    lettersEl.classList.remove("writing");
-    lettersEl.classList.remove("zen");
     var l = letterView.letter;
     if (!l) { letterView.mode = "stack"; return renderLetters(); }
 
@@ -2991,7 +2961,6 @@
   }
 
   function renderLetterWrite() {
-    lettersEl.classList.add("writing");     // page scrolling off; see .letters.writing
     // Shaped like a letter: title, then the message, then who it's from at the END where a signature goes.
     // Writing it and dressing it are two different jobs, so they are two steps — you finish the words, THEN
     // choose what it arrives in. Sending happens on that second step, at the end of the whole gesture.
@@ -3019,17 +2988,17 @@
       var words = t ? t.split(/\s+/).length : 0;
       count.textContent = words ? words + (words === 1 ? " word" : " words") : "";
     }
-    body.addEventListener("input", function () { letterView.draft = body.value; tally(); });
-    // Only the message does this — see .letters.writing.zen. The title and the "from" field deliberately
-    // leave the layout alone.
-    body.addEventListener("focus", function () { lettersEl.classList.add("zen"); });
-    body.addEventListener("blur", function () { lettersEl.classList.remove("zen"); });
+    // As long as the letter, always: the box is set to exactly the height of its own content, so there is
+    // never anything to scroll inside it and never a line hidden below its edge.
+    function growWrite() {
+      body.style.height = "auto";          // collapse to the content first, or it can only ever grow
+      body.style.height = body.scrollHeight + "px";
+    }
+    body.addEventListener("input", function () { letterView.draft = body.value; tally(); growWrite(); });
     title.addEventListener("input", function () { letterView.title = title.value; });
     from.addEventListener("input", function () { letterView.author = from.value; });
     tally();
-    // Deliberately NOT focused on open: focusing the message is what expands it (see .zen), so auto-focus
-    // would land you in the expanded view before you had touched anything — which is not the view you want
-    // to arrive at. On iOS a programmatic focus doesn't raise the keyboard anyway, so nothing is lost.
+    growWrite();
 
     lettersEl.onclick = function (e) {
       var b = e.target.closest("button");
@@ -3050,8 +3019,6 @@
   // previewed for real: the envelope above is the same markup the inbox draws, and the sheet below is the
   // same markup she will read, so there is no "and then it looks different when it sends".
   function renderLetterDress() {
-    lettersEl.classList.remove("writing");
-    lettersEl.classList.remove("zen");
     var st = letterView.style;
     var signed = (letterView.author || "").trim() || pushWho || EM;
 
