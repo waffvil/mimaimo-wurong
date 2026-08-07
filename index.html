@@ -1063,12 +1063,12 @@
   .lt-writing .lt-titlein { margin: 2px 0 14px 42px; width: calc(100% - 42px); }
   .lt-writing .lt-write { min-height: 42vh; }
   /* the same ruled paper and the same hand the letter is read in, so what you write is what she sees */
-  /* The paper GROWS with the letter (see growWrite) rather than scrolling inside a fixed box: writing into
-     the bottom edge of a little window is nothing like writing on a page. resize is off because a height
-     dragged by hand would be overwritten by the next keystroke anyway; overflow is hidden because there is
-     never anything to scroll — the sheet is always as tall as the words plus a few spare lines. */
+  /* A fixed sheet that scrolls INSIDE itself — growing it made the page scroll instead, which parked the
+     line you were typing on the very bottom edge of the phone. The room to write into comes from 84px of
+     padding under the text (three of the 28px ruled lines, and the ruling keeps repeating through it), plus
+     the nudge in renderLetterWrite that keeps the view at the end while you type. */
   .lt-write {
-    padding: 13px 15px; min-height: 46vh; resize: none; overflow: hidden;
+    padding: 13px 15px 84px; min-height: 46vh; resize: vertical; overflow: auto;
     font-family: "Caveat", cursive; font-weight: 500; font-size: 19px; line-height: 28px;
     background-color: var(--lp, #fffdf6);
     background-image: repeating-linear-gradient(180deg, transparent 0 27px, var(--lr, rgba(206,168,180,0.16)) 27px 28px);
@@ -1369,7 +1369,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"PXVPZe4CnUo1tQcNDRISaA==","iv":"fgEq/bCBV/t7TuMv","ct":"449dGwf50f9ms2oMUEPKhr3N9/mJTvWyQ24tdUA6Tr7CkVnbZKtpz3APbIoUBg1Yc/cRF9KKVgGthP3ZVz0Tn5rdY/kOzM5qojw1PFUW8VRkXEDq6leiregSNwtB05YTYtoUG98yVhm/8heIDZQB5KfHCjxAPJbbHQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"3XA5qH3NRlmZKveR+eMYDQ==","iv":"7LCRiI3Mk/cfsonD","ct":"G7Xeb9hBs9LouxzZXJbBf5vNHr9Vykna1v+sWJK5t0RESff5x0hTp5H3/nUESxrKuFFkB1CAnpKYVazq3cBhL3Mg+qKTHGKHmEfNf8+uECb5QMX3o3PjTHbXK0JzNSmRcM9ENgZMcDJgQoFD3i93iW3VAi7k6llq8g==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2977,19 +2977,19 @@
       var words = t ? t.split(/\s+/).length : 0;
       count.textContent = words ? words + (words === 1 ? " word" : " words") : "";
     }
-    // Three spare lines under the last one, always. The ruling repeats every 28px, so this is exactly three
-    // more ruled lines of empty paper — enough that the line you are writing is never the bottom edge.
-    var SPARE_LINES = 3, LINE = 28;
-    function growWrite() {
-      body.style.height = "auto";                      // let it collapse to its content first…
-      body.style.height = (body.scrollHeight + SPARE_LINES * LINE) + "px";
+    // Keep the blank lines UNDER the caret in view. The browser scrolls only far enough to reveal the caret,
+    // which leaves it on the box's bottom edge with the padding below the fold — so when you are typing at
+    // the end of the letter, we scroll all the way down instead. Only then: if you are editing further up,
+    // the view is yours and nothing moves.
+    function keepRoomBelow() {
+      if (body.selectionStart === body.value.length) body.scrollTop = body.scrollHeight;
     }
-    body.addEventListener("input", function () { letterView.draft = body.value; tally(); growWrite(); });
+    body.addEventListener("input", function () { letterView.draft = body.value; tally(); keepRoomBelow(); });
     title.addEventListener("input", function () { letterView.title = title.value; });
     from.addEventListener("input", function () { letterView.author = from.value; });
     tally();
-    growWrite();
     body.focus();
+    keepRoomBelow();
 
     lettersEl.onclick = function (e) {
       var b = e.target.closest("button");
