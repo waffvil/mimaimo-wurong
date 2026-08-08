@@ -1214,7 +1214,11 @@
                     calc(70px + max(env(safe-area-inset-bottom), var(--sab, 0px)) + var(--kb, 0px)); }
     /* the letters tab wears the curtain, so its paper starts below it rather than under it */
     .letters { padding-top: calc(max(58px, env(safe-area-inset-top), var(--sat, 0px)) + 26px); }
-    .add-inner { padding: 18px 18px 22px; }
+    /* A phone card, not a stretched sheet. .add-inner's 940px ceiling is a desktop measure: on a big phone
+       (660 CSS px wide and 1434 tall — an iPhone 17 Pro Max at DPR 2) the creator spread the whole width,
+       which put every row of chips in one long line and left the card sitting in the top quarter of the
+       screen. 540px keeps it the shape it is on a small phone, centred, whatever the screen does. */
+    .add-inner { padding: 18px 18px 22px; max-width: 540px; }
     .add-title { text-align: left; margin-left: 44px; padding-right: 104px; font-size: 26px; }
     .add-msg { padding-right: 104px; min-height: 108px; }
   }
@@ -1388,7 +1392,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"Kr9Hpq9tw/rZVhHW1xRB1g==","iv":"hkNothHz4tkdDB6D","ct":"EPk46v8wCA6yZxlmrsaaal0ijx8AH8VdG7oGYSzFJjniDYssND1APxJopdQWv0Xi33BONAxPcyz2GC5PfH3q4VRsR3LsLuHXSxbmBfusXxN9Vx0LDmQs6tRC2ET95tl+iASuZyFSlqa9hXz11k/yFTR4YXeHS45+EQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"QmjYCisquGBcuWODWDdQRQ==","iv":"IJ/Sa53kw/bBUy6h","ct":"7tcEAxUVN88vc+NLcaFIzGbZpQoyY/Ilo5KvU5DbCZzqyasZgXXyIHkRIShGCx+K2+QJXtLzLNRIDnrbb/ujWUjAZu20UY30a5PHOGV8D74bJzqoezDlEGZSKBO0YOEVy9HLEKY8FjzqGBRtoZ/4ZJ22PGkj1kJ5gg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
