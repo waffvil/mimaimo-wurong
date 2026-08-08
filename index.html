@@ -1388,7 +1388,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"fa2nnqW9dsSwwIFTOMOZNA==","iv":"5XmDLd0TFQ5WMfyO","ct":"VIUHjg+ZG7aq4RfsZsXOpkozKYRlYShKURSNVpChw7Fku4lFu0yxMbyCU/xy/9Ru9y8CAOUJyVyEnEyDI/YOerS9SXaAR1cLiz0Sd7t/N/o1LPBWcETSm9OAhGBWbJQKU++ZMe2K3gb/u+v8BGV4GiUAUcNx4IJj7A==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"Kr9Hpq9tw/rZVhHW1xRB1g==","iv":"hkNothHz4tkdDB6D","ct":"EPk46v8wCA6yZxlmrsaaal0ijx8AH8VdG7oGYSzFJjniDYssND1APxJopdQWv0Xi33BONAxPcyz2GC5PfH3q4VRsR3LsLuHXSxbmBfusXxN9Vx0LDmQs6tRC2ET95tl+iASuZyFSlqa9hXz11k/yFTR4YXeHS45+EQ==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2474,7 +2474,9 @@
     var wallNotes = document.getElementById("wallNotes");
     var bw = wallNotes.clientWidth || 340;
     var bh = wallNotes.clientHeight || 500;
-    var noteW = Math.min(190, Math.max(148, bw * 0.44));
+    // 0.44 of the board, floored at 148 so a narrow phone stays readable and capped at 250 so a big phone
+    // grows the notes with it instead of leaving them small in the middle of all that paper.
+    var noteW = Math.min(250, Math.max(148, bw * 0.44));
 
     if (!renderWall._ctx) renderWall._ctx = document.createElement("canvas").getContext("2d");
     var ctx = renderWall._ctx;
@@ -2575,6 +2577,22 @@
         }
       }
 
+      // --- a row with only ONE note (an odd last one, or a month holding a single note) has no neighbour
+      // to overlap, so the pair rule above never touches it and it stayed at its base width — a small note
+      // in the corner of an enormous empty board, which is exactly how a big phone showed a single note.
+      // It grows to a generous share of the width instead, and is centred below.
+      if (order.length % 2 === 1) {
+        var lastI = order.length - 1;
+        var room = wallW - 2 * (FRAME_INNER + FRAME_CLEAR);
+        var want = Math.max(pW[lastI], Math.round(wallW * 0.68));
+        for (var lp = 0; lp < 4; lp++) {                 // the lean's inset depends on the width, so settle it
+          var cap = Math.round(room - 2 * tiltPad(want, pS[lastI].tilt));
+          if (want <= cap) break;
+          want = cap;
+        }
+        pW[lastI] = want;
+      }
+
       // --- down: a row may only step as far as its SHORTER note allows, or that note leaves a gap under
       // itself. Otherwise keep the roomier 0.88 spacing.
       var accY = 20;                        // a little air under the header before the first row
@@ -2604,7 +2622,10 @@
         // container starts further in than the frame does. This is also what opens up the middle: the two
         // columns used to overlap by 51px on a 393px screen.
         var pOut = Math.round(FRAME_INNER + FRAME_CLEAR + tiltPad(nW, s.tilt) - pHostLeft);
-        if (c === 0) wrap.left = pOut + "px"; else wrap.right = pOut + "px";
+        // a note alone on its row is centred — there is no second column for it to lean away from
+        if (c === 0 && oi === order.length - 1) wrap.left = Math.round((bw - nW) / 2) + "px";
+        else if (c === 0) wrap.left = pOut + "px";
+        else wrap.right = pOut + "px";
         wrap.top = pRowTop[r] + "px";
         pBottom = Math.max(pBottom, pRowTop[r] + noteH);
       } else {
