@@ -466,7 +466,14 @@
   /* PHONE VIEW (exclusive): scalloped pink banner + ears round the Dynamic Island + a scalloped,
      dashed frame. The banner/ears/frame are pinned; the header + notes scroll underneath them.
      Rules scoped under .wall so they out-specify the base .wall-* rules later in this stylesheet. */
-  @media (max-width: 600px) {
+  /* IS THIS A PHONE?
+     Width alone was the test, and a big phone reporting more than 600px got the DESKTOP board: no curtain,
+     the spelled-out "9 months together" heading, notes placed by percentage — which is exactly what an
+     iPhone 17 Pro Max was showing. A touch screen with no mouse is a phone whatever width it claims, so it
+     is asked directly now, with width kept as the answer for a narrow window on a desktop.
+     ⚠ The JS copy of this test (isPhone) MUST stay identical: the phone layout positions notes in pixels,
+     so if the two ever disagree the board falls apart. */
+  @media (max-width: 700px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
     html, body { height: 100vh; overflow: hidden; overscroll-behavior: none; }   /* 100vh — see the chin-gap note up top */
     /* The WALL paints its own checkered pattern (see the base .wall rule) — it must, because the
        bloom→board heart reveal masks this element: the pattern has to travel with the mask so the heart
@@ -825,7 +832,8 @@
   .am-shrink { position: absolute; top: 9px; left: 0; width: 300px; height: 300px; transform-origin: top left; }
   .am-cap { display: block; text-align: center; margin-top: 3px; letter-spacing: 0.6px;
     font: 10px "Bradley Hand","Segoe Print",cursive; color: #c08fa2; }
-  @media (max-width: 620px) { .add-mini { width: 122px; } .am-window { width: 102px; height: 110px; } }
+  @media (max-width: 700px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+    .add-mini { width: 122px; } .am-window { width: 102px; height: 110px; } }
   .add-row { margin: 13px 0; }
   .add-label { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 15px; color: #b07890; margin-bottom: 7px; letter-spacing: 0.4px; }
   .add-opts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -1197,7 +1205,7 @@
 
   /* The miniature is pinned over the scrolling card, so the full-width things underneath it keep clear of
      its corner. The grid rows are short and left-aligned, so they simply pass under the empty part of it. */
-  @media (max-width: 620px) {
+  @media (max-width: 700px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
     /* Every millimetre here goes into the writing field, because its type size is now derived from its
        width (exact wrapping — see styleWriteField). At the old paddings the field came out at 12.8px,
        which is too small to write in; trimming the two gutters and the miniature's reserved strip to
@@ -1380,7 +1388,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"X45ITDiwK4Smn9I6hOt+CA==","iv":"Tls3xVBqXoV312O1","ct":"GEjYcYfhP6wO9iIiqkOwGDHMc2hM3nGtVyMVAEDz/6tVArGdYUWsWW/SYyy6XN1rZbAexITF0GZnizV1eN3XZ5HvH/qT4B6oOYOrRkM9L+G1wlHnFUBM14ddl5KyN9TxtOkYLiPayuj3w05xtkq1bZa7qfhWq7fpRA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"Ln8MRmEbnKURsVSIQjs9pA==","iv":"KX2OoMh9fMYJYb1E","ct":"on/f4pUxEjJqKttpAQFM085hZQDdpPljs3kXR1ZLtWzQvUnPfXGlM37z7Up/FmjQOVsu18lTEH30eEozv5iPV4QbJWdxMQwSvCgOUvjJapHGuKy3OvhyWhHwac1zGyPB3nK4i8tybRWqJfymqUgvxLqvLu6Sc5TtKw==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -1744,7 +1752,7 @@
     // would clobber the just-added (not-yet-committed) note. Fresh pulls happen on unlock.
     // Phone scrolls the whole document (see the max-width media query), so DON'T lock body overflow
     // there; "" clears the inline lock and lets the CSS (vertical scroll, no horizontal) win.
-    document.body.style.overflow = (window.innerWidth < 600) ? "" : "hidden";
+    document.body.style.overflow = isPhone() ? "" : "hidden";
     rootSkin("rt-board");
     markDebug("wall");
   }
@@ -2506,7 +2514,7 @@
     // phone: notes can't be placed/moved — they present systematically, in the order a
     // left→right, top→bottom scan of the desktop board hits them, then stack straight down.
     // the WHOLE board scrolls as one page (see the max-width media query); only the + stays pinned.
-    var PHONE = window.innerWidth < 600;
+    var PHONE = isPhone();
     wallNotes.classList.toggle("stack", PHONE);
     if (PHONE) NOTES.forEach(function (n) { n.locked = true; });
     var order = NOTES.map(function (n, i) { return i; });
@@ -3766,6 +3774,12 @@
   function thisMonthView() { var n = new Date(); return { all: false, y: n.getFullYear(), m: n.getMonth() }; }
   // A note with no date yet (just written, not saved) belongs to today — otherwise it would vanish the
   // moment it was pinned.
+  /** The one definition of "phone", kept in step BY HAND with the media query in the stylesheet. */
+  function isPhone() {
+    return window.innerWidth <= 700 ||
+      (window.matchMedia("(hover: none) and (pointer: coarse)").matches && window.innerWidth <= 1024);
+  }
+
   function noteYM(n) {
     var d = n.created_at ? new Date(n.created_at) : new Date();
     if (isNaN(d)) d = new Date();
