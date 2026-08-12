@@ -473,7 +473,7 @@
      is asked directly now, with width kept as the answer for a narrow window on a desktop.
      ⚠ The JS copy of this test (isPhone) MUST stay identical: the phone layout positions notes in pixels,
      so if the two ever disagree the board falls apart. */
-  @media (max-width: 750px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+  @media (max-width: 700px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
     html, body { height: 100vh; overflow: hidden; overscroll-behavior: none; }   /* 100vh — see the chin-gap note up top */
     /* The WALL paints its own checkered pattern (see the base .wall rule) — it must, because the
        bloom→board heart reveal masks this element: the pattern has to travel with the mask so the heart
@@ -832,7 +832,7 @@
   .am-shrink { position: absolute; top: 9px; left: 0; width: 300px; height: 300px; transform-origin: top left; }
   .am-cap { display: block; text-align: center; margin-top: 3px; letter-spacing: 0.6px;
     font: 10px "Bradley Hand","Segoe Print",cursive; color: #c08fa2; }
-  @media (max-width: 750px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+  @media (max-width: 700px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
     .add-mini { width: 122px; } .am-window { width: 102px; height: 110px; } }
   .add-row { margin: 13px 0; }
   .add-label { font-family: "Bradley Hand","Segoe Print",cursive; font-size: 15px; color: #b07890; margin-bottom: 7px; letter-spacing: 0.4px; }
@@ -1205,7 +1205,7 @@
 
   /* The miniature is pinned over the scrolling card, so the full-width things underneath it keep clear of
      its corner. The grid rows are short and left-aligned, so they simply pass under the empty part of it. */
-  @media (max-width: 750px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+  @media (max-width: 700px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
     /* Every millimetre here goes into the writing field, because its type size is now derived from its
        width (exact wrapping — see styleWriteField). At the old paddings the field came out at 12.8px,
        which is too small to write in; trimming the two gutters and the miniature's reserved strip to
@@ -1392,7 +1392,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"QmjYCisquGBcuWODWDdQRQ==","iv":"IJ/Sa53kw/bBUy6h","ct":"7tcEAxUVN88vc+NLcaFIzGbZpQoyY/Ilo5KvU5DbCZzqyasZgXXyIHkRIShGCx+K2+QJXtLzLNRIDnrbb/ujWUjAZu20UY30a5PHOGV8D74bJzqoezDlEGZSKBO0YOEVy9HLEKY8FjzqGBRtoZ/4ZJ22PGkj1kJ5gg==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"Y+dNpsvJqNmdC6KDM7iDuQ==","iv":"cW+dmlSpKQcWx2VB","ct":"hjE+fN25hTnVaqxn6rTJb8YuX3iAqJ8AV/G/cI1VCf/zkgm+B7fTXTFcaLtMEWEJml2gxOdyT5Ugn7huvrEJtRisYZBnGcSplnnqO70W/MTFSStLQuRl426649aE2PzsmLLh4wTEx1FGLoAhvbGp/z+/Zd1/AAA/jA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2478,9 +2478,11 @@
     var wallNotes = document.getElementById("wallNotes");
     var bw = wallNotes.clientWidth || 340;
     var bh = wallNotes.clientHeight || 500;
-    // 0.44 of the board, floored at 148 so a narrow phone stays readable and capped at 250 so a big phone
-    // grows the notes with it instead of leaving them small in the middle of all that paper.
-    var noteW = Math.min(250, Math.max(148, bw * 0.44));
+    // 0.44 of the board, floored at 148 so a narrow phone stays readable. The ceiling differs by layout on
+    // purpose: a phone board is one column of scrolling paper and a big phone needs bigger notes to fill it
+    // (250), while the desktop board is a wide wall holding many notes at once — letting them grow there
+    // just made each one huge (190, which is what it always was).
+    var noteW = Math.min(isPhone() ? 250 : 190, Math.max(148, bw * 0.44));
 
     if (!renderWall._ctx) renderWall._ctx = document.createElement("canvas").getContext("2d");
     var ctx = renderWall._ctx;
@@ -2581,22 +2583,6 @@
         }
       }
 
-      // --- a row with only ONE note (an odd last one, or a month holding a single note) has no neighbour
-      // to overlap, so the pair rule above never touches it and it stayed at its base width — a small note
-      // in the corner of an enormous empty board, which is exactly how a big phone showed a single note.
-      // It grows to a generous share of the width instead, and is centred below.
-      if (order.length % 2 === 1) {
-        var lastI = order.length - 1;
-        var room = wallW - 2 * (FRAME_INNER + FRAME_CLEAR);
-        var want = Math.max(pW[lastI], Math.round(wallW * 0.68));
-        for (var lp = 0; lp < 4; lp++) {                 // the lean's inset depends on the width, so settle it
-          var cap = Math.round(room - 2 * tiltPad(want, pS[lastI].tilt));
-          if (want <= cap) break;
-          want = cap;
-        }
-        pW[lastI] = want;
-      }
-
       // --- down: a row may only step as far as its SHORTER note allows, or that note leaves a gap under
       // itself. Otherwise keep the roomier 0.88 spacing.
       var accY = 20;                        // a little air under the header before the first row
@@ -2626,10 +2612,7 @@
         // container starts further in than the frame does. This is also what opens up the middle: the two
         // columns used to overlap by 51px on a 393px screen.
         var pOut = Math.round(FRAME_INNER + FRAME_CLEAR + tiltPad(nW, s.tilt) - pHostLeft);
-        // a note alone on its row is centred — there is no second column for it to lean away from
-        if (c === 0 && oi === order.length - 1) wrap.left = Math.round((bw - nW) / 2) + "px";
-        else if (c === 0) wrap.left = pOut + "px";
-        else wrap.right = pOut + "px";
+        if (c === 0) wrap.left = pOut + "px"; else wrap.right = pOut + "px";
         wrap.top = pRowTop[r] + "px";
         pBottom = Math.max(pBottom, pRowTop[r] + noteH);
       } else {
@@ -3801,7 +3784,7 @@
   // moment it was pinned.
   /** The one definition of "phone", kept in step BY HAND with the media query in the stylesheet. */
   function isPhone() {
-    return window.innerWidth <= 750 ||
+    return window.innerWidth <= 700 ||
       (window.matchMedia("(hover: none) and (pointer: coarse)").matches && window.innerWidth <= 1024);
   }
 
