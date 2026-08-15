@@ -881,6 +881,13 @@
      A letter has to READ like a letter: a generous measure, real paragraph spacing, handwriting rather
      than UI type, and no length limit anywhere in the chain. The stack lists them; sealed ones say only
      that they exist and who they're for. */
+  /* An overlay, so: no paper of its own (the .add rule paints a full cream sheet with the checkered
+     pattern — that's what made it read as a separate tab), just a dim wash the board shows through. It sits
+     BELOW the curtain (z8) on purpose, so the ornament stays crisp on top of it rather than being dimmed. */
+  .letters {
+    background-color: rgba(116,72,92,0.34); background-image: none;
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  }
   .letters .add-inner { max-width: 620px; }
   /* the header sits on one line — arrow, then the name, the way your mock has it — instead of a centred
      title with the arrow floating over it */
@@ -1026,8 +1033,11 @@
     background: repeating-linear-gradient(90deg, #e0a8bd 0 6px, transparent 6px 11px); }
   .lt-l-name { font-family: "Parisienne", cursive; font-size: 27px; color: #c9527d; line-height: 1.3; }
   .lt-l-tail { display: flex; justify-content: center; gap: 12px; margin-top: 20px; font-size: 12px; color: #e7aec1; }
+  /* It sits OUTSIDE the letter (a sibling of .add-inner), so width:100% meant the whole window — a
+     1707px-wide pill under a 620px letter. Same ceiling and the same auto margins as the letter itself, so
+     it stays exactly as wide as the paper it closes. */
   .lt-close {
-    display: block; width: 100%; margin: 26px 0 0; padding: 16px; border: none; border-radius: 999px;
+    display: block; width: 100%; max-width: 620px; margin: 26px auto 0; padding: 16px; border: none; border-radius: 999px;
     cursor: pointer; font-family: "Gochi Hand", cursive; font-size: 19px; color: #fff;
     background: linear-gradient(160deg,#f892b0,#e26e93); box-shadow: 0 8px 18px rgba(226,110,147,0.4);
   }
@@ -1392,7 +1402,7 @@
 
   
 
-  <script>window.ENC_PAYLOAD = {"salt":"Y+dNpsvJqNmdC6KDM7iDuQ==","iv":"cW+dmlSpKQcWx2VB","ct":"hjE+fN25hTnVaqxn6rTJb8YuX3iAqJ8AV/G/cI1VCf/zkgm+B7fTXTFcaLtMEWEJml2gxOdyT5Ugn7huvrEJtRisYZBnGcSplnnqO70W/MTFSStLQuRl426649aE2PzsmLLh4wTEx1FGLoAhvbGp/z+/Zd1/AAA/jA==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
+  <script>window.ENC_PAYLOAD = {"salt":"elVaGc8Ttc4qDSi4FQOWtQ==","iv":"MsbL0oPkErWLACgG","ct":"Z9oQlp1OSNuQGr2KqQVorAfIsReSfXDyRRIJit8cKI2MBBHAm+sBfNPuoTB4CWDX2lP2O5ll8WR8pg1dEfT9uJJwkjZ6jpWM8I7ZwbS82Kldu3el4V4X2Sc5NsY0+wB/IdOVZefVt/McgLxn8Zc+Nh2ptyUbnLFBXw==","iter":310000};</script><!-- build.js replaces this with the encrypted content in the published file -->
 <script>
 (function () {
   // DEV passcode for the un-encrypted source. build.js sets this to null in the
@@ -2837,17 +2847,21 @@
   var lettersEl = document.getElementById("letters");
   var letterView = { mode: "stack", letter: null, draft: "", title: "", author: null, style: null };
 
+  // The letters are an OVERLAY over the board, not a screen that replaces it: the wall is left exactly as it
+  // was, showing through behind, so closing the letters puts you back on the board you left — same notes,
+  // same scroll position, nothing re-rendered and nothing re-fetched.
   function showLetters(mode) {
     showChrome(true);
     rootSkin("rt-board");
     clearBloomTimers();
     bloomEl.classList.remove("show"); bloomEl.innerHTML = "";
-    wallEl.classList.remove("show"); wallEl.innerHTML = "";
     addEl.classList.remove("show"); addEl.innerHTML = "";
     drawEl.classList.remove("show"); drawEl.innerHTML = "";
     if (settingsEl) { settingsEl.classList.remove("show"); settingsEl.innerHTML = ""; }
     lockEl.style.display = "none";
     backdropEl.style.display = "none";
+    // if the board isn't up yet (a deep link straight to the letters), build it underneath first
+    if (!wallEl.classList.contains("show")) { wallEl.classList.add("show"); void wallEl.offsetWidth; renderWall(); }
     letterView = { mode: mode || "stack", letter: null, draft: "", title: "", author: pushWho || EM,
       style: ltStyleNew() };
     lettersEl.classList.add("show");
@@ -2867,6 +2881,15 @@
     lettersEl.style.display = "none";
     void lettersEl.offsetHeight;
     lettersEl.style.display = "";
+  }
+
+  /** Lift the overlay off the board. The board was never taken down, so there is nothing to rebuild. */
+  function hideLetters() {
+    lettersEl.classList.remove("show");
+    lettersEl.innerHTML = "";
+    letterView = { mode: "stack", letter: null, draft: "", title: "", author: null, style: null };
+    document.body.style.overflow = isPhone() ? "" : "hidden";
+    markDebug("wall");
   }
 
   function renderLetters() {
@@ -2913,7 +2936,7 @@
     lettersEl.onclick = function (e) {
       var b = e.target.closest("button");
       if (!b) return;
-      if (b.id === "ltBack") { showWall(); return; }
+      if (b.id === "ltBack") { hideLetters(); return; }
       if (b.id === "ltNew") { letterView.mode = "write"; renderLetters(); return; }
       var row = b.closest(".lt-row");
       if (row) {
