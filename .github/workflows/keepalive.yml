@@ -1,27 +1,45 @@
 name: Keep Supabase awake
 
-# Supabase free projects pause after ~7 days of no activity.
-# This pings the database on a schedule so our notes board never sleeps.
-# Runs every 3 days (comfortable buffer under the 7-day limit), and can be
-# triggered by hand from the Actions tab too.
+# Supabase pauses a Free project that doesn't see enough database activity over a 7-day window. Their docs
+# are specific about what "enough" means:
+#
+#   "Typically a few user requests to the database each day over the previous week is enough to keep the
+#    project from being paused."   — supabase.com/docs/guides/platform/free-project-pausing
+#
+# So it is FREQUENCY that counts, not volume: one big request (or one huge write, then deleting it) is still
+# one request. The old schedule ran once every three days — two or three requests a WEEK — and the project
+# was flagged for pausing anyway, despite every run succeeding. It now runs three times a day and makes a
+# handful of requests each time, which is comfortably inside what they ask for.
+#
+# It only ever READS. A read is a user query and counts the same, and it means this job can never touch a
+# note or a letter.
 
 on:
   schedule:
-    - cron: "0 9 */3 * *"   # 09:00 UTC, every 3rd day
-  workflow_dispatch:          # lets you run it manually anytime
+    - cron: "17 6 * * *"    # 06:17 UTC
+    - cron: "23 13 * * *"   # 13:23 UTC   (odd minutes on purpose: GitHub's cron
+    - cron: "41 20 * * *"   # 20:41 UTC    queue is busiest on the hour)
+  workflow_dispatch:        # and by hand from the Actions tab
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping the notes table
+      - name: A few requests to the database
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          curl --fail --silent --show-error \
-            "$SUPABASE_URL/rest/v1/notes?select=id&limit=1" \
-            -H "apikey: $SUPABASE_KEY" \
-            -H "Authorization: Bearer $SUPABASE_KEY" \
-            -o /dev/null
-          echo "Pinged Supabase — project kept awake. 🌸"
+          set -euo pipefail
+          ping () {   # $1 = path, $2 = what it is
+            code=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+              --max-time 20 "$SUPABASE_URL/rest/v1/$1" \
+              -H "apikey: $SUPABASE_KEY" -H "Authorization: Bearer $SUPABASE_KEY")
+            echo "  $2 -> HTTP $code"
+            case "$code" in 2*) return 0;; *) return 1;; esac
+          }
+          ping "notes?select=id&order=created_at.desc&limit=1"   "newest note"
+          ping "letters?select=id&order=created_at.desc&limit=1" "newest letter"
+          ping "notes?select=id"                                 "every note id"
+          ping "push_subs?select=who"                            "who's registered"
+          echo "Supabase pinged four times — kept awake. 🌸"
