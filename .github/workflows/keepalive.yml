@@ -11,8 +11,11 @@ name: Keep Supabase awake
 # was flagged for pausing anyway, despite every run succeeding. It now runs three times a day and makes a
 # handful of requests each time, which is comfortably inside what they ask for.
 #
-# It only ever READS. A read is a user query and counts the same, and it means this job can never touch a
-# note or a letter.
+# It reads, and it writes one row into public.keepalive — its own table, chosen deliberately:
+#   · public.letters has an after-insert trigger that PUSHES A NOTIFICATION to the other phone. A keepalive
+#     letter would ping her three times a day, forever, including at 6am.
+#   · anything in notes or letters would also show up on the board, in the inbox and in the tidying list.
+# public.keepalive has no trigger and no screen, so nothing it does can be seen or heard.
 
 on:
   schedule:
@@ -42,4 +45,20 @@ jobs:
           ping "letters?select=id&order=created_at.desc&limit=1" "newest letter"
           ping "notes?select=id"                                 "every note id"
           ping "push_subs?select=who"                            "who's registered"
-          echo "Supabase pinged four times — kept awake. 🌸"
+
+          # a write as well as reads — and a prune, so this table can never grow. Both are requests too.
+          stamp=$(date -u +%FT%TZ)
+          curl --silent --show-error --fail --output /dev/null \
+            --max-time 20 -X POST "$SUPABASE_URL/rest/v1/keepalive" \
+            -H "apikey: $SUPABASE_KEY" -H "Authorization: Bearer $SUPABASE_KEY" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"who\":\"github actions $stamp\"}"
+          echo "  wrote a keepalive row"
+
+          cutoff=$(date -u -d '3 days ago' +%FT%TZ 2>/dev/null || date -u -v-3d +%FT%TZ)
+          curl --silent --show-error --fail --output /dev/null \
+            --max-time 20 -X DELETE "$SUPABASE_URL/rest/v1/keepalive?at=lt.$cutoff" \
+            -H "apikey: $SUPABASE_KEY" -H "Authorization: Bearer $SUPABASE_KEY"
+          echo "  pruned anything older than $cutoff"
+
+          echo "Supabase pinged six times — kept awake, and nobody was notified. 🌸"
